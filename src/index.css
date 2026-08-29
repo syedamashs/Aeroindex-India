@@ -1,0 +1,122 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    @apply bg-slate-50 text-navy-900 font-sans antialiased;
+  }
+  * {
+    @apply border-slate-200;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-xl border border-slate-200 shadow-card;
+  }
+  .card-hover {
+    @apply transition-shadow duration-200 hover:shadow-card-hover;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-primary {
+    @apply btn bg-navy-800 text-white hover:bg-navy-700 active:bg-navy-900;
+  }
+  .btn-secondary {
+    @apply btn bg-white text-navy-800 border border-slate-300 hover:bg-slate-50;
+  }
+  .btn-ghost {
+    @apply btn text-navy-600 hover:bg-navy-50;
+  }
+  .input {
+    @apply w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-sm text-navy-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-navy-500/30 focus:border-navy-500 transition;
+  }
+  .select {
+    @apply input pr-8 appearance-none cursor-pointer;
+  }
+  .badge {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium;
+  }
+  .badge-success { @apply badge bg-success-500/10 text-success-600; }
+  .badge-warning { @apply badge bg-warning-500/10 text-warning-600; }
+  .badge-danger  { @apply badge bg-danger-500/10 text-danger-600; }
+  .badge-navy    { @apply badge bg-navy-100 text-navy-700; }
+  .badge-slate   { @apply badge bg-slate-100 text-slate-600; }
+  .section-title {
+    @apply text-lg font-display font-semibold text-navy-900;
+  }
+  .section-subtitle {
+    @apply text-sm text-slate-500;
+  }
+  .kpi-label {
+    @apply text-xs font-medium uppercase tracking-wider text-slate-500;
+  }
+  .kpi-value {
+    @apply text-3xl font-display font-bold text-navy-900;
+  }
+  .table-th {
+    @apply px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap;
+  }
+  .table-td {
+    @apply px-4 py-3 text-sm text-navy-800 whitespace-nowrap;
+  }
+  .table-row {
+    @apply border-t border-slate-100 hover:bg-slate-50 transition-colors;
+  }
+}
+
+/* Leaflet overrides for professional look */
+.leaflet-container {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 12px;
+}
+.leaflet-popup-content-wrapper {
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(15, 29, 56, 0.15);
+}
+.leaflet-popup-content {
+  margin: 12px 14px;
+}
+.leaflet-bar a {
+  border-radius: 6px !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 5px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* Recharts tooltip */
+.recharts-default-tooltip {
+  border-radius: 8px !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 4px 12px rgba(15, 29, 56, 0.08) !important;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+@media print {
+  .no-print { display: none !important; }
+  .print-full { width: 100% !important; max-width: none !important; }
+}
