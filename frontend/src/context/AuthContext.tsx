@@ -1,9 +1,10 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import type { UserRole, AuditEntry } from '@/data/types';
+import { apiLogin } from '@/lib/api';
 
 interface AuthContextValue {
   user: UserRole | null;
-  login: (email: string, password: string) => boolean;
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   auditLog: AuditEntry[];
   addAudit: (action: string, module: string) => void;
@@ -43,18 +44,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const login = (email: string, password: string): boolean => {
-    const account = DEMO_ACCOUNTS.find(
-      (a) => a.email.toLowerCase() === email.toLowerCase() && a.password === password,
-    );
-    if (account) {
-      const u: UserRole = { role: account.role, name: account.name, email: account.email };
+  const login = async (email: string, password: string): Promise<boolean> => {
+    try {
+      const response = await apiLogin(email, password);
+      const u: UserRole = {
+        role: response.user.role as UserRole['role'],
+        name: response.user.name,
+        email: response.user.email,
+      };
+
       setUser(u);
       sessionStorage.setItem(STORAGE_KEY, JSON.stringify(u));
       addAuditInternal(u, 'Login', 'Authentication');
       return true;
+    } catch (error) {
+      return false;
     }
-    return false;
   };
 
   const logout = () => {

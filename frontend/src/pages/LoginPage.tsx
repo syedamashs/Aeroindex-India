@@ -10,9 +10,10 @@ export function LoginPage() {
   const [password, setPassword] = useState('admin123');
   const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (login(email, password)) {
+    const ok = await login(email, password);
+    if (ok) {
       navigate('/dashboard');
     } else {
       setError('Invalid credentials. Use one of the demo accounts below.');

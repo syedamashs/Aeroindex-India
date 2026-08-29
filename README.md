@@ -20,6 +20,42 @@ AeroIndex India models the complete flow from airfare observation to decision su
 
 The application is a client-side React prototype. Its data source is designed behind a `DataSource` interface so a permitted live API or feed can be connected later.
 
+## Project Structure
+
+This project is now organized into a clear frontend/backend split:
+
+- `frontend/` - React + Vite UI
+- `backend/` - Express API server
+- `backend/data/mockData.json` - local mock dataset used before database integration
+- `README.md` - project overview and run instructions
+
+## Local Development Setup
+
+### 1. Start backend
+
+```bash
+cd backend
+node src/server.js
+```
+
+The backend runs on port `4002` in the current prototype setup.
+
+### 2. Start frontend
+
+```bash
+cd frontend
+npm install
+npm run dev -- --host 0.0.0.0
+```
+
+The frontend runs on `http://localhost:5173` by default.
+
+### 3. Access the app
+
+- Frontend: `http://localhost:5173`
+- Backend health: `http://localhost:4002/api/health`
+- Login endpoint: `POST http://localhost:4002/api/login`
+
 ## Main Technologies
 
 - React 18 with TypeScript
