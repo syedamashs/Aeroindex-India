@@ -1,19 +1,19 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Card } from '@/components/ui/Card';
 import { useApp } from '@/context/AppContext';
-import { getObservations } from '@/data/generator';
 import { AIRPORTS } from '@/data/airports';
 import { AIRLINES } from '@/data/airlines';
 import { formatINR } from '@/data/random';
 import { Search, Download, ChevronLeft, ChevronRight, ChevronsUpDown } from 'lucide-react';
 import type { Observation } from '@/data/types';
+import { apiObservations, type ApiFilters } from '@/lib/api';
 
 const PAGE_SIZE = 20;
 
 type SortKey = 'id' | 'collectionDate' | 'origin' | 'destination' | 'airline' | 'travelDate' | 'bookingWindow' | 'totalFare' | 'status';
 
 export function DataExplorerPage() {
-  const { lastUpdate } = useApp();
+  const { filters, lastUpdate } = useApp();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [origin, setOrigin] = useState('all');
@@ -22,38 +22,37 @@ export function DataExplorerPage() {
   const [status, setStatus] = useState('all');
   const [sortBy, setSortBy] = useState<SortKey>('collectionDate');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
+  const [data, setData] = useState<{ rows: Observation[]; total: number }> ({ rows: [], total: 0 });
+  const [loading, setLoading] = useState(true);
 
-  const allObs = useMemo(() => getObservations(), [lastUpdate]);
-
-  const filtered = useMemo(() => {
-    let result = allObs;
-    if (search) {
-      const q = search.toLowerCase();
-      result = result.filter(
-        (o) =>
-          o.id.toLowerCase().includes(q) ||
-          o.origin.toLowerCase().includes(q) ||
-          o.destination.toLowerCase().includes(q) ||
-          o.airline.toLowerCase().includes(q),
-      );
-    }
-    if (origin !== 'all') result = result.filter((o) => o.origin === origin);
-    if (destination !== 'all') result = result.filter((o) => o.destination === destination);
-    if (airline !== 'all') result = result.filter((o) => o.airline === airline);
-    if (status !== 'all') result = result.filter((o) => o.status === status);
-
-    result = [...result].sort((a, b) => {
-      const dir = sortDir === 'desc' ? -1 : 1;
-      const av = a[sortBy];
-      const bv = b[sortBy];
-      if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * dir;
-      return String(av).localeCompare(String(bv)) * dir;
-    });
-    return result;
-  }, [allObs, search, origin, destination, airline, status, sortBy, sortDir]);
-
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-  const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const apiFilters: ApiFilters = {
+          origin: origin !== 'all' ? origin : undefined,
+          destination: destination !== 'all' ? destination : undefined,
+          airline: airline !== 'all' ? airline : undefined,
+          status: status !== 'all' ? status : undefined,
+          search: search || undefined,
+          preset: filters.preset,
+          customStart: filters.customStart,
+          customEnd: filters.customEnd,
+          page,
+          pageSize: PAGE_SIZE,
+          sortBy: sortBy as string,
+          sortDir,
+        };
+        const res = await apiObservations(apiFilters);
+        setData({ rows: res.data.rows, total: res.data.total });
+      } catch (error) {
+        console.error('Failed to fetch observations:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [origin, destination, airline, status, search, page, sortBy, sortDir, filters.preset, filters.customStart, filters.customEnd, lastUpdate]);
 
   const handleSort = (key: SortKey) => {
     if (sortBy === key) {
@@ -67,7 +66,7 @@ export function DataExplorerPage() {
 
   const exportCSV = () => {
     const headers = ['Observation ID', 'Collection Date', 'Origin', 'Destination', 'Airline', 'Travel Date', 'Booking Window', 'Travel Class', 'Base Fare', 'Taxes', 'Fees', 'Total Fare', 'Currency', 'Source', 'Status'];
-    const rows = filtered.map((o: Observation) => [
+    const rows = data.rows.map((o: Observation) => [
       o.id, o.collectionDate, o.origin, o.destination, o.airline, o.travelDate, o.bookingWindow, o.travelClass, o.baseFare, o.taxes, o.fees, o.totalFare, o.currency, o.source, o.status,
     ]);
     const csv = [headers, ...rows].map((row) => row.join(',')).join('\n');
@@ -92,15 +91,18 @@ export function DataExplorerPage() {
     return <span className="badge-slate">{s}</span>;
   };
 
+  const totalPages = Math.ceil(data.total / PAGE_SIZE);
+  const paged = data.rows;
+
   return (
     <div className="animate-fade-in">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="font-display font-bold text-2xl lg:text-3xl text-navy-900">Data Explorer</h1>
-          <p className="text-slate-500 mt-1">Underlying airfare observations — {allObs.length.toLocaleString('en-IN')} total records</p>
+          <p className="text-slate-500 mt-1">Underlying airfare observations — {data.total.toLocaleString('en-IN')} total records</p>
         </div>
         <button onClick={exportCSV} className="btn-secondary">
-          <Download className="w-4 h-4" /> Export CSV ({filtered.length.toLocaleString('en-IN')})
+          <Download className="w-4 h-4" /> Export CSV ({data.total.toLocaleString('en-IN')})
         </button>
       </div>
 
@@ -180,20 +182,20 @@ export function DataExplorerPage() {
         {/* Pagination */}
         <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
           <p className="text-sm text-slate-500">
-            Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length.toLocaleString('en-IN')}
+            Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, data.total)} of {data.total.toLocaleString('en-IN')}
           </p>
           <div className="flex items-center gap-2">
             <button
               className="btn-secondary py-1.5 px-3"
               onClick={() => setPage(1)}
-              disabled={page === 1}
+              disabled={page === 1 || loading}
             >
               First
             </button>
             <button
               className="btn-secondary py-1.5 px-3"
               onClick={() => setPage(Math.max(1, page - 1))}
-              disabled={page === 1}
+              disabled={page === 1 || loading}
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -201,14 +203,14 @@ export function DataExplorerPage() {
             <button
               className="btn-secondary py-1.5 px-3"
               onClick={() => setPage(Math.min(totalPages, page + 1))}
-              disabled={page === totalPages}
+              disabled={page === totalPages || loading}
             >
               <ChevronRight className="w-4 h-4" />
             </button>
             <button
               className="btn-secondary py-1.5 px-3"
               onClick={() => setPage(totalPages)}
-              disabled={page === totalPages}
+              disabled={page === totalPages || loading}
             >
               Last
             </button>

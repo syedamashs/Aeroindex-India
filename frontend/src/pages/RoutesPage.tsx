@@ -1,23 +1,49 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/Card';
 import { FilterBar } from '@/components/FilterBar';
 import { useApp } from '@/context/AppContext';
-import { computeRouteStats, getAirportLabel } from '@/data/analytics';
+import { getAirportLabel } from '@/data/analytics';
 import { formatINR, formatPercent } from '@/data/random';
 import { Search, ArrowUp, ArrowDown, Minus, Download } from 'lucide-react';
 import type { RouteStats } from '@/data/types';
+import { apiRoutes, type ApiFilters } from '@/lib/api';
 
 type SortKey = keyof Pick<RouteStats, 'averageFare' | 'index' | 'momChange' | 'yoyChange' | 'observations' | 'volatility'>;
 
 export function RoutesPage() {
-  const { lastUpdate } = useApp();
+  const { filters, lastUpdate } = useApp();
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState<SortKey>('momChange');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
+  const [routeStats, setRouteStats] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const routeStats = useMemo(() => computeRouteStats(), [lastUpdate]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const apiFilters: ApiFilters = {
+          origin: filters.origin !== 'all' ? filters.origin : undefined,
+          destination: filters.destination !== 'all' ? filters.destination : undefined,
+          airline: filters.airline !== 'all' ? filters.airline : undefined,
+          travelClass: filters.travelClass !== 'all' ? filters.travelClass : undefined,
+          bookingWindow: filters.bookingWindow !== 'all' ? filters.bookingWindow : undefined,
+          preset: filters.preset,
+          customStart: filters.customStart,
+          customEnd: filters.customEnd,
+        };
+        const res = await apiRoutes(apiFilters);
+        setRouteStats(res.data);
+      } catch (error) {
+        console.error('Failed to fetch routes:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [filters, lastUpdate]);
 
   const filtered = useMemo(() => {
     let result = routeStats;

@@ -1,26 +1,44 @@
-import { useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine,
 } from 'recharts';
 import { Card } from '@/components/ui/Card';
 import { FilterBar } from '@/components/FilterBar';
 import { useApp } from '@/context/AppContext';
-import { computeBookingWindowStats } from '@/data/analytics';
 import { formatINR } from '@/data/random';
 import { Info, TrendingUp } from 'lucide-react';
 import { fareTooltipFormatter } from '@/components/chartFormatters';
+import { apiBookingWindow, type ApiFilters } from '@/lib/api';
 
 export function BookingWindowPage() {
   const { filters, lastUpdate } = useApp();
+  const [bwStats, setBwStats] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const bwStats = useMemo(
-    () => computeBookingWindowStats({
-      origin: filters.origin !== 'all' ? filters.origin : undefined,
-      destination: filters.destination !== 'all' ? filters.destination : undefined,
-      airline: filters.airline !== 'all' ? filters.airline : undefined,
-    }),
-    [filters, lastUpdate],
-  );
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const apiFilters: ApiFilters = {
+          origin: filters.origin !== 'all' ? filters.origin : undefined,
+          destination: filters.destination !== 'all' ? filters.destination : undefined,
+          airline: filters.airline !== 'all' ? filters.airline : undefined,
+          travelClass: filters.travelClass !== 'all' ? filters.travelClass : undefined,
+          bookingWindow: filters.bookingWindow !== 'all' ? filters.bookingWindow : undefined,
+          preset: filters.preset,
+          customStart: filters.customStart,
+          customEnd: filters.customEnd,
+        };
+        const res = await apiBookingWindow(apiFilters);
+        setBwStats(res.data);
+      } catch (error) {
+        console.error('Failed to fetch booking window stats:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [filters, lastUpdate]);
 
   const t45 = bwStats.find((b) => b.window === 45);
   const t1 = bwStats.find((b) => b.window === 1);
