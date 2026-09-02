@@ -26,7 +26,8 @@ This project is now organized into a clear frontend/backend split:
 
 - `frontend/` - React + Vite UI
 - `backend/` - Express API server
-- `backend/data/mockData.json` - local mock dataset used before database integration
+- `datasets/` - separate JSON files for users, airports, routes, airlines, and observations
+- `backend/scripts/generate_mock_data.py` - deterministic dataset generator
 - `README.md` - project overview and run instructions
 
 ## Local Development Setup
@@ -39,6 +40,8 @@ node src/server.js
 ```
 
 The backend runs on port `4002` in the current prototype setup.
+
+The backend reads the JSON files from the top-level `datasets/` directory and combines them into the API data model at runtime. To regenerate the deterministic dataset, run `python backend/scripts/generate_mock_data.py` from the project root.
 
 ### 2. Start frontend
 
@@ -72,12 +75,6 @@ The frontend runs on `http://localhost:5173` by default.
 
 ### Requirements
 
-- Node.js 18 or newer
-- npm
-
-### Install dependencies
-
-```bash
 npm install
 ```
 
@@ -102,9 +99,6 @@ npm run lint
 
 ## First-Time User Flow
 
-1. Open `/` to see the public landing page.
-2. Select **Enter Dashboard** to open the demo login page.
-3. Use one of the demo accounts below.
 4. After login, the protected dashboard opens at `/dashboard`.
 5. Use the desktop sidebar or mobile menu to move between modules.
 6. Use **Simulate Update** to append mock observations and refresh the analytics.

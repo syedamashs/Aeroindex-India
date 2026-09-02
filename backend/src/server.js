@@ -9,14 +9,19 @@ const PORT = 4002;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const dataPath = path.resolve(__dirname, '../data/mockData.json');
+const datasetsPath = path.resolve(__dirname, '../../datasets');
 
 app.use(cors());
 app.use(express.json());
 
 async function loadData() {
-  const raw = await readFile(dataPath, 'utf8');
-  return JSON.parse(raw);
+  const datasetNames = ['users', 'airports', 'routes', 'airlines', 'observations'];
+  const entries = await Promise.all(datasetNames.map(async (name) => {
+    const raw = await readFile(path.join(datasetsPath, `${name}.json`), 'utf8');
+    return [name, JSON.parse(raw)];
+  }));
+
+  return Object.fromEntries(entries);
 }
 
 function parseNumber(value, fallback = 0) {

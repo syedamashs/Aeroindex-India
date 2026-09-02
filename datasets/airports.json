@@ -1,0 +1,162 @@
+[
+  {
+    "code": "AMD",
+    "city": "Ahmedabad",
+    "state": "Gujarat",
+    "lat": 23.0225,
+    "lng": 72.5714,
+    "region": "West"
+  },
+  {
+    "code": "BLR",
+    "city": "Bengaluru",
+    "state": "Karnataka",
+    "lat": 12.9716,
+    "lng": 77.5946,
+    "region": "South"
+  },
+  {
+    "code": "BOM",
+    "city": "Mumbai",
+    "state": "Maharashtra",
+    "lat": 19.076,
+    "lng": 72.8777,
+    "region": "West"
+  },
+  {
+    "code": "CCU",
+    "city": "Kolkata",
+    "state": "West Bengal",
+    "lat": 22.5726,
+    "lng": 88.3639,
+    "region": "East"
+  },
+  {
+    "code": "COK",
+    "city": "Kochi",
+    "state": "Kerala",
+    "lat": 9.9312,
+    "lng": 76.2673,
+    "region": "South"
+  },
+  {
+    "code": "DEL",
+    "city": "New Delhi",
+    "state": "Delhi",
+    "lat": 28.6139,
+    "lng": 77.209,
+    "region": "North"
+  },
+  {
+    "code": "GAU",
+    "city": "Guwahati",
+    "state": "Assam",
+    "lat": 26.1445,
+    "lng": 91.7362,
+    "region": "North-East"
+  },
+  {
+    "code": "GOI",
+    "city": "Goa",
+    "state": "Goa",
+    "lat": 15.4989,
+    "lng": 73.8278,
+    "region": "West"
+  },
+  {
+    "code": "HYD",
+    "city": "Hyderabad",
+    "state": "Telangana",
+    "lat": 17.385,
+    "lng": 78.4867,
+    "region": "South"
+  },
+  {
+    "code": "IXB",
+    "city": "Bagdogra",
+    "state": "West Bengal",
+    "lat": 26.6831,
+    "lng": 88.3251,
+    "region": "North-East"
+  },
+  {
+    "code": "IXC",
+    "city": "Chandigarh",
+    "state": "Chandigarh",
+    "lat": 30.7333,
+    "lng": 76.7794,
+    "region": "North"
+  },
+  {
+    "code": "JAI",
+    "city": "Jaipur",
+    "state": "Rajasthan",
+    "lat": 26.9124,
+    "lng": 75.7873,
+    "region": "North"
+  },
+  {
+    "code": "LKO",
+    "city": "Lucknow",
+    "state": "Uttar Pradesh",
+    "lat": 26.8467,
+    "lng": 80.9462,
+    "region": "North"
+  },
+  {
+    "code": "MAA",
+    "city": "Chennai",
+    "state": "Tamil Nadu",
+    "lat": 13.0827,
+    "lng": 80.2707,
+    "region": "South"
+  },
+  {
+    "code": "NAG",
+    "city": "Nagpur",
+    "state": "Maharashtra",
+    "lat": 21.1458,
+    "lng": 79.0882,
+    "region": "Central"
+  },
+  {
+    "code": "PAT",
+    "city": "Patna",
+    "state": "Bihar",
+    "lat": 25.6154,
+    "lng": 85.1013,
+    "region": "East"
+  },
+  {
+    "code": "PNQ",
+    "city": "Pune",
+    "state": "Maharashtra",
+    "lat": 18.5204,
+    "lng": 73.8567,
+    "region": "West"
+  },
+  {
+    "code": "RPR",
+    "city": "Raipur",
+    "state": "Chhattisgarh",
+    "lat": 21.2514,
+    "lng": 81.6296,
+    "region": "Central"
+  },
+  {
+    "code": "TRV",
+    "city": "Thiruvananthapuram",
+    "state": "Kerala",
+    "lat": 8.5241,
+    "lng": 76.9366,
+    "region": "South"
+  },
+  {
+    "code": "VNS",
+    "city": "Varanasi",
+    "state": "Uttar Pradesh",
+    "lat": 25.3176,
+    "lng": 82.9739,
+    "region": "North"
+  }
+]

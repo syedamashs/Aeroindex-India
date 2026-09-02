@@ -60,7 +60,7 @@ export function LandingPage() {
               <ArrowRight className="w-5 h-5" />
             </button>
             <button
-              onClick={() => navigate('/methodology')}
+              onClick={() => navigate('/login', { state: { from: '/methodology' } })}
               className="btn bg-white/10 text-white border border-white/20 hover:bg-white/20 px-6 py-3 text-base font-semibold"
             >
               <BookOpen className="w-5 h-5" />

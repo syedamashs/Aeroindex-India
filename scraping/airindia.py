@@ -16,7 +16,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 PROFILE_DIR = PROJECT_ROOT / ".airindia_playwright_profile"
 
-OUTPUT_DIR = PROJECT_ROOT / "scraped_output"
+OUTPUT_DIR = Path(__file__).resolve().parent / "scraped_output"
 
 ORIGIN = "Madurai"
 DESTINATION = "Chennai"

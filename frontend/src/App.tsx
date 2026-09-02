@@ -41,7 +41,7 @@ function AppRoutes() {
       <Route path="/explorer" element={<ProtectedRoute><DataExplorerPage /></ProtectedRoute>} />
       <Route path="/alerts" element={<ProtectedRoute><AlertsPage /></ProtectedRoute>} />
       <Route path="/insights" element={<ProtectedRoute><InsightsPage /></ProtectedRoute>} />
-      <Route path="/methodology" element={<MethodologyPage />} />
+      <Route path="/methodology" element={<ProtectedRoute><MethodologyPage /></ProtectedRoute>} />
       <Route path="/system" element={<ProtectedRoute><SystemPage /></ProtectedRoute>} />
       <Route path="/audit" element={<ProtectedRoute><AuditLogPage /></ProtectedRoute>} />
       <Route path="*" element={<Navigate to="/" replace />} />

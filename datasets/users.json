@@ -1,0 +1,20 @@
+[
+  {
+    "role": "Administrator",
+    "name": "Admin User",
+    "email": "admin@aeroindex.gov.in",
+    "password": "admin123"
+  },
+  {
+    "role": "Analyst",
+    "name": "Analyst User",
+    "email": "analyst@aeroindex.gov.in",
+    "password": "analyst123"
+  },
+  {
+    "role": "Viewer",
+    "name": "Viewer User",
+    "email": "viewer@aeroindex.gov.in",
+    "password": "viewer123"
+  }
+]

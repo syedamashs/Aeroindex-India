@@ -1,6 +1,7 @@
 import json
 import random
 from datetime import date, timedelta
+from pathlib import Path
 
 random.seed(26056)
 
@@ -178,8 +179,13 @@ payload = {
     "observations": observations,
 }
 
-with open("backend/data/mockData.json", "w", encoding="utf-8") as f:
-    json.dump(payload, f, indent=2)
-    f.write("\n")
+project_root = Path(__file__).resolve().parents[2]
+datasets_dir = project_root / "datasets"
+datasets_dir.mkdir(parents=True, exist_ok=True)
+
+for name in ("users", "airports", "routes", "airlines", "observations"):
+    with (datasets_dir / f"{name}.json").open("w", encoding="utf-8") as f:
+        json.dump(payload[name], f, indent=2)
+        f.write("\n")
 
 print(f"Generated {len(payload['observations'])} observations for {len(payload['routes'])} routes.")

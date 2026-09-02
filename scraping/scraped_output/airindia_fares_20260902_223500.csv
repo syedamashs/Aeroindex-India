@@ -1,0 +1,4 @@
+﻿search_timestamp,departure_date,origin,destination,carrier,flight_id,air_bound_id,cabin,booking_class,fare_class,fare_family,fare_type,status_code,quota,base_fare,taxes,total_fees,total_fare,currency,price_source,advance_purchase_window
+2026-09-02 22:35:00,2026-09-04,IXM,MAA,AI,SEG-AI9608-IXMMAA-2026-09-04-1200,BC1-1-1I1AIZ_L18UI9HZRXEQMQC0REF6R4LNXEA8,eco,S,SL1YXYII,YXININ,unifares,HK,4,3583,1831,399,5813,INR,airOffer.totalPrice,2
+2026-09-02 22:35:00,2026-09-04,IXM,MAA,AI,SEG-AI9608-IXMMAA-2026-09-04-1200,BC1-1-1I1AIZ_BL6TADJDDQ9HTBOER20U4FBUH6WZ,eco,S,SL1YWYII,YWININ,unifares,HK,4,3983,1851,399,6233,INR,airOffer.totalPrice,2
+2026-09-02 22:35:00,2026-09-04,IXM,MAA,AI,SEG-AI9608-IXMMAA-2026-09-04-1200,BC1-1-1I1AIZ_W5S2XR0LMR5S0S5DRQDFR1BAU0W7,eco,S,SL1YFYII,YFININ,unifares,HK,4,4783,1891,399,7073,INR,airOffer.totalPrice,2

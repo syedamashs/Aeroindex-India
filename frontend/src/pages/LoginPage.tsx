@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth, DEMO_ACCOUNTS } from '@/context/AuthContext';
 import { Plane, Lock, Mail, ArrowRight, Info } from 'lucide-react';
 
 export function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState('admin@aeroindex.gov.in');
   const [password, setPassword] = useState('admin123');
   const [error, setError] = useState('');
@@ -14,7 +15,13 @@ export function LoginPage() {
     e.preventDefault();
     const ok = await login(email, password);
     if (ok) {
-      navigate('/dashboard');
+      const requestedPath = (location.state as { from?: unknown } | null)?.from;
+      const destination = typeof requestedPath === 'string'
+        && requestedPath.startsWith('/')
+        && !requestedPath.startsWith('//')
+        ? requestedPath
+        : '/dashboard';
+      navigate(destination, { replace: true });
     } else {
       setError('Invalid credentials. Use one of the demo accounts below.');
     }

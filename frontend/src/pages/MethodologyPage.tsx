@@ -89,74 +89,65 @@ export function MethodologyPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="animate-fade-in">
-      <div className="mb-6">
-        <h1 className="font-display font-bold text-2xl lg:text-3xl text-navy-900">Methodology</h1>
-        <p className="text-slate-500 mt-1">How AeroIndex India works — explained for non-technical readers</p>
+    <div className="animate-fade-in px-1 sm:px-2">
+      <div className="mb-7 flex flex-col gap-4 border-b border-slate-200 pb-6 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-accent-600">The measurement framework</p>
+          <h1 className="font-display text-2xl font-bold text-navy-900 lg:text-3xl">How AeroIndex works</h1>
+          <p className="mt-1.5 max-w-2xl text-sm text-slate-500">A transparent path from raw airfare observations to policy-ready signals.</p>
+        </div>
+        <div className="flex items-center gap-3 text-sm text-slate-500">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-success-500/10 text-success-600"><ShieldCheck className="h-4 w-4" /></span>
+          <span>Prototype framework<br /><strong className="font-semibold text-navy-800">January 2026 base period</strong></span>
+        </div>
+        <button onClick={() => navigate('/dashboard')} className="btn-primary self-start lg:self-auto">
+          Go to Dashboard <ArrowRight className="h-4 w-4" />
+        </button>
       </div>
 
-      <div className="space-y-5">
+      <div className="mb-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {PHASES.map((phase, phaseIndex) => (
-          <Card key={phase.label} className="overflow-hidden" bodyClassName="px-0 pb-0">
-            <div className="flex items-start gap-4 px-5 pb-4">
-              <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-navy-800 text-sm font-semibold text-white">
-                {phaseIndex + 1}
-              </div>
+          <div key={phase.label} className="relative border-t-2 border-navy-800 pt-4">
+            <div className="mb-3 flex items-start gap-3">
+              <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-navy-800 text-xs font-bold text-white">0{phaseIndex + 1}</span>
               <div>
-                <h2 className="font-display text-lg font-semibold text-navy-900">{phase.label}</h2>
-                <p className="mt-0.5 text-sm text-slate-500">{phase.description}</p>
+                <h2 className="font-display font-semibold text-navy-900">{phase.label}</h2>
+                <p className="mt-1 text-xs leading-relaxed text-slate-500">{phase.description}</p>
               </div>
             </div>
-            <div className="divide-y divide-slate-100 border-t border-slate-100">
-              {phase.items.map((s) => {
-                const Icon = s.icon;
+            <div className="space-y-2.5 pl-10">
+              {phase.items.map((section) => {
+                const Icon = section.icon;
                 return (
-                  <div key={s.title} className="flex items-start gap-4 px-5 py-4 lg:px-7">
-                    <Icon className="mt-0.5 h-4 w-4 flex-shrink-0 text-accent-600" />
-                    <div className="min-w-0">
-                      <h3 className="font-display font-semibold text-navy-900">{s.title.replace(/^\d+\.\s*/, '')}</h3>
-                      <p className="mt-1 max-w-4xl text-sm leading-relaxed text-slate-600">{s.body}</p>
-                    </div>
+                  <div key={section.title} className="flex items-center gap-2 text-sm text-slate-600">
+                    <Icon className="h-3.5 w-3.5 flex-shrink-0 text-accent-600" />
+                    <span>{section.title.replace(/^\d+\.\s*/, '')}</span>
                   </div>
                 );
               })}
             </div>
-          </Card>
+          </div>
         ))}
       </div>
 
-      <Card title="Future Production Integration" className="mt-6">
-        <div className="grid gap-3 md:grid-cols-3 mb-6">
-          {['Airline Portals', 'OTA Portals', 'Permitted APIs'].map((src, i) => (
-            <div key={src} className="flex items-center gap-3">
-              <div className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-center">
-                <span className="text-sm font-medium text-navy-800">{src}</span>
-              </div>
-              {i < 2 && <ArrowRight className="hidden h-4 w-4 flex-shrink-0 text-slate-300 md:block" />}
+      <Card title="From collection to decision support" subtitle="The production architecture is ready to accept a permitted live feed without changing the analysis layer." className="mb-6">
+        <div className="grid gap-3 md:grid-cols-2">
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Potential sources</p>
+            <div className="flex flex-wrap gap-2">
+              {['Airline portals', 'OTA feeds', 'Permitted APIs'].map((source) => <span key={source} className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-navy-800">{source}</span>)}
             </div>
-          ))}
-        </div>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {['Automated Collection', 'Validation', 'Database', 'Index'].map((stage, i) => (
-            <div key={stage} className="flex items-center gap-3">
-              <div className="w-full rounded-lg border border-navy-100 bg-navy-50 px-4 py-3 text-center">
-                <span className="text-sm font-medium text-navy-800">{stage}</span>
-              </div>
-              {i < 3 && <ArrowRight className="hidden h-4 w-4 flex-shrink-0 text-slate-300 lg:block" />}
+          </div>
+          <div className="rounded-lg border border-navy-100 bg-navy-50 p-4">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-navy-600">Processing path</p>
+            <div className="flex flex-wrap items-center gap-2 text-sm font-medium text-navy-800">
+              {['Collect', 'Validate', 'Normalize', 'Index'].map((stage, index) => <span key={stage} className="flex items-center gap-2">{stage}{index < 3 && <ArrowRight className="h-3.5 w-3.5 text-navy-400" />}</span>)}
             </div>
-          ))}
+          </div>
         </div>
-        <p className="text-sm text-slate-500 mt-6 text-center max-w-2xl mx-auto">
-          All production data collection will follow applicable website terms, robots.txt, rate limits,
-          API licensing and ethical data-collection requirements. The prototype does not currently scrape any live source.
-        </p>
+        <p className="mx-auto mt-5 max-w-3xl text-center text-xs leading-relaxed text-slate-500">All production data collection will follow applicable website terms, robots.txt, rate limits, API licensing, and ethical data-collection requirements. The prototype does not currently scrape any live source.</p>
       </Card>
 
-      <div className="text-center mt-8">
-        <button onClick={() => navigate('/dashboard')} className="btn-primary">
-          Go to Dashboard <ArrowRight className="w-4 h-4" />
-        </button>
-      </div>
     </div>
   );
 }

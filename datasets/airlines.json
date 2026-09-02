@@ -1,0 +1,38 @@
+[
+  {
+    "code": "6E",
+    "name": "Indigo",
+    "color": "#14b8a6",
+    "marketShare": 35
+  },
+  {
+    "code": "AI",
+    "name": "Air India",
+    "color": "#ef4444",
+    "marketShare": 25
+  },
+  {
+    "code": "IX",
+    "name": "Air India Express",
+    "color": "#f59e0b",
+    "marketShare": 18
+  },
+  {
+    "code": "QP",
+    "name": "Akasa Air",
+    "color": "#8b5cf6",
+    "marketShare": 12
+  },
+  {
+    "code": "SG",
+    "name": "SpiceJet",
+    "color": "#3b82f6",
+    "marketShare": 7
+  },
+  {
+    "code": "UK",
+    "name": "Vistara",
+    "color": "#ec4899",
+    "marketShare": 3
+  }
+]
