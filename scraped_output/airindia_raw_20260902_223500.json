@@ -1,0 +1,545 @@
+{
+  "code": "200",
+  "status": "SUCCESS",
+  "hasError": false,
+  "warnings": [
+    {
+      "code": "40003",
+      "title": "MISSING FREE BAGGAGE DETAILS",
+      "detail": "Missing Free baggage Details"
+    }
+  ],
+  "responsePayload": [
+    {
+      "airBoundGroups": [
+        {
+          "boundDetails": {
+            "originLocationCode": "IXM",
+            "destinationLocationCode": "MAA",
+            "duration": 4200,
+            "ranking": 1,
+            "segments": [
+              {
+                "flightId": "SEG-AI9608-IXMMAA-2026-09-04-1200"
+              }
+            ],
+            "isHubAndSpokeEligible": false
+          },
+          "airBounds": [
+            {
+              "airBoundId": "BC1-1-1I1AIZ_L18UI9HZRXEQMQC0REF6R4LNXEA8",
+              "fareFamilyCode": "YXININ",
+              "isCheapestOffer": true,
+              "availabilityDetails": [
+                {
+                  "flightId": "SEG-AI9608-IXMMAA-2026-09-04-1200",
+                  "cabin": "eco",
+                  "bookingClass": "S",
+                  "statusCode": "HK",
+                  "quota": 4
+                }
+              ],
+              "fareInfos": [
+                {
+                  "fareType": "unifares",
+                  "fareClass": "SL1YXYII",
+                  "pricedPassengerTypeCodes": [
+                    "ADT"
+                  ],
+                  "travelerIds": [
+                    "ADT-1"
+                  ],
+                  "flightIds": [
+                    "SEG-AI9608-IXMMAA-2026-09-04-1200"
+                  ]
+                }
+              ],
+              "prices": {
+                "unitPrices": [
+                  {
+                    "travelerIds": [
+                      "ADT-1"
+                    ],
+                    "prices": [
+                      {
+                        "base": 3583,
+                        "total": 5813,
+                        "currencyCode": "INR",
+                        "taxes": [
+                          {
+                            "value": 469,
+                            "currencyCode": "INR",
+                            "code": "YQYR"
+                          }
+                        ],
+                        "totalTaxes": 1831
+                      }
+                    ]
+                  }
+                ],
+                "totalPrices": [
+                  {
+                    "base": 3583,
+                    "total": 5813,
+                    "currencyCode": "INR",
+                    "taxes": [
+                      {
+                        "value": 469,
+                        "currencyCode": "INR",
+                        "code": "YQYR"
+                      }
+                    ],
+                    "totalTaxes": 1831
+                  }
+                ]
+              },
+              "services": [
+                {
+                  "serviceCode": "FBA1",
+                  "flightIds": [
+                    "SEG-AI9608-IXMMAA-2026-09-04-1200"
+                  ]
+                }
+              ],
+              "airOffer": {
+                "totalPrice": {
+                  "value": 5813,
+                  "currencyCode": "INR"
+                },
+                "prices": {
+                  "unitPrices": [
+                    {
+                      "travelerIds": [
+                        "ADT-1"
+                      ],
+                      "prices": [
+                        {
+                          "base": 3583,
+                          "total": 5813,
+                          "currencyCode": "INR",
+                          "taxes": [
+                            {
+                              "value": 469,
+                              "currencyCode": "INR",
+                              "code": "YQYR"
+                            }
+                          ],
+                          "totalTaxes": 1831
+                        }
+                      ]
+                    }
+                  ],
+                  "totalPrices": [
+                    {
+                      "base": 3583,
+                      "total": 5813,
+                      "currencyCode": "INR",
+                      "taxes": [
+                        {
+                          "value": 469,
+                          "currencyCode": "INR",
+                          "code": "YQYR"
+                        }
+                      ],
+                      "totalTaxes": 1831,
+                      "totalFees": 399
+                    }
+                  ]
+                }
+              },
+              "aiUnitPrice": {
+                "value": 5414,
+                "originalValue": 5414,
+                "currencyCode": "INR"
+              }
+            },
+            {
+              "airBoundId": "BC1-1-1I1AIZ_BL6TADJDDQ9HTBOER20U4FBUH6WZ",
+              "fareFamilyCode": "YWININ",
+              "availabilityDetails": [
+                {
+                  "flightId": "SEG-AI9608-IXMMAA-2026-09-04-1200",
+                  "cabin": "eco",
+                  "bookingClass": "S",
+                  "statusCode": "HK",
+                  "quota": 4
+                }
+              ],
+              "fareInfos": [
+                {
+                  "fareType": "unifares",
+                  "fareClass": "SL1YWYII",
+                  "pricedPassengerTypeCodes": [
+                    "ADT"
+                  ],
+                  "travelerIds": [
+                    "ADT-1"
+                  ],
+                  "flightIds": [
+                    "SEG-AI9608-IXMMAA-2026-09-04-1200"
+                  ]
+                }
+              ],
+              "prices": {
+                "unitPrices": [
+                  {
+                    "travelerIds": [
+                      "ADT-1"
+                    ],
+                    "prices": [
+                      {
+                        "base": 3983,
+                        "total": 6233,
+                        "currencyCode": "INR",
+                        "taxes": [
+                          {
+                            "value": 469,
+                            "currencyCode": "INR",
+                            "code": "YQYR"
+                          }
+                        ],
+                        "totalTaxes": 1851
+                      }
+                    ]
+                  }
+                ],
+                "totalPrices": [
+                  {
+                    "base": 3983,
+                    "total": 6233,
+                    "currencyCode": "INR",
+                    "taxes": [
+                      {
+                        "value": 469,
+                        "currencyCode": "INR",
+                        "code": "YQYR"
+                      }
+                    ],
+                    "totalTaxes": 1851
+                  }
+                ]
+              },
+              "services": [
+                {
+                  "serviceCode": "FBA2",
+                  "flightIds": [
+                    "SEG-AI9608-IXMMAA-2026-09-04-1200"
+                  ]
+                }
+              ],
+              "airOffer": {
+                "totalPrice": {
+                  "value": 6233,
+                  "currencyCode": "INR"
+                },
+                "prices": {
+                  "unitPrices": [
+                    {
+                      "travelerIds": [
+                        "ADT-1"
+                      ],
+                      "prices": [
+                        {
+                          "base": 3983,
+                          "total": 6233,
+                          "currencyCode": "INR",
+                          "taxes": [
+                            {
+                              "value": 469,
+                              "currencyCode": "INR",
+                              "code": "YQYR"
+                            }
+                          ],
+                          "totalTaxes": 1851
+                        }
+                      ]
+                    }
+                  ],
+                  "totalPrices": [
+                    {
+                      "base": 3983,
+                      "total": 6233,
+                      "currencyCode": "INR",
+                      "taxes": [
+                        {
+                          "value": 469,
+                          "currencyCode": "INR",
+                          "code": "YQYR"
+                        }
+                      ],
+                      "totalTaxes": 1851,
+                      "totalFees": 399
+                    }
+                  ]
+                }
+              },
+              "aiUnitPrice": {
+                "value": 5834,
+                "originalValue": 5834,
+                "currencyCode": "INR"
+              }
+            },
+            {
+              "airBoundId": "BC1-1-1I1AIZ_W5S2XR0LMR5S0S5DRQDFR1BAU0W7",
+              "fareFamilyCode": "YFININ",
+              "availabilityDetails": [
+                {
+                  "flightId": "SEG-AI9608-IXMMAA-2026-09-04-1200",
+                  "cabin": "eco",
+                  "bookingClass": "S",
+                  "statusCode": "HK",
+                  "quota": 4
+                }
+              ],
+              "fareInfos": [
+                {
+                  "fareType": "unifares",
+                  "fareClass": "SL1YFYII",
+                  "pricedPassengerTypeCodes": [
+                    "ADT"
+                  ],
+                  "travelerIds": [
+                    "ADT-1"
+                  ],
+                  "flightIds": [
+                    "SEG-AI9608-IXMMAA-2026-09-04-1200"
+                  ]
+                }
+              ],
+              "prices": {
+                "unitPrices": [
+                  {
+                    "travelerIds": [
+                      "ADT-1"
+                    ],
+                    "prices": [
+                      {
+                        "base": 4783,
+                        "total": 7073,
+                        "currencyCode": "INR",
+                        "taxes": [
+                          {
+                            "value": 469,
+                            "currencyCode": "INR",
+                            "code": "YQYR"
+                          }
+                        ],
+                        "totalTaxes": 1891
+                      }
+                    ]
+                  }
+                ],
+                "totalPrices": [
+                  {
+                    "base": 4783,
+                    "total": 7073,
+                    "currencyCode": "INR",
+                    "taxes": [
+                      {
+                        "value": 469,
+                        "currencyCode": "INR",
+                        "code": "YQYR"
+                      }
+                    ],
+                    "totalTaxes": 1891
+                  }
+                ]
+              },
+              "services": [
+                {
+                  "serviceCode": "FBA3",
+                  "flightIds": [
+                    "SEG-AI9608-IXMMAA-2026-09-04-1200"
+                  ]
+                }
+              ],
+              "airOffer": {
+                "totalPrice": {
+                  "value": 7073,
+                  "currencyCode": "INR"
+                },
+                "prices": {
+                  "unitPrices": [
+                    {
+                      "travelerIds": [
+                        "ADT-1"
+                      ],
+                      "prices": [
+                        {
+                          "base": 4783,
+                          "total": 7073,
+                          "currencyCode": "INR",
+                          "taxes": [
+                            {
+                              "value": 469,
+                              "currencyCode": "INR",
+                              "code": "YQYR"
+                            }
+                          ],
+                          "totalTaxes": 1891
+                        }
+                      ]
+                    }
+                  ],
+                  "totalPrices": [
+                    {
+                      "base": 4783,
+                      "total": 7073,
+                      "currencyCode": "INR",
+                      "taxes": [
+                        {
+                          "value": 469,
+                          "currencyCode": "INR",
+                          "code": "YQYR"
+                        }
+                      ],
+                      "totalTaxes": 1891,
+                      "totalFees": 399
+                    }
+                  ]
+                }
+              },
+              "aiUnitPrice": {
+                "value": 6674,
+                "originalValue": 6674,
+                "currencyCode": "INR"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "dictionaries": {
+    "location": {
+      "MAA": {
+        "type": "airport",
+        "airportName": "CHENNAI INTERNATIONAL",
+        "cityCode": "MAA",
+        "cityName": "CHENNAI",
+        "stateCode": "TN",
+        "countryCode": "IN"
+      },
+      "IXM": {
+        "type": "airport",
+        "airportName": "MADURAI",
+        "cityCode": "IXM",
+        "cityName": "MADURAI",
+        "stateCode": "TN",
+        "countryCode": "IN"
+      }
+    },
+    "country": {
+      "IN": "INDIA"
+    },
+    "airline": {
+      "AI": "AIR INDIA",
+      "IX": "AIR INDIA EXPRESS"
+    },
+    "aircraft": {
+      "320": "AIRBUS A320"
+    },
+    "flight": {
+      "SEG-AI9608-IXMMAA-2026-09-04-1200": {
+        "marketingAirlineCode": "AI",
+        "operatingAirlineCode": "IX",
+        "marketingFlightNumber": "9608",
+        "departure": {
+          "locationCode": "IXM",
+          "dateTime": "2026-09-04T12:00:00.000+05:30"
+        },
+        "arrival": {
+          "locationCode": "MAA",
+          "dateTime": "2026-09-04T13:10:00.000+05:30",
+          "terminal": "4"
+        },
+        "aircraftCode": "320",
+        "duration": 4200,
+        "connectionTime": 0,
+        "secureFlightIndicator": false
+      }
+    },
+    "currency": {
+      "INR": {
+        "name": "INDIAN RUPEE",
+        "decimalPlaces": 0
+      }
+    },
+    "anonymousTraveler": {
+      "ADT-1": {
+        "passengerTypeCode": "ADT"
+      }
+    },
+    "fareFamilyWithServices": {
+      "YXININ": {
+        "hierarchy": 9200,
+        "commercialFareFamily": "ECONOMY",
+        "cabin": "eco",
+        "aiChangeFee": "INR3000",
+        "aiCancelRefundFee": "INR5000",
+        "aiFareFamilyName": "Value",
+        "aiCabinName": "Economy"
+      },
+      "YWININ": {
+        "hierarchy": 9100,
+        "commercialFareFamily": "ECONOMY",
+        "cabin": "eco",
+        "aiChangeFee": "INR300 upto 3days,Thereafter INR1000",
+        "aiCancelRefundFee": "INR2500 upto 3 days,Thereafter INR3500",
+        "aiFareFamilyName": "Classic",
+        "aiCabinName": "Economy"
+      },
+      "YFININ": {
+        "hierarchy": 9000,
+        "commercialFareFamily": "ECONOMY",
+        "cabin": "eco",
+        "aiChangeFee": "INR250",
+        "aiCancelRefundFee": "INR999",
+        "aiFareFamilyName": "Flex",
+        "aiCabinName": "Economy"
+      }
+    },
+    "bookingStatus": {
+      "HK": {
+        "name": "Holding confirmed"
+      }
+    },
+    "service": {
+      "FBA1": {
+        "serviceType": "freeCheckedBaggage",
+        "baggagePolicyDescriptions": [
+          {
+            "type": "weight",
+            "weightUnit": "kilogram",
+            "quantity": 15
+          }
+        ]
+      },
+      "FBA2": {
+        "serviceType": "freeCheckedBaggage",
+        "baggagePolicyDescriptions": [
+          {
+            "type": "weight",
+            "weightUnit": "kilogram",
+            "quantity": 20
+          }
+        ]
+      },
+      "FBA3": {
+        "serviceType": "freeCheckedBaggage",
+        "baggagePolicyDescriptions": [
+          {
+            "type": "weight",
+            "weightUnit": "kilogram",
+            "quantity": 25
+          }
+        ]
+      }
+    }
+  },
+  "meta": {
+    "office": {
+      "officeId": "DELAI08AA"
+    }
+  }
+}

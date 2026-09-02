@@ -18,6 +18,9 @@ yarn-debug.log*
 yarn-error.log*
 *.log
 
+# Local browser session used by the Air India scraper
+.airindia_playwright_profile/
+
 # OS / editor
 .DS_Store
 Thumbs.db
