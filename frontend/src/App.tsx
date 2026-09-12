@@ -14,9 +14,7 @@ import { BookingWindowPage } from '@/pages/BookingWindowPage';
 import { MapPage } from '@/pages/MapPage';
 import { DataExplorerPage } from '@/pages/DataExplorerPage';
 import { AlertsPage } from '@/pages/AlertsPage';
-import { InsightsPage } from '@/pages/InsightsPage';
 import { MethodologyPage } from '@/pages/MethodologyPage';
-import { SystemPage } from '@/pages/SystemPage';
 import { AuditLogPage } from '@/pages/AuditLogPage';
 import type { JSX } from 'react';
 
@@ -40,9 +38,7 @@ function AppRoutes() {
       <Route path="/map" element={<ProtectedRoute><MapPage /></ProtectedRoute>} />
       <Route path="/explorer" element={<ProtectedRoute><DataExplorerPage /></ProtectedRoute>} />
       <Route path="/alerts" element={<ProtectedRoute><AlertsPage /></ProtectedRoute>} />
-      <Route path="/insights" element={<ProtectedRoute><InsightsPage /></ProtectedRoute>} />
       <Route path="/methodology" element={<ProtectedRoute><MethodologyPage /></ProtectedRoute>} />
-      <Route path="/system" element={<ProtectedRoute><SystemPage /></ProtectedRoute>} />
       <Route path="/audit" element={<ProtectedRoute><AuditLogPage /></ProtectedRoute>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

@@ -18,8 +18,17 @@ yarn-debug.log*
 yarn-error.log*
 *.log
 
+# Python caches and generated scraper exports
+__pycache__/
+*.py[cod]
+scraping/scraped_output/
+
 # Local browser session used by the Air India scraper
 .airindia_playwright_profile/
+.spicejet_playwright_profile/
+
+# Separate prototype project
+vimaan-airfare-index-main/
 
 # OS / editor
 .DS_Store

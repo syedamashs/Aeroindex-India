@@ -45,6 +45,5 @@ export function formatNumber(value: number): string {
 }
 
 export function formatPercent(value: number, decimals = 1): string {
-  const sign = value > 0 ? '+' : '';
-  return `${sign}${value.toFixed(decimals)}%`;
+  return `${value.toFixed(decimals)}%`;
 }

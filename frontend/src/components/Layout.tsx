@@ -10,13 +10,11 @@ import {
   Table2,
   Bell,
   BookOpen,
-  Server,
   LogOut,
   Menu,
   X,
   Zap,
   Shield,
-  Activity,
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useApp } from '@/context/AppContext';
@@ -30,9 +28,7 @@ const NAV_ITEMS = [
   { to: '/map', label: 'India Map', icon: MapIcon },
   { to: '/explorer', label: 'Data Explorer', icon: Table2 },
   { to: '/alerts', label: 'Alerts', icon: Bell },
-  { to: '/insights', label: 'Policy Insights', icon: Activity },
   { to: '/methodology', label: 'Methodology', icon: BookOpen },
-  { to: '/system', label: 'System/API', icon: Server },
 ];
 
 export function Layout({ children }: { children: ReactNode }) {

@@ -1,24 +1,30 @@
 import { useState } from 'react';
 import { Card } from '@/components/ui/Card';
 import { useApp } from '@/context/AppContext';
-import { computePipelineStats } from '@/data/analytics';
+import { computePipelineStats, getValidObservations, getObservations } from '@/data/analytics';
 import { getDataSource } from '@/data/datasource';
 import { formatNumber } from '@/data/random';
 import {
   Database, Filter, Sparkles, Copy, GitCompareArrows, Scale, BarChart3,
-  Server, ArrowRight, Zap, CheckCircle2, AlertTriangle, Code2,
+  Server, ArrowRight, Zap, CheckCircle2, AlertTriangle, Code2, Shield, TrendingUp, Layers,
 } from 'lucide-react';
 
-const PIPELINE_STAGES = [
-  { icon: Database, label: 'Source', desc: 'MockAirfareDataSource' },
-  { icon: Filter, label: 'Collection', desc: 'Fetch observations' },
-  { icon: CheckCircle2, label: 'Validation', desc: 'Check structure & ranges' },
-  { icon: Sparkles, label: 'Cleaning', desc: 'Remove invalid records' },
-  { icon: Copy, label: 'Deduplication', desc: 'Remove duplicates' },
-  { icon: Scale, label: 'Normalization', desc: 'Decompose fare components' },
-  { icon: BarChart3, label: 'Index Calculation', desc: 'Weighted price relatives' },
-  { icon: GitCompareArrows, label: 'Analytics', desc: 'Route, airline, window' },
-  { icon: Server, label: 'Dashboard', desc: 'API → UI' },
+const VALIDATION_RULES = [
+  { rule: 'Fare Range', desc: '₹1,500 - ₹25,000', status: 'active' },
+  { rule: 'Required Fields', desc: 'route, airline, date, fare', status: 'active' },
+  { rule: 'Date Format', desc: 'YYYY-MM-DD format', status: 'active' },
+  { rule: 'Booking Window', desc: '1-365 days in advance', status: 'active' },
+  { rule: 'Airline Code', desc: 'Valid 2-letter code', status: 'active' },
+  { rule: 'Route Exists', desc: 'Cross-check monitored routes', status: 'active' },
+  { rule: 'Duplicate Detection', desc: 'Hash-based deduplication', status: 'active' },
+  { rule: 'Outlier Detection', desc: '3-sigma price boundaries', status: 'active' },
+];
+
+const DATA_QUALITY_ALERTS = [
+  { type: 'High Duplication Rate', severity: 'warning', threshold: '> 5%', message: 'Duplicate observations detected in recent batch' },
+  { type: 'Invalid Records Spike', severity: 'alert', threshold: '> 10%', message: 'Unusual number of invalid records detected' },
+  { type: 'Data Freshness', severity: 'info', threshold: '< 24h', message: 'Data source last updated 12 hours ago' },
+  { type: 'Quality Decline', severity: 'warning', threshold: 'Previous < 95%', message: 'Data quality has declined by 2.1% this month' },
 ];
 
 const API_ENDPOINTS = [
@@ -55,6 +61,19 @@ export function SystemPage() {
   const [processing, setProcessing] = useState(false);
   const [pipelineStats, setPipelineStats] = useState(() => computePipelineStats());
   const ds = getDataSource();
+
+  // Calculate data quality metrics
+  const allObs = getObservations();
+  const validObs = getValidObservations();
+  const invalidObs = allObs.filter((o) => o.status === 'invalid').length;
+  const duplicateObs = allObs.filter((o) => o.status === 'duplicate').length;
+  const duplicatePercentage = (duplicateObs / allObs.length) * 100;
+
+  // Fare statistics
+  const fareValues = validObs.map((o) => o.totalFare);
+  const minFare = Math.min(...fareValues);
+  const maxFare = Math.max(...fareValues);
+  const avgFare = Math.round(fareValues.reduce((a, b) => a + b, 0) / fareValues.length);
 
   const runProcessing = () => {
     setProcessing(true);
@@ -141,6 +160,121 @@ export function SystemPage() {
                 <Icon className="w-4 h-4 text-navy-600 mx-auto mb-1" />
                 <p className="text-xs text-slate-500">{stat.label}</p>
                 <p className="text-lg font-mono font-semibold text-navy-900">{stat.value}</p>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
+
+      {/* Data Quality & Validation */}
+      <Card
+        title="Data Quality Metrics & Validation"
+        subtitle="Complete data pipeline quality assurance"
+        className="mb-6"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="bg-gradient-to-br from-success-50 to-emerald-50 rounded-lg p-4 border border-success-200">
+            <CheckCircle2 className="w-5 h-5 text-success-600 mb-2" />
+            <p className="text-sm text-slate-600">Valid Observations</p>
+            <p className="text-3xl font-mono font-bold text-success-700 mt-1">{validObs.toLocaleString('en-IN')}</p>
+            <p className="text-xs text-slate-500 mt-2">✓ {((validObs / allObs.length) * 100).toFixed(1)}% quality</p>
+          </div>
+
+          <div className="bg-gradient-to-br from-danger-50 to-red-50 rounded-lg p-4 border border-danger-200">
+            <AlertTriangle className="w-5 h-5 text-danger-600 mb-2" />
+            <p className="text-sm text-slate-600">Invalid Observations</p>
+            <p className="text-3xl font-mono font-bold text-danger-700 mt-1">{invalidObs.toLocaleString('en-IN')}</p>
+            <p className="text-xs text-slate-500 mt-2">✗ {((invalidObs / allObs.length) * 100).toFixed(1)}% of total</p>
+          </div>
+
+          <div className="bg-gradient-to-br from-warning-50 to-amber-50 rounded-lg p-4 border border-warning-200">
+            <Copy className="w-5 h-5 text-warning-600 mb-2" />
+            <p className="text-sm text-slate-600">Duplicate Observations</p>
+            <p className="text-3xl font-mono font-bold text-warning-700 mt-1">{duplicateObs.toLocaleString('en-IN')}</p>
+            <p className="text-xs text-slate-500 mt-2">⊗ {duplicatePercentage.toFixed(1)}% duplicated</p>
+          </div>
+
+          <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg p-4 border border-blue-200">
+            <Sparkles className="w-5 h-5 text-blue-600 mb-2" />
+            <p className="text-sm text-slate-600">Total Observations</p>
+            <p className="text-3xl font-mono font-bold text-blue-700 mt-1">{allObs.length.toLocaleString('en-IN')}</p>
+            <p className="text-xs text-slate-500 mt-2">📊 Complete dataset</p>
+          </div>
+        </div>
+
+        {/* Fare Statistics */}
+        <div className="border-t border-slate-100 pt-6 mb-6">
+          <h4 className="text-sm font-semibold text-navy-900 mb-4 flex items-center gap-2"><TrendingUp className="w-4 h-4" />Fare Value Distribution</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-slate-50 rounded-lg p-3">
+              <p className="text-xs text-slate-500 mb-1">Minimum Fare</p>
+              <p className="text-xl font-mono font-bold text-navy-900">₹{minFare.toLocaleString('en-IN')}</p>
+            </div>
+            <div className="bg-slate-50 rounded-lg p-3">
+              <p className="text-xs text-slate-500 mb-1">Maximum Fare</p>
+              <p className="text-xl font-mono font-bold text-navy-900">₹{maxFare.toLocaleString('en-IN')}</p>
+            </div>
+            <div className="bg-slate-50 rounded-lg p-3">
+              <p className="text-xs text-slate-500 mb-1">Average Fare</p>
+              <p className="text-xl font-mono font-bold text-navy-900">₹{avgFare.toLocaleString('en-IN')}</p>
+            </div>
+            <div className="bg-slate-50 rounded-lg p-3">
+              <p className="text-xs text-slate-500 mb-1">Fare Range</p>
+              <p className="text-xl font-mono font-bold text-navy-900">₹{(maxFare - minFare).toLocaleString('en-IN')}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Validation Rules */}
+        <div className="border-t border-slate-100 pt-6">
+          <h4 className="text-sm font-semibold text-navy-900 mb-4 flex items-center gap-2"><Shield className="w-4 h-4" />Validation Rules Applied</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+            {VALIDATION_RULES.map((v) => (
+              <div key={v.rule} className="bg-gradient-to-br from-success-50 to-emerald-50 rounded-lg p-3 border border-success-200">
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-success-600 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-sm font-medium text-navy-900">{v.rule}</p>
+                    <p className="text-xs text-slate-600 mt-0.5">{v.desc}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Card>
+
+      {/* Data Quality Alerts */}
+      <Card title="Data Quality Alerts" subtitle="Real-time quality monitoring & warnings" className="mb-6">
+        <div className="space-y-3">
+          {DATA_QUALITY_ALERTS.map((alert, i) => {
+            const severityColor = 
+              alert.severity === 'alert' ? 'border-danger-200 bg-danger-50' :
+              alert.severity === 'warning' ? 'border-warning-200 bg-warning-50' :
+              'border-blue-200 bg-blue-50';
+            const iconColor = 
+              alert.severity === 'alert' ? 'text-danger-600' :
+              alert.severity === 'warning' ? 'text-warning-600' :
+              'text-blue-600';
+            return (
+              <div key={i} className={`rounded-lg p-4 border ${severityColor}`}>
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start gap-3">
+                    <Shield className={`w-4 h-4 ${iconColor} mt-0.5 flex-shrink-0`} />
+                    <div>
+                      <p className="font-medium text-navy-900">{alert.type}</p>
+                      <p className="text-sm text-slate-600 mt-1">{alert.message}</p>
+                      <p className="text-xs text-slate-500 mt-2">Threshold: {alert.threshold}</p>
+                    </div>
+                  </div>
+                  <span className={`badge text-xs font-medium whitespace-nowrap ${
+                    alert.severity === 'alert' ? 'bg-danger-500/10 text-danger-600' :
+                    alert.severity === 'warning' ? 'bg-warning-500/10 text-warning-600' :
+                    'bg-blue-500/10 text-blue-600'
+                  }`}>
+                    {alert.severity.toUpperCase()}
+                  </span>
+                </div>
               </div>
             );
           })}

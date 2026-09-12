@@ -2,7 +2,7 @@ import json
 import csv
 import time
 import re
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from pathlib import Path
 
 from playwright.sync_api import sync_playwright
@@ -18,10 +18,11 @@ PROFILE_DIR = PROJECT_ROOT / ".airindia_playwright_profile"
 
 OUTPUT_DIR = Path(__file__).resolve().parent / "scraped_output"
 
-ORIGIN = "Madurai"
-DESTINATION = "Chennai"
+ORIGIN = "Chennai"
+DESTINATION = "Delhi"
 
-DEPARTURE_DATE = "2026-09-04"
+# Use 7 days from today (airlines need booking window)
+DEPARTURE_DATE = (date.today() + timedelta(days=7)).strftime("%Y-%m-%d")
 
 OUTPUT_DIR.mkdir(
     parents=True,
@@ -117,6 +118,29 @@ def close_popups(page):
     print(
         "No dismissible popup found."
     )
+
+
+def select_airport(page, airport_input, city_name):
+    """Select the first autocomplete result for an airport input."""
+    print(f"\nSelecting airport: {city_name}")
+
+    airport_input.click()
+    airport_input.fill("")
+    airport_input.fill(city_name)
+    page.wait_for_timeout(1500)
+
+    airport_input.press("ArrowDown")
+    page.wait_for_timeout(300)
+    airport_input.press("Enter")
+    page.wait_for_timeout(1000)
+
+    selected_value = airport_input.input_value().strip()
+    print(f"Selected airport value: {selected_value}")
+    if not selected_value:
+        print(f"WARNING: Airport selection is empty for {city_name}")
+        return False
+
+    return True
 
 
 ######################################
@@ -1236,13 +1260,40 @@ def save_csv(
             records
         )
 
-    print(
-        "\nCSV saved successfully:"
-    )
 
-    print(
-        output_file
+def append_first_observation(record):
+    observations_file = PROJECT_ROOT / "datasets" / "observations.json"
+
+    with observations_file.open("r", encoding="utf-8") as file:
+        observations = json.load(file)
+
+    last_id = max(
+        [int(observation["id"].split("-")[1]) for observation in observations],
+        default=0
     )
+    observation = {
+        "id": f"OBS-{last_id + 1:06d}",
+        "collectionDate": record["search_timestamp"][:10],
+        "origin": record["origin"],
+        "destination": record["destination"],
+        "airline": record["carrier"],
+        "travelDate": record["departure_date"],
+        "bookingWindow": int(record["advance_purchase_window"]),
+        "travelClass": "Economy" if record["cabin"] == "eco" else record["cabin"],
+        "baseFare": int(float(record["base_fare"])),
+        "taxes": int(float(record["taxes"])),
+        "fees": int(float(record["total_fees"])),
+        "totalFare": int(float(record["total_fare"])),
+        "currency": record["currency"],
+        "source": "Air-India-Portal",
+        "status": "valid",
+    }
+    observations.append(observation)
+
+    with observations_file.open("w", encoding="utf-8") as file:
+        json.dump(observations, file, indent=2, ensure_ascii=False)
+
+    print(f"[SUCCESS] Added {observation['id']} to observations.json")
 
 
 ######################################
@@ -1479,6 +1530,22 @@ with sync_playwright() as p:
     close_popups(page)
 
     ######################################
+    # CLOSE OFFER BANNER
+    ######################################
+
+    try:
+        banner = page.locator(
+            'div[class*="offer-banner"]'
+        )
+        if banner.count() > 0:
+            page.evaluate(
+                'document.querySelector(".offer-banner")?.style.display = "none"'
+            )
+            print("Offer banner hidden.")
+    except Exception:
+        pass
+
+    ######################################
     # AIRPORT INPUTS
     ######################################
 
@@ -1496,156 +1563,50 @@ with sync_playwright() as p:
     ######################################
 
     origin = airports.nth(0)
-
-    origin.click()
-
-    page.wait_for_timeout(
-        500
-    )
-
-    origin.fill(
-        ORIGIN
-    )
-
-    page.wait_for_timeout(
-        1500
-    )
-
-    delhi_elements = page.get_by_text(
-        ORIGIN,
-        exact=False
-    )
-
-    origin_selected = False
-
-    for i in range(
-        delhi_elements.count()
-    ):
-
-        try:
-
-            element = delhi_elements.nth(i)
-
-            if not element.is_visible():
-
-                continue
-
-            text = (
-                element.inner_text()
-                .strip()
-            )
-
-            if "delhi" in text.lower():
-
-                element.click(
-                    timeout=3000
-                )
-
-                origin_selected = True
-
-                print(
-                    "Origin selected:",
-                    text
-                )
-
-                break
-
-        except Exception:
-            pass
-
-    if not origin_selected:
-
-        print(
-            "WARNING: Origin selection failed."
-        )
+    if not select_airport(page, origin, ORIGIN):
+        raise Exception(f"Failed to select origin airport: {ORIGIN}")
 
     ######################################
     # DESTINATION
     ######################################
 
     destination = airports.nth(1)
-
-    destination.click()
-
-    page.wait_for_timeout(
-        500
-    )
-
-    destination.fill(
-        DESTINATION
-    )
-
-    page.wait_for_timeout(
-        1500
-    )
-
-    mumbai_elements = page.get_by_text(
-        DESTINATION,
-        exact=False
-    )
-
-    destination_selected = False
-
-    for i in range(
-        mumbai_elements.count()
-    ):
-
-        try:
-
-            element = mumbai_elements.nth(i)
-
-            if not element.is_visible():
-
-                continue
-
-            text = (
-                element.inner_text()
-                .strip()
-            )
-
-            if (
-                "mumbai" in text.lower()
-                and
-                "navi mumbai"
-                not in text.lower()
-            ):
-
-                element.click(
-                    timeout=3000
-                )
-
-                destination_selected = True
-
-                print(
-                    "Destination selected:",
-                    text
-                )
-
-                break
-
-        except Exception:
-            pass
-
-    if not destination_selected:
-
-        print(
-            "WARNING: Destination selection failed."
+    if not select_airport(page, destination, DESTINATION):
+        raise Exception(
+            f"Failed to select destination airport: {DESTINATION}"
         )
 
     ######################################
     # DATE PICKER
     ######################################
 
-    date_picker_button = page.get_by_role(
-        "button",
-        name="Open date picker"
-    )
-
-    date_picker_button.click()
-
-    print(
-        "\nDate picker opened."
-    )
+    date_picker_opened = False
+    for attempt in range(3):
+        try:
+            date_picker_button = page.get_by_role(
+                "button",
+                name="Open date picker"
+            )
+            date_picker_button.click(
+                timeout=5000
+            )
+            date_picker_opened = True
+            print(
+                "\nDate picker opened."
+            )
+            break
+        except Exception as e:
+            print(
+                f"Date picker click attempt {attempt+1} failed: {e}"
+            )
+            page.wait_for_timeout(1000)
+            if attempt == 2:
+                print(
+                    "ERROR: Failed to open date picker after 3 attempts."
+                )
+                page.close()
+                browser.close()
+                raise
 
     page.wait_for_timeout(
         1000
@@ -2050,6 +2011,9 @@ with sync_playwright() as p:
         csv_file
     )
 
+    if fare_records:
+        append_first_observation(fare_records[0])
+
     ######################################
     # DONE
     ######################################
@@ -2061,14 +2025,6 @@ with sync_playwright() as p:
         "######################################"
     )
 
-    print(
-        "\nBrowser will remain open."
-    )
-
-    print(
-        "Press ENTER to close..."
-    )
-
-    input()
-
+    print("\nClosing browser...")
     context.close()
+    print("Done!")

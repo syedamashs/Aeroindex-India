@@ -393,7 +393,7 @@ export function computeInsights(): Insight[] {
   if (topIncrease) {
     insights.push({
       id: 'ins-route-up',
-      text: `${getAirportLabel(topIncrease.origin)} → ${getAirportLabel(topIncrease.destination)} shows the highest monthly increase (+${topIncrease.momChange.toFixed(1)}%) among monitored routes.`,
+      text: `${getAirportLabel(topIncrease.origin)} → ${getAirportLabel(topIncrease.destination)} shows the highest monthly increase (${topIncrease.momChange.toFixed(1)}%) among monitored routes.`,
       category: 'route',
     });
   }

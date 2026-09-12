@@ -33,15 +33,15 @@ export function KpiCard({ label, value, sublabel, change, icon, accent = 'navy' 
         {change !== undefined && (
           <span
             className={`badge ${
-              change > 0.5
+              change > 0
                 ? 'badge-danger'
-                : change < -0.5
+                : change < 0
                   ? 'badge-success'
                   : 'badge-slate'
             }`}
           >
-            {change > 0.5 ? <TrendingUp className="w-3 h-3" /> : change < -0.5 ? <TrendingDown className="w-3 h-3" /> : <Minus className="w-3 h-3" />}
-            {change > 0 ? '+' : ''}{change.toFixed(1)}%
+            {change > 0 ? <TrendingUp className="w-3 h-3" /> : change < 0 ? <TrendingDown className="w-3 h-3" /> : <Minus className="w-3 h-3" />}
+            {change.toFixed(1)}%
           </span>
         )}
         {sublabel && <span className="text-slate-500">{sublabel}</span>}
