@@ -9,7 +9,7 @@ const PORT = 4002;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const datasetsPath = path.resolve(__dirname, '../../datasets');
+const datasetsPath = path.resolve(__dirname, 'database');
 
 app.use(cors());
 app.use(express.json());

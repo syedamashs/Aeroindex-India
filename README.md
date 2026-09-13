@@ -25,9 +25,9 @@ The application is a client-side React prototype. Its data source is designed be
 This project is now organized into a clear frontend/backend split:
 
 - `frontend/` - React + Vite UI
-- `backend/` - Express API server
-- `datasets/` - separate JSON files for users, airports, routes, airlines, and observations
-- `backend/scripts/generate_mock_data.py` - deterministic dataset generator
+- `backend/` - Express API server, scrapers, database, and data pipeline structure
+- `backend/database/` - JSON data for users, airports, routes, airlines, and observations
+- `backend/data/generate_mock_data.py` - deterministic dataset generator
 - `README.md` - project overview and run instructions
 
 ## Local Development Setup
@@ -36,12 +36,12 @@ This project is now organized into a clear frontend/backend split:
 
 ```bash
 cd backend
-node src/server.js
+node server.js
 ```
 
 The backend runs on port `4002` in the current prototype setup.
 
-The backend reads the JSON files from the top-level `datasets/` directory and combines them into the API data model at runtime. To regenerate the deterministic dataset, run `python backend/scripts/generate_mock_data.py` from the project root.
+The backend reads the JSON files from `backend/database/` and combines them into the API data model at runtime. To regenerate the deterministic dataset, run `python backend/data/generate_mock_data.py` from the project root.
 
 ### 2. Start frontend
 

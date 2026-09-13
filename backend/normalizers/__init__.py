@@ -1,0 +1,3 @@
+from .airindia_normalizer import normalize_airindia
+from .indigo_normalizer import normalize_indigo
+from .spicejet_normalizer import normalize_spicejet

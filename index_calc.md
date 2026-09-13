@@ -340,7 +340,7 @@ This is different from the intended formula because:
 - It may include invalid and duplicate records unless a status filter is supplied.
 - Route weights are loaded by the backend, but the resulting `weightedIndex` field is not used as the displayed `indexValue`.
 
-The backend implementation is in `backend/src/server.js`, in `computeIndex()`.
+The backend implementation is in `backend/server.js`, in `computeIndex()`.
 
 ### Important result
 
@@ -448,7 +448,7 @@ For a custom range, the selected `customStart` and `customEnd` values are used.
 
 For a preset such as `30d`, the backend calculates a start date by subtracting 30 days from the maximum travel date in the dataset, then keeps observations through that maximum date.
 
-The backend date filtering is implemented in `filterObservations()` in `backend/src/server.js`.
+The backend date filtering is implemented in `filterObservations()` in `backend/server.js`.
 
 ### Effect on the index
 

@@ -180,8 +180,7 @@ payload = {
 }
 
 project_root = Path(__file__).resolve().parents[2]
-datasets_dir = project_root / "datasets"
-datasets_dir.mkdir(parents=True, exist_ok=True)
+datasets_dir = project_root / "backend" / "database"
 
 for name in ("users", "airports", "routes", "airlines", "observations"):
     with (datasets_dir / f"{name}.json").open("w", encoding="utf-8") as f:

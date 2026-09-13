@@ -1,7 +1,8 @@
-# Node / frontend
+# Dependencies and frontend build output
 node_modules/
 frontend/node_modules/
 backend/node_modules/
+.node_modules/
 .vite/
 frontend/dist/
 dist/
@@ -21,14 +22,24 @@ yarn-error.log*
 # Python caches and generated scraper exports
 __pycache__/
 *.py[cod]
-scraping/scraped_output/
+backend/data/raw/
+backend/data/normalized/
+backend/logs/
+backend/data/*.db
+backend/data/*.db-*
 
-# Local browser session used by the Air India scraper
+# Local browser sessions used by the scrapers
 .airindia_playwright_profile/
 .spicejet_playwright_profile/
+.indigo_chrome_profile/
+.makemytrip_playwright_profile/
+.apix/
 
-# Separate prototype project
+# Local archive and separate prototype project
+.OLD_Scrapers/
+.OLD_Database/
 vimaan-airfare-index-main/
+.vimaan-airfare-index-main/
 
 # OS / editor
 .DS_Store
@@ -39,3 +50,7 @@ Thumbs.db
 # Build artifacts
 coverage/
 *.tsbuildinfo
+
+# Local SQLite database
+backend/database/*.db
+backend/database/*.db-*

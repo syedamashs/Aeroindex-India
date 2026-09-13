@@ -9,32 +9,68 @@ from playwright.sync_api import sync_playwright
 
 
 ######################################
-# CONFIGURATION
-######################################
-
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-
-PROFILE_DIR = PROJECT_ROOT / ".airindia_playwright_profile"
-
-OUTPUT_DIR = Path(__file__).resolve().parent / "scraped_output"
-
-ORIGIN = "Chennai"
-DESTINATION = "Delhi"
-
-# Use 7 days from today (airlines need booking window)
-DEPARTURE_DATE = (date.today() + timedelta(days=7)).strftime("%Y-%m-%d")
-
-OUTPUT_DIR.mkdir(
-    parents=True,
-    exist_ok=True
-)
-
-
-######################################
 # CLOSE POPUPS
 ######################################
 
 def close_popups(page):
+
+    # Handle Air India's OneTrust cookie overlay before touching the booking form.
+    try:
+        consent_selectors = [
+            "#onetrust-accept-btn-handler",
+            'button:has-text("Accept All Cookies")',
+            'button:has-text("Accept All")',
+            'button:has-text("Allow All")',
+            'button:has-text("I Agree")',
+        ]
+
+        consent_done = False
+
+        for selector in consent_selectors:
+            try:
+                buttons = page.locator(selector)
+                for i in range(buttons.count()):
+                    button = buttons.nth(i)
+                    if button.is_visible():
+                        button.click(timeout=3000)
+                        print("Accepted cookie consent.")
+                        page.wait_for_timeout(1000)
+                        consent_done = True
+                        break
+                if consent_done:
+                    break
+            except Exception:
+                pass
+
+        if not consent_done:
+            for consent_text in [
+                "Accept All Cookies",
+                "Accept All",
+                "Allow All",
+                "I Agree",
+            ]:
+                try:
+                    elements = page.get_by_text(
+                        consent_text,
+                        exact=True
+                    )
+                    for i in range(elements.count()):
+                        element = elements.nth(i)
+                        if element.is_visible():
+                            element.click(timeout=3000)
+                            print(
+                                f"Accepted cookie consent using: {consent_text}"
+                            )
+                            page.wait_for_timeout(1000)
+                            consent_done = True
+                            break
+                    if consent_done:
+                        break
+                except Exception:
+                    pass
+    except Exception:
+        pass
+
 
     print("\nChecking for popups...")
 
@@ -118,29 +154,6 @@ def close_popups(page):
     print(
         "No dismissible popup found."
     )
-
-
-def select_airport(page, airport_input, city_name):
-    """Select the first autocomplete result for an airport input."""
-    print(f"\nSelecting airport: {city_name}")
-
-    airport_input.click()
-    airport_input.fill("")
-    airport_input.fill(city_name)
-    page.wait_for_timeout(1500)
-
-    airport_input.press("ArrowDown")
-    page.wait_for_timeout(300)
-    airport_input.press("Enter")
-    page.wait_for_timeout(1000)
-
-    selected_value = airport_input.input_value().strip()
-    print(f"Selected airport value: {selected_value}")
-    if not selected_value:
-        print(f"WARNING: Airport selection is empty for {city_name}")
-        return False
-
-    return True
 
 
 ######################################
@@ -854,6 +867,291 @@ def extract_price(air_bound):
             price_source
     }
 
+######################################
+# EXTRACT FLIGHT DETAILS
+######################################
+
+def extract_flight_details(response_data, flight_id):
+    """
+    Extract detailed flight information from Air India's dictionaries.
+    """
+
+    result = {
+        "marketing_airline": "",
+        "operating_airline": "",
+        "flight_number": "",
+        "departure_datetime": "",
+        "arrival_datetime": "",
+        "duration_minutes": "",
+        "aircraft_code": "",
+        "connection_time_minutes": "",
+    }
+
+    dictionaries = response_data.get(
+        "dictionaries",
+        {}
+    )
+
+    flights = dictionaries.get(
+        "flight",
+        {}
+    )
+
+    flight = flights.get(
+        flight_id,
+        {}
+    )
+
+    if not isinstance(flight, dict):
+        return result
+
+    result["marketing_airline"] = flight.get(
+        "marketingAirlineCode",
+        ""
+    )
+
+    result["operating_airline"] = flight.get(
+        "operatingAirlineCode",
+        ""
+    )
+
+    result["flight_number"] = flight.get(
+        "marketingFlightNumber",
+        ""
+    )
+
+    departure = flight.get(
+        "departure",
+        {}
+    )
+
+    arrival = flight.get(
+        "arrival",
+        {}
+    )
+
+    if isinstance(departure, dict):
+        result["departure_datetime"] = departure.get(
+            "dateTime",
+            ""
+        )
+
+    if isinstance(arrival, dict):
+        result["arrival_datetime"] = arrival.get(
+            "dateTime",
+            ""
+        )
+
+    duration_seconds = safe_number(
+        flight.get(
+            "duration",
+            0
+        )
+    )
+
+    if duration_seconds > 0:
+        result["duration_minutes"] = round(
+            duration_seconds / 60,
+            2
+        )
+
+    result["aircraft_code"] = flight.get(
+        "aircraftCode",
+        ""
+    )
+
+    connection_seconds = safe_number(
+        flight.get(
+            "connectionTime",
+            0
+        )
+    )
+
+    if connection_seconds > 0:
+        result["connection_time_minutes"] = round(
+            connection_seconds / 60,
+            2
+        )
+    else:
+        result["connection_time_minutes"] = 0
+
+    return result
+
+
+######################################
+# EXTRACT FARE FAMILY DETAILS
+######################################
+
+def extract_fare_family_details(
+    response_data,
+    fare_family
+):
+    """
+    Extract fare-family metadata from Air India's dictionaries.
+    """
+
+    result = {
+        "fare_family_name": "",
+        "fare_family_hierarchy": "",
+        "commercial_fare_family": "",
+        "fare_cabin_name": "",
+        "change_fee": "",
+        "cancel_refund_fee": "",
+    }
+
+    dictionaries = response_data.get(
+        "dictionaries",
+        {}
+    )
+
+    fare_families = dictionaries.get(
+        "fareFamilyWithServices",
+        {}
+    )
+
+    details = fare_families.get(
+        fare_family,
+        {}
+    )
+
+    if not isinstance(details, dict):
+        return result
+
+    result["fare_family_name"] = details.get(
+        "aiFareFamilyName",
+        ""
+    )
+
+    result["fare_family_hierarchy"] = details.get(
+        "hierarchy",
+        ""
+    )
+
+    result["commercial_fare_family"] = details.get(
+        "commercialFareFamily",
+        ""
+    )
+
+    result["fare_cabin_name"] = details.get(
+        "aiCabinName",
+        ""
+    )
+
+    result["change_fee"] = details.get(
+        "aiChangeFee",
+        ""
+    )
+
+    result["cancel_refund_fee"] = details.get(
+        "aiCancelRefundFee",
+        ""
+    )
+
+    return result
+
+
+######################################
+# EXTRACT BAGGAGE
+######################################
+
+def extract_baggage_kg(
+    response_data,
+    air_bound
+):
+    """
+    Extract free checked baggage associated with the fare.
+    """
+
+    dictionaries = response_data.get(
+        "dictionaries",
+        {}
+    )
+
+    services_dictionary = dictionaries.get(
+        "service",
+        {}
+    )
+
+    services = air_bound.get(
+        "services",
+        []
+    )
+
+    if not isinstance(services, list):
+        return ""
+
+    baggage_values = []
+
+    for service in services:
+
+        if not isinstance(service, dict):
+            continue
+
+        service_code = service.get(
+            "serviceCode",
+            ""
+        )
+
+        service_details = services_dictionary.get(
+            service_code,
+            {}
+        )
+
+        if not isinstance(service_details, dict):
+            continue
+
+        if service_details.get(
+            "serviceType",
+            ""
+        ) != "freeCheckedBaggage":
+            continue
+
+        descriptions = service_details.get(
+            "baggagePolicyDescriptions",
+            []
+        )
+
+        if not isinstance(descriptions, list):
+            continue
+
+        for description in descriptions:
+
+            if not isinstance(description, dict):
+                continue
+
+            if description.get(
+                "type",
+                ""
+            ) != "weight":
+                continue
+
+            unit = description.get(
+                "weightUnit",
+                ""
+            )
+
+            quantity = safe_number(
+                description.get(
+                    "quantity",
+                    0
+                )
+            )
+
+            if (
+                unit.lower() == "kilogram"
+                and quantity > 0
+            ):
+                baggage_values.append(
+                    quantity
+                )
+
+    if baggage_values:
+        return max(baggage_values)
+
+    return ""
+######################################
+# EXTRACT FARES
+######################################
 
 ######################################
 # EXTRACT FARES
@@ -862,7 +1160,9 @@ def extract_price(air_bound):
 def extract_fares(
     response_data,
     search_timestamp,
-    departure_date
+    departure_date,
+    requested_origin,
+    requested_destination,
 ):
 
     records = []
@@ -885,6 +1185,10 @@ def extract_fares(
         )
 
         for group in air_bound_groups:
+
+            ######################################
+            # BOUND DETAILS
+            ######################################
 
             bound_details = group.get(
                 "boundDetails",
@@ -925,6 +1229,20 @@ def extract_fares(
                 f"Air bounds: {len(air_bounds)}"
             )
 
+            if (
+                origin.upper() != requested_origin.upper()
+                or destination.upper() != requested_destination.upper()
+            ):
+                print(
+                    f"Skipping non-requested route: "
+                    f"{origin} -> {destination}"
+                )
+                continue
+
+            ######################################
+            # EACH FARE OPTION
+            ######################################
+
             for air_bound in air_bounds:
 
                 ######################################
@@ -945,28 +1263,21 @@ def extract_fares(
                 # AVAILABILITY
                 ######################################
 
-                availability_details = (
-                    air_bound.get(
-                        "availabilityDetails",
-                        []
-                    )
+                availability_details = air_bound.get(
+                    "availabilityDetails",
+                    []
                 )
 
                 flight_id = group_flight_id
 
                 cabin = ""
-
                 booking_class = ""
-
                 status_code = ""
-
                 quota = ""
 
                 if availability_details:
 
-                    availability = (
-                        availability_details[0]
-                    )
+                    availability = availability_details[0]
 
                     flight_id = availability.get(
                         "flightId",
@@ -1003,7 +1314,6 @@ def extract_fares(
                 )
 
                 fare_class = ""
-
                 fare_type = ""
 
                 if fare_infos:
@@ -1021,7 +1331,7 @@ def extract_fares(
                     )
 
                 ######################################
-                # EXTRACT PRICE
+                # PRICE
                 ######################################
 
                 price_data = extract_price(
@@ -1053,6 +1363,35 @@ def extract_fares(
                 ]
 
                 ######################################
+                # FLIGHT DETAILS
+                ######################################
+
+                flight_details = extract_flight_details(
+                    response_data,
+                    flight_id
+                )
+
+                ######################################
+                # FARE FAMILY DETAILS
+                ######################################
+
+                fare_family_details = (
+                    extract_fare_family_details(
+                        response_data,
+                        fare_family
+                    )
+                )
+
+                ######################################
+                # BAGGAGE
+                ######################################
+
+                baggage_kg = extract_baggage_kg(
+                    response_data,
+                    air_bound
+                )
+
+                ######################################
                 # CARRIER
                 ######################################
 
@@ -1061,7 +1400,7 @@ def extract_fares(
                 )
 
                 ######################################
-                # ADVANCE PURCHASE
+                # ADVANCE PURCHASE WINDOW
                 ######################################
 
                 try:
@@ -1085,16 +1424,53 @@ def extract_fares(
                     advance_purchase_window = ""
 
                 ######################################
+                # ACTUAL DEPARTURE DATE
+                ######################################
+
+                actual_departure_date = (
+                    flight_details[
+                        "departure_datetime"
+                    ][:10]
+                    if flight_details[
+                        "departure_datetime"
+                    ]
+                    else departure_date
+                )
+
+                ######################################
+                # IS CHEAPEST OFFER
+                ######################################
+
+                is_cheapest_offer = air_bound.get(
+                    "isCheapestOffer",
+                    False
+                )
+
+                ######################################
                 # RECORD
                 ######################################
 
                 record = {
 
+                    # ------------------------------
+                    # COLLECTION
+                    # ------------------------------
+
                     "search_timestamp":
                         search_timestamp,
 
-                    "departure_date":
+                    "requested_departure_date":
                         departure_date,
+
+                    "actual_departure_date":
+                        actual_departure_date,
+
+                    "advance_purchase_days":
+                        advance_purchase_window,
+
+                    # ------------------------------
+                    # ROUTE
+                    # ------------------------------
 
                     "origin":
                         origin,
@@ -1102,8 +1478,27 @@ def extract_fares(
                     "destination":
                         destination,
 
+                    # ------------------------------
+                    # FLIGHT
+                    # ------------------------------
+
                     "carrier":
                         carrier,
+
+                    "marketing_airline":
+                        flight_details[
+                            "marketing_airline"
+                        ],
+
+                    "operating_airline":
+                        flight_details[
+                            "operating_airline"
+                        ],
+
+                    "flight_number":
+                        flight_details[
+                            "flight_number"
+                        ],
 
                     "flight_id":
                         flight_id,
@@ -1111,8 +1506,42 @@ def extract_fares(
                     "air_bound_id":
                         air_bound_id,
 
+                    "departure_datetime":
+                        flight_details[
+                            "departure_datetime"
+                        ],
+
+                    "arrival_datetime":
+                        flight_details[
+                            "arrival_datetime"
+                        ],
+
+                    "duration_minutes":
+                        flight_details[
+                            "duration_minutes"
+                        ],
+
+                    "aircraft_code":
+                        flight_details[
+                            "aircraft_code"
+                        ],
+
+                    "connection_time_minutes":
+                        flight_details[
+                            "connection_time_minutes"
+                        ],
+
+                    # ------------------------------
+                    # FARE PRODUCT
+                    # ------------------------------
+
                     "cabin":
                         cabin,
+
+                    "fare_cabin_name":
+                        fare_family_details[
+                            "fare_cabin_name"
+                        ],
 
                     "booking_class":
                         booking_class,
@@ -1123,14 +1552,40 @@ def extract_fares(
                     "fare_family":
                         fare_family,
 
+                    "fare_family_name":
+                        fare_family_details[
+                            "fare_family_name"
+                        ],
+
+                    "fare_family_hierarchy":
+                        fare_family_details[
+                            "fare_family_hierarchy"
+                        ],
+
+                    "commercial_fare_family":
+                        fare_family_details[
+                            "commercial_fare_family"
+                        ],
+
                     "fare_type":
                         fare_type,
+
+                    # ------------------------------
+                    # AVAILABILITY
+                    # ------------------------------
 
                     "status_code":
                         status_code,
 
                     "quota":
                         quota,
+
+                    "is_cheapest_offer":
+                        is_cheapest_offer,
+
+                    # ------------------------------
+                    # PRICE
+                    # ------------------------------
 
                     "base_fare":
                         base_fare,
@@ -1150,8 +1605,22 @@ def extract_fares(
                     "price_source":
                         price_source,
 
-                    "advance_purchase_window":
-                        advance_purchase_window
+                    # ------------------------------
+                    # PRODUCT ATTRIBUTES
+                    # ------------------------------
+
+                    "baggage_kg":
+                        baggage_kg,
+
+                    "change_fee":
+                        fare_family_details[
+                            "change_fee"
+                        ],
+
+                    "cancel_refund_fee":
+                        fare_family_details[
+                            "cancel_refund_fee"
+                        ]
                 }
 
                 records.append(
@@ -1174,9 +1643,11 @@ def extract_fares(
 
             record["destination"],
 
-            record["departure_date"],
+            record["actual_departure_date"],
 
             record["flight_id"],
+
+            record["fare_family"],
 
             record["fare_class"],
 
@@ -1200,7 +1671,6 @@ def extract_fares(
 
     return unique_records
 
-
 ######################################
 # SAVE CSV
 ######################################
@@ -1218,29 +1688,9 @@ def save_csv(
 
         return
 
-    fieldnames = [
-        "search_timestamp",
-        "departure_date",
-        "origin",
-        "destination",
-        "carrier",
-        "flight_id",
-        "air_bound_id",
-        "cabin",
-        "booking_class",
-        "fare_class",
-        "fare_family",
-        "fare_type",
-        "status_code",
-        "quota",
-        "base_fare",
-        "taxes",
-        "total_fees",
-        "total_fare",
-        "currency",
-        "price_source",
-        "advance_purchase_window",
-    ]
+    fieldnames = list(
+        records[0].keys()
+    )
 
     with open(
         output_file,
@@ -1260,771 +1710,311 @@ def save_csv(
             records
         )
 
-
-def append_first_observation(record):
-    observations_file = PROJECT_ROOT / "datasets" / "observations.json"
-
-    with observations_file.open("r", encoding="utf-8") as file:
-        observations = json.load(file)
-
-    last_id = max(
-        [int(observation["id"].split("-")[1]) for observation in observations],
-        default=0
+    print(
+        "\nCSV saved successfully:"
     )
-    observation = {
-        "id": f"OBS-{last_id + 1:06d}",
-        "collectionDate": record["search_timestamp"][:10],
-        "origin": record["origin"],
-        "destination": record["destination"],
-        "airline": record["carrier"],
-        "travelDate": record["departure_date"],
-        "bookingWindow": int(record["advance_purchase_window"]),
-        "travelClass": "Economy" if record["cabin"] == "eco" else record["cabin"],
-        "baseFare": int(float(record["base_fare"])),
-        "taxes": int(float(record["taxes"])),
-        "fees": int(float(record["total_fees"])),
-        "totalFare": int(float(record["total_fare"])),
-        "currency": record["currency"],
-        "source": "Air-India-Portal",
-        "status": "valid",
-    }
-    observations.append(observation)
 
-    with observations_file.open("w", encoding="utf-8") as file:
-        json.dump(observations, file, indent=2, ensure_ascii=False)
+    print(
+        output_file
+    )
 
-    print(f"[SUCCESS] Added {observation['id']} to observations.json")
 
+######################################
+# SELECT AIRPORT
+######################################
+
+def select_airport(page, airport_input, city_name, airport_code):
+    """
+    Select the exact airport code from Air India's autocomplete dropdown.
+    """
+
+    airport_code = str(airport_code).upper()
+    print(f"\nSelecting airport: {city_name} ({airport_code})")
+
+    airport_input.click()
+
+    airport_input.fill("")
+
+    airport_input.fill(city_name)
+
+    page.wait_for_timeout(1500)
+
+    print(f"Typed: {city_name}")
+
+    # Do not select the first suggestion: DEL can match ADL, and Mumbai can
+    # match multiple airports. Select only an option containing the required
+    # IATA code.
+    option = None
+    for selector in (
+        '[role="option"]:visible',
+        'li:visible',
+    ):
+        options = page.locator(selector)
+        for index in range(options.count()):
+            candidate = options.nth(index)
+            text = candidate.inner_text().upper()
+            if airport_code in text:
+                option = candidate
+                break
+        if option is not None:
+            break
+
+    if option is None:
+        raise RuntimeError(
+            f"Air India airport option {airport_code} was not found for {city_name}"
+        )
+
+    option.click()
+    page.wait_for_timeout(1000)
+
+    # Air India may replace the city name with its IATA code
+    # e.g. Madurai -> IXM
+    selected_value = airport_input.input_value()
+
+    print(f"Selected airport value: {selected_value}")
+
+    if not selected_value.strip():
+        print(
+            f"WARNING: Airport selection is empty for {city_name}"
+        )
+        return False
+
+    print(
+        f"Successfully selected {city_name} "
+        f"(Air India value: {selected_value})"
+    )
+
+    return True
 
 ######################################
 # MAIN
 ######################################
 
-print(
-    "\n"
-    "######################################\n"
-    "# STARTING AIR INDIA SCRAPER\n"
-    "######################################"
-)
 
+# ============================================================
+# PRODUCTION ENTRY POINT
+# ============================================================
 
-with sync_playwright() as p:
+def run(task):
+    """Run one Air India collection task.
 
-    ######################################
-    # LAUNCH CHROME
-    ######################################
+    Expected task keys:
+        run_id, task_id, route_id, origin, destination,
+        departure_date, target_lead_days
 
-    context = p.chromium.launch_persistent_context(
+    Optional:
+        origin_query, destination_query, profile_dir, output_dir
+    """
+    required = [
+        "run_id", "task_id", "route_id", "origin", "destination",
+        "departure_date", "target_lead_days"
+    ]
+    missing = [k for k in required if k not in task]
+    if missing:
+        raise ValueError(f"Missing task fields: {missing}")
 
-        user_data_dir=PROFILE_DIR,
+    run_id = str(task["run_id"])
+    task_id = str(task["task_id"])
+    route_id = str(task["route_id"])
+    origin_code = str(task["origin"]).upper()
+    destination_code = str(task["destination"]).upper()
+    departure_date = str(task["departure_date"])
+    target_lead_days = int(task["target_lead_days"])
 
-        channel="chrome",
+    # Search by code so a city with multiple airports cannot select the wrong
+    # autocomplete result, such as NMI instead of BOM for Mumbai.
+    origin_query = str(task.get("origin_query") or origin_code)
+    destination_query = str(task.get("destination_query") or destination_code)
 
-        headless=False,
+    output_dir = Path(task.get("output_dir") or Path(__file__).resolve().parents[1] / "data")
+    raw_dir = output_dir / "raw" / "airindia"
+    raw_dir.mkdir(parents=True, exist_ok=True)
 
-        args=[
-            "--disable-blink-features=AutomationControlled",
-            "--disable-web-security",
-        ],
+    profile_dir = str(task.get("profile_dir") or (Path.home() / ".apix" / "profiles" / "airindia"))
 
-        viewport={
-            "width": 1400,
-            "height": 900
-        }
-    )
-
-    page = (
-        context.pages[0]
-        if context.pages
-        else context.new_page()
-    )
-
-    ######################################
-    # REQUEST HANDLER
-    ######################################
-
-    def handle_request(request):
-
-        if "air-bounds" in request.url:
-
-            print(
-                "\n"
-                "######################################\n"
-                "# AIR-BOUNDS REQUEST\n"
-                "######################################"
-            )
-
-            print(
-                "Method:",
-                request.method
-            )
-
-            print(
-                "URL:",
-                request.url
-            )
-
-            try:
-
-                print(
-                    "\nPOST DATA:"
-                )
-
-                print(
-                    request.post_data
-                )
-
-            except Exception:
-                pass
-
-            print(
-                "\nRequest headers "
-                "(Authorization/Cookie redacted)"
-            )
-
-            try:
-
-                headers = dict(
-                    request.headers
-                )
-
-                safe_headers = {}
-
-                for key, value in headers.items():
-
-                    if key.lower() in [
-                        "authorization",
-                        "cookie"
-                    ]:
-
-                        safe_headers[key] = (
-                            "[REDACTED]"
-                        )
-
-                    else:
-
-                        safe_headers[key] = value
-
-                print(
-                    json.dumps(
-                        safe_headers,
-                        indent=2
-                    )
-                )
-
-            except Exception:
-                pass
-
-    ######################################
-    # RESPONSE HANDLER
-    ######################################
-
-    def handle_response(response):
-
-        if "air-bounds" in response.url:
-
-            print(
-                "\n"
-                "######################################\n"
-                "# AIR-BOUNDS RESPONSE\n"
-                "######################################"
-            )
-
-            print(
-                "Status:",
-                response.status
-            )
-
-            print(
-                "URL:",
-                response.url
-            )
-
-            if response.status == 200:
-
-                print(
-                    "\nAir-bounds JSON captured successfully!"
-                )
-
-    ######################################
-    # FAILED REQUEST
-    ######################################
-
-    def handle_failed_request(request):
-
-        if "air-bounds" in request.url:
-
-            print(
-                "\nAIR-BOUNDS REQUEST FAILED:"
-            )
-
-            print(
-                request.failure
-            )
-
-    ######################################
-    # CONSOLE
-    ######################################
-
-    def handle_console(message):
-
-        text = message.text
-
-        if (
-            "Geolocation" in text
-            or
-            "GSI_LOGGER" in text
-        ):
-
-            print(
-                "Browser console:",
-                text
-            )
-
-    page.on(
-        "request",
-        handle_request
-    )
-
-    page.on(
-        "response",
-        handle_response
-    )
-
-    page.on(
-        "requestfailed",
-        handle_failed_request
-    )
-
-    page.on(
-        "console",
-        handle_console
-    )
-
-    ######################################
-    # OPEN AIR INDIA
-    ######################################
-
-    print(
-        "\nOpening Air India..."
-    )
-
-    page.goto(
-        "https://www.airindia.com/",
-        wait_until="domcontentloaded",
-        timeout=120000
-    )
-
-    page.wait_for_timeout(
-        5000
-    )
-
-    print(
-        "Air India opened."
-    )
-
-    ######################################
-    # COOKIE / POPUPS
-    ######################################
-
-    close_popups(page)
-
-    ######################################
-    # CLOSE OFFER BANNER
-    ######################################
+    collection_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    result = {
+        "run_id": run_id,
+        "task_id": task_id,
+        "route_id": route_id,
+        "source": "Air India",
+        "origin": origin_code,
+        "destination": destination_code,
+        "departure_date": departure_date,
+        "target_lead_days": target_lead_days,
+        "collection_timestamp": collection_timestamp,
+        "status": "FAILED",
+        "raw_file": None,
+        "records": [],
+        "error": None,
+    }
 
     try:
-        banner = page.locator(
-            'div[class*="offer-banner"]'
-        )
-        if banner.count() > 0:
-            page.evaluate(
-                'document.querySelector(".offer-banner")?.style.display = "none"'
-            )
-            print("Offer banner hidden.")
-    except Exception:
-        pass
+        print("\n######################################")
+        print("# AIR INDIA PRODUCTION TASK")
+        print("######################################")
+        print(f"run_id: {run_id}")
+        print(f"task_id: {task_id}")
+        print(f"route: {origin_code} -> {destination_code}")
+        print(f"departure: {departure_date}")
+        print(f"target lead: T+{target_lead_days}")
 
-    ######################################
-    # AIRPORT INPUTS
-    ######################################
-
-    airports = page.locator(
-        'input[aria-label="Select origin airport"]'
-    )
-
-    print(
-        "\nAirport input count:",
-        airports.count()
-    )
-
-    ######################################
-    # ORIGIN
-    ######################################
-
-    origin = airports.nth(0)
-    if not select_airport(page, origin, ORIGIN):
-        raise Exception(f"Failed to select origin airport: {ORIGIN}")
-
-    ######################################
-    # DESTINATION
-    ######################################
-
-    destination = airports.nth(1)
-    if not select_airport(page, destination, DESTINATION):
-        raise Exception(
-            f"Failed to select destination airport: {DESTINATION}"
-        )
-
-    ######################################
-    # DATE PICKER
-    ######################################
-
-    date_picker_opened = False
-    for attempt in range(3):
-        try:
-            date_picker_button = page.get_by_role(
-                "button",
-                name="Open date picker"
-            )
-            date_picker_button.click(
-                timeout=5000
-            )
-            date_picker_opened = True
-            print(
-                "\nDate picker opened."
-            )
-            break
-        except Exception as e:
-            print(
-                f"Date picker click attempt {attempt+1} failed: {e}"
-            )
-            page.wait_for_timeout(1000)
-            if attempt == 2:
-                print(
-                    "ERROR: Failed to open date picker after 3 attempts."
-                )
-                page.close()
-                browser.close()
-                raise
-
-    page.wait_for_timeout(
-        1000
-    )
-
-    ######################################
-    # DATE PICKER ONE WAY
-    ######################################
-
-    one_way_checkbox = page.locator(
-        'input[name="isOneWay"]'
-    )
-
-    print(
-        "One Way checkbox count:",
-        one_way_checkbox.count()
-    )
-
-    if one_way_checkbox.count() > 0:
-
-        checkbox = one_way_checkbox.first
-
-        try:
-
-            if not checkbox.is_checked():
-
-                parent = checkbox.locator(
-                    "xpath=.."
-                )
-
-                parent.click()
-
-                print(
-                    "One Way selected."
-                )
-
-            else:
-
-                print(
-                    "One Way already selected."
-                )
-
-        except Exception as e:
-
-            print(
-                "One Way error:",
-                e
+        with sync_playwright() as p:
+            context = p.chromium.launch_persistent_context(
+                user_data_dir=profile_dir,
+                channel="chrome",
+                headless=False,
+                args=[
+                    "--disable-blink-features=AutomationControlled",
+                    "--disable-web-security",
+                ],
+                viewport={"width": 1400, "height": 900},
             )
 
-    ######################################
-    # SELECT SEPTEMBER 3
-    ######################################
+            page = context.pages[0] if context.pages else context.new_page()
 
-    departure_day = str(int(DEPARTURE_DATE.split("-")[2]))
+            # Keep the existing network diagnostics from the validated scraper,
+            # but do not print credentials/cookies.
+            def handle_request(request):
+                if "air-bounds" in request.url:
+                    print(f"Air-bounds request: {request.method} {request.url}")
 
-    dates = page.get_by_text(departure_day, exact=True)
+            def handle_response(response):
+                if "air-bounds" in response.url:
+                    print(f"Air-bounds response: {response.status} {response.url}")
 
-    selected_date = False
+            def handle_failed_request(request):
+                if "air-bounds" in request.url:
+                    print(f"Air-bounds request failed: {request.failure}")
 
-    for i in range(
-        dates.count()
-    ):
-
-        try:
-
-            element = dates.nth(i)
-
-            if not element.is_visible():
-
-                continue
+            page.on("request", handle_request)
+            page.on("response", handle_response)
+            page.on("requestfailed", handle_failed_request)
 
             try:
-
-                element.click(
-                    timeout=3000
+                page.goto(
+                    "https://www.airindia.com/",
+                    wait_until="domcontentloaded",
+                    timeout=120000,
                 )
+                page.wait_for_timeout(5000)
+                close_popups(page)
 
-                selected_date = True
+                airports = page.locator('input[aria-label="Select origin airport"]')
+                if airports.count() < 2:
+                    raise RuntimeError("Could not find both Air India airport inputs")
 
-                print(f"{DEPARTURE_DATE} selected.")
+                if not select_airport(page, airports.nth(0), origin_query, origin_code):
+                    raise RuntimeError(f"Failed to select origin: {origin_query}")
 
-                break
+                if not select_airport(page, airports.nth(1), destination_query, destination_code):
+                    raise RuntimeError(f"Failed to select destination: {destination_query}")
 
-            except Exception:
-                pass
+                date_picker_button = page.get_by_role("button", name="Open date picker")
+                date_picker_button.click()
+                page.wait_for_timeout(1000)
 
-            try:
+                one_way_checkbox = page.locator('input[name="isOneWay"]')
+                if one_way_checkbox.count() > 0:
+                    checkbox = one_way_checkbox.first
+                    try:
+                        if not checkbox.is_checked():
+                            checkbox.locator("xpath=..").click()
+                    except Exception:
+                        pass
 
-                button = element.locator(
-                    "xpath=ancestor::button[1]"
-                )
+                departure_day = str(int(departure_date.split("-")[2]))
+                dates = page.locator(f'[data-date="{departure_date}"]')
+                if dates.count() == 0:
+                    dates = page.get_by_text(departure_day, exact=True)
+                selected_date = False
 
-                if (
-                    button.count() > 0
-                    and
-                    button.first.is_visible()
-                ):
+                for i in range(dates.count()):
+                    element = dates.nth(i)
+                    if not element.is_visible():
+                        continue
+                    try:
+                        element.click(timeout=3000)
+                        selected_date = True
+                        break
+                    except Exception:
+                        try:
+                            button = element.locator("xpath=ancestor::button[1]")
+                            if button.count() > 0 and button.first.is_visible():
+                                button.first.click(timeout=3000)
+                                selected_date = True
+                                break
+                        except Exception:
+                            pass
 
-                    button.first.click(
-                        timeout=3000
+                if not selected_date:
+                    raise RuntimeError(f"Departure date not selected: {departure_date}")
+
+                page.wait_for_timeout(1000)
+
+                search_button = page.get_by_role(
+                    "button", name=re.compile(r"Search", re.IGNORECASE)
+                ).first
+                if search_button.count() == 0:
+                    raise RuntimeError("Air India Search button not found")
+
+                with page.expect_response(
+                    lambda response: "air-bounds" in response.url,
+                    timeout=120000,
+                ) as response_info:
+                    search_button.click()
+
+                air_bounds_response = response_info.value
+                if air_bounds_response.status != 200:
+                    raise RuntimeError(
+                        f"Air India air-bounds returned HTTP {air_bounds_response.status}"
                     )
 
-                    selected_date = True
+                response_data = air_bounds_response.json()
 
-                    print(
-                        "September 3 selected "
-                        "through button."
-                    )
+                raw_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+                raw_file = raw_dir / (
+                    f"{raw_timestamp}_{route_id}_{departure_date}_{task_id}.json"
+                )
+                with raw_file.open("w", encoding="utf-8") as file:
+                    json.dump(response_data, file, indent=2, ensure_ascii=False)
 
-                    break
+                search_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                fare_records = extract_fares(
+                    response_data,
+                    search_timestamp,
+                    departure_date,
+                    origin_code,
+                    destination_code,
+                )
 
-            except Exception:
-                pass
+                # Attach orchestration metadata without changing the validated
+                # source-specific extraction fields.
+                for record in fare_records:
+                    record["run_id"] = run_id
+                    record["task_id"] = task_id
+                    record["route_id"] = route_id
+                    record["target_lead_days"] = target_lead_days
+                    record["raw_file"] = str(raw_file)
 
-        except Exception:
-            pass
+                result["status"] = "SUCCESS"
+                result["raw_file"] = str(raw_file)
+                result["records"] = fare_records
+                result["collection_timestamp"] = search_timestamp
 
-    if not selected_date:
+                print(f"Air India task successful: {len(fare_records)} fare records")
 
-        print(
-            "WARNING: September 3 "
-            "was not selected."
-        )
+            finally:
+                context.close()
 
-    ######################################
-    # WAIT
-    ######################################
+    except Exception as exc:
+        result["error"] = f"{type(exc).__name__}: {exc}"
+        print(f"Air India task FAILED: {result['error']}")
 
-    page.wait_for_timeout(
-        1000
+    return result
+
+
+if __name__ == "__main__":
+    raise SystemExit(
+        "Air India scraper is task-driven. Use run(task) from the scheduler."
     )
-
-    ######################################
-    # SEARCH BUTTON
-    ######################################
-
-    search_button = page.get_by_role(
-        "button",
-        name=re.compile(
-            r"Search",
-            re.IGNORECASE
-        )
-    )
-
-    print(
-        "\nSearch button count:",
-        search_button.count()
-    )
-
-    try:
-
-        print(
-            "Search enabled:",
-            search_button.first.is_enabled()
-        )
-
-    except Exception:
-        pass
-
-    ######################################
-    # SEARCH + RESPONSE CAPTURE
-    ######################################
-
-    print(
-        "\nClicking Search..."
-    )
-
-    with page.expect_response(
-        lambda response:
-            "air-bounds" in response.url,
-        timeout=120000
-    ) as response_info:
-
-        search_button.first.click()
-
-    air_bounds_response = (
-        response_info.value
-    )
-
-    print(
-        "\n"
-        "######################################\n"
-        "# AIR-BOUNDS RESPONSE RECEIVED!\n"
-        "######################################"
-    )
-
-    print(
-        "Status:",
-        air_bounds_response.status
-    )
-
-    ######################################
-    # PARSE JSON
-    ######################################
-
-    response_data = (
-        air_bounds_response.json()
-    )
-
-    print(
-        "\nAir-bounds JSON parsed successfully!"
-    )
-
-    print(
-        "\nRESPONSE READY FOR PROCESSING"
-    )
-
-    print(
-        "Response type:",
-        type(response_data).__name__
-    )
-
-    print(
-        "Top-level keys:",
-        list(response_data.keys())
-    )
-
-    ######################################
-    # SAVE RAW JSON
-    ######################################
-
-    timestamp = datetime.now().strftime(
-        "%Y%m%d_%H%M%S"
-    )
-
-    raw_file = (
-        OUTPUT_DIR
-        /
-        f"airindia_raw_{timestamp}.json"
-    )
-
-    with open(
-        raw_file,
-        "w",
-        encoding="utf-8"
-    ) as file:
-
-        json.dump(
-            response_data,
-            file,
-            indent=2,
-            ensure_ascii=False
-        )
-
-    print(
-        "\nRaw JSON saved:"
-    )
-
-    print(
-        raw_file
-    )
-
-    ######################################
-    # SEARCH TIMESTAMP
-    ######################################
-
-    search_timestamp = datetime.now().strftime(
-        "%Y-%m-%d %H:%M:%S"
-    )
-
-    ######################################
-    # EXTRACT FARES
-    ######################################
-
-    fare_records = extract_fares(
-        response_data,
-        search_timestamp,
-        DEPARTURE_DATE
-    )
-
-    print(
-        "\nFare records extracted:",
-        len(fare_records)
-    )
-
-    ######################################
-    # PRICE CHECK
-    ######################################
-
-    non_zero_prices = 0
-
-    zero_prices = 0
-
-    for record in fare_records:
-
-        if record["total_fare"] > 0:
-
-            non_zero_prices += 1
-
-        else:
-
-            zero_prices += 1
-
-    print(
-        "\n"
-        "######################################\n"
-        "# PRICE EXTRACTION CHECK\n"
-        "######################################"
-    )
-
-    print(
-        "Total fare records:",
-        len(fare_records)
-    )
-
-    print(
-        "Non-zero prices:",
-        non_zero_prices
-    )
-
-    print(
-        "Zero prices:",
-        zero_prices
-    )
-
-    ######################################
-    # PREVIEW
-    ######################################
-
-    print(
-        "\n"
-        "######################################\n"
-        "# FARE PREVIEW\n"
-        "######################################"
-    )
-
-    for index, record in enumerate(
-        fare_records[:10],
-        start=1
-    ):
-
-        print(
-            f"\nFare {index}"
-        )
-
-        print(
-            "Route:",
-            record["origin"],
-            "->",
-            record["destination"]
-        )
-
-        print(
-            "Flight:",
-            record["flight_id"]
-        )
-
-        print(
-            "Fare class:",
-            record["fare_class"]
-        )
-
-        print(
-            "Base:",
-            record["base_fare"],
-            record["currency"]
-        )
-
-        print(
-            "Taxes:",
-            record["taxes"]
-        )
-
-        print(
-            "Fees:",
-            record["total_fees"]
-        )
-
-        print(
-            "Total:",
-            record["total_fare"],
-            record["currency"]
-        )
-
-        print(
-            "Cabin:",
-            record["cabin"]
-        )
-
-        print(
-            "Booking class:",
-            record["booking_class"]
-        )
-
-        print(
-            "Price source:",
-            record["price_source"]
-        )
-
-    ######################################
-    # SAVE CSV
-    ######################################
-
-    csv_file = (
-        OUTPUT_DIR
-        /
-        f"airindia_fares_{timestamp}.csv"
-    )
-
-    save_csv(
-        fare_records,
-        csv_file
-    )
-
-    if fare_records:
-        append_first_observation(fare_records[0])
-
-    ######################################
-    # DONE
-    ######################################
-
-    print(
-        "\n"
-        "######################################\n"
-        "# SCRAPING COMPLETED\n"
-        "######################################"
-    )
-
-    print("\nClosing browser...")
-    context.close()
-    print("Done!")
