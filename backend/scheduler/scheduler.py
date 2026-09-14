@@ -66,6 +66,7 @@ STAGE_A_AIRLINES = (
 STAGE_A_LEAD_TIMES = (
     1,
     7,
+    30,
 )
 
 
@@ -259,6 +260,15 @@ def execute_task(task):
         if not isinstance(observations, list):
             raise TypeError(
                 "Normalizer must return a list of observations."
+            )
+
+        for observation in observations:
+            observation.update(
+                run_id=task["run_id"],
+                task_id=task["task_id"],
+                route_id=task["route_id"],
+                target_lead_days=task["target_lead_days"],
+                actual_lead_days=task["target_lead_days"],
             )
 
         print(

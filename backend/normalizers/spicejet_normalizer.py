@@ -67,44 +67,66 @@ def finalize(rows, task):
 def task_ts(task):
     return task.get("search_timestamp") or task.get("collection_timestamp") or datetime.now(timezone.utc).isoformat()
 
+def spicejet_sold_status(value):
+    """Convert fare-level availableCount into a canonical sold flag."""
+    count = safe_int(value)
+    if count is None:
+        return None
+    if count > 0:
+        return False
+    if count == 0:
+        return True
+    return None
+
 def normalize_spicejet(raw: Dict[str, Any], task: Dict[str, Any]):
-    rows=[]; ts=task_ts(task); ro,rd=task.get("origin"),task.get("destination")
-    data=raw.get("data",{}) or {}; params=data.get("searchParams",{}) or {}
-    currency=params.get("currencyCode") or params.get("currency") or "INR"
-    for trip in data.get("trips",[]) or []:
-      for j in (trip.get("journeys") or trip.get("journeysAvailable") or []):
-        jd=j.get("designator",{}) or {}; o=jd.get("origin") or j.get("origin"); d=jd.get("destination") or j.get("destination")
-        if ro and str(o).upper()!=str(ro).upper(): continue
-        if rd and str(d).upper()!=str(rd).upper(): continue
-        segs=j.get("segments") or []; nums=[]; carriers=[]; aircraft=[]
-        for s in segs:
-          ident=s.get("identifier")
-          if isinstance(ident,dict): nums.append(str(ident.get("identifier") or ident.get("flightNumber") or "")); carriers.append(str(ident.get("carrierCode") or ""))
-          elif ident: nums.append(str(ident)); carriers.append(str(s.get("carrierCode") or ""))
-          for l in s.get("legs") or []:
-            if l.get("equipmentType"): aircraft.append(str(l["equipmentType"]))
-        dep,arr=jd.get("departure"),jd.get("arrival"); dur=None
-        try: dur=int(round((pd.Timestamp(arr)-pd.Timestamp(dep)).total_seconds()/60))
-        except Exception: pass
-        fares=j.get("passengerFares") or []
-        if not fares and isinstance(data.get("faresAvailable"),dict): fares=list(data["faresAvailable"].values())
-        for pf in fares:
-          if not isinstance(pf,dict): continue
-          base=safe_float(pf.get("publishedFare") if pf.get("publishedFare") is not None else pf.get("revenueFare"))
-          total=safe_float(pf.get("fareAmount")); taxes=safe_float(pf.get("TaxSum") if pf.get("TaxSum") is not None else pf.get("taxAmount"))
-          fees=safe_float(pf.get("feeAmount")); key=pf.get("fareAvailabilityKey")
-          row=blank(); row.update({
-            "observation_id":stable_id("spicejet",task.get("run_id"),task.get("task_id"),o,d,dep,j.get("journeyKey"),pf.get("productClass"),pf.get("fareClass"),total),
-            "source":"spicejet","source_url":task.get("source_url"),"search_timestamp":ts,"extraction_status":"success","currency":currency,
-            "origin":o,"destination":d,"departure_datetime":iso(dep),"arrival_datetime":iso(arr),"departure_utc":utc_iso(dep),"arrival_utc":utc_iso(arr),
-            "duration_minutes":dur,"flight_number":",".join(dict.fromkeys([x for x in nums if x])) or None,
-            "carrier_code":",".join(dict.fromkeys([x for x in carriers if x])) or "SG","marketing_airline":"SpiceJet",
-            "operating_airline":pf.get("operatingCarrier") or "SpiceJet","flight_id":j.get("journeyKey"),
-            "journey_id":j.get("journeyKey"),"aircraft_code":",".join(dict.fromkeys(aircraft)) or None,
-            "stops":safe_int(j.get("stops")) if j.get("stops") is not None else max(len(segs)-1,0),"flight_type":j.get("flightType"),
-            "fare_product_class":pf.get("productClass"),"fare_class":pf.get("FareClassOfService") or pf.get("classOfService") or pf.get("fareClass"),
-            "fare_family":pf.get("fareCode"),"source_offer_id":key,"fare_availability_key":key,"base_fare":base,"taxes":taxes,"total_fees":fees,
-            "total_fare":total,"is_sold":j.get("isSold"),"service_charges":json.dumps(pf.get("serviceCharges"),default=str),
-            "original_fare_amount":total,"original_published_amount":safe_float(pf.get("publishedFare")),"passenger_type":"ADT"
-          }); rows.append(row)
-    return finalize(rows,task)
+        rows=[]; ts=task_ts(task); ro,rd=task.get("origin"),task.get("destination")
+        data=raw.get("data",{}) or {}; params=data.get("searchParams",{}) or {}
+        currency=data.get("currencyCode") or params.get("currencyCode") or params.get("currency") or "INR"
+        fare_definitions=data.get("faresAvailable") or {}
+        for trip in data.get("trips",[]) or []:
+            for j in (trip.get("journeys") or trip.get("journeysAvailable") or []):
+                jd=j.get("designator",{}) or {}; o=jd.get("origin") or j.get("origin"); d=jd.get("destination") or j.get("destination")
+                if ro and str(o).upper()!=str(ro).upper(): continue
+                if rd and str(d).upper()!=str(rd).upper(): continue
+                segs=j.get("segments") or []; nums=[]; carriers=[]; aircraft=[]
+                for s in segs:
+                    ident=s.get("identifier")
+                    if isinstance(ident,dict): nums.append(str(ident.get("identifier") or ident.get("flightNumber") or "")); carriers.append(str(ident.get("carrierCode") or ""))
+                    elif ident: nums.append(str(ident)); carriers.append(str(s.get("carrierCode") or ""))
+                    for l in s.get("legs") or []:
+                        if l.get("equipmentType"): aircraft.append(str(l["equipmentType"]))
+                dep,arr=jd.get("departure"),jd.get("arrival"); dur=None
+                try: dur=int(round((pd.Timestamp(arr)-pd.Timestamp(dep)).total_seconds()/60))
+                except Exception: pass
+                leg_evidence=[(leg.get("legInfo") or {}) for segment in segs for leg in segment.get("legs") or []]
+                for journey_fare in (j.get("fares") or {}).values():
+                    if not isinstance(journey_fare,dict): continue
+                    journey_key=journey_fare.get("fareAvailabilityKey")
+                    fare=fare_definitions.get(journey_key) if journey_key else None
+                    if not isinstance(fare,dict): continue
+                    available_count=journey_fare.get("availableCount")
+                    for pf in fare.get("passengerFares") or []:
+                        if not isinstance(pf,dict) or pf.get("passengerType") != "ADT": continue
+                        base=safe_float(pf.get("publishedFare") if pf.get("publishedFare") is not None else pf.get("revenueFare"))
+                        total=safe_float(pf.get("fareAmount")); taxes=safe_float(pf.get("TaxSum") if pf.get("TaxSum") is not None else pf.get("taxAmount"))
+                        fees=safe_float(pf.get("feeAmount")); key=pf.get("fareAvailabilityKey") or journey_key
+                        availability_evidence={
+                            "available_count":available_count,
+                            "leg_inventory":[{field:info.get(field) for field in ("capacity","adjustedCapacity","sold","lid","status")} for info in leg_evidence],
+                            "service_charges":pf.get("serviceCharges"),
+                        }
+                        row=blank(); row.update({
+                            "observation_id":stable_id("spicejet",task.get("run_id"),task.get("task_id"),o,d,dep,j.get("journeyKey"),pf.get("productClass"),pf.get("fareClass"),total),
+                            "source":"spicejet","source_url":task.get("source_url"),"search_timestamp":ts,"extraction_status":"success","currency":currency,
+                            "origin":o,"destination":d,"departure_datetime":iso(dep),"arrival_datetime":iso(arr),"departure_utc":utc_iso(dep),"arrival_utc":utc_iso(arr),
+                            "duration_minutes":dur,"flight_number":",".join(dict.fromkeys([x for x in nums if x])) or None,
+                            "carrier_code":",".join(dict.fromkeys([x for x in carriers if x])) or "SG","marketing_airline":"SpiceJet",
+                            "operating_airline":pf.get("operatingCarrier") or "SpiceJet","flight_id":j.get("journeyKey"),
+                            "journey_id":j.get("journeyKey"),"aircraft_code":",".join(dict.fromkeys(aircraft)) or None,
+                            "stops":safe_int(j.get("stops")) if j.get("stops") is not None else max(len(segs)-1,0),"flight_type":j.get("flightType"),
+                            "fare_product_class":fare.get("productClass"),"fare_class":fare.get("fareClassOfService") or fare.get("classOfService") or fare.get("fareClass"),
+                            "fare_family":fare.get("fareCode"),"source_offer_id":key,"fare_availability_key":key,"base_fare":base,"taxes":taxes,"total_fees":fees,
+                            "total_fare":total,"is_sold":spicejet_sold_status(available_count),"service_charges":json.dumps(availability_evidence,default=str),
+                            "original_fare_amount":total,"original_published_amount":safe_float(pf.get("publishedFare")),"passenger_type":"ADT"
+                        }); rows.append(row)
+        return finalize(rows,task)

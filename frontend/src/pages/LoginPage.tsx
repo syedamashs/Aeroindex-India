@@ -55,14 +55,14 @@ export function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="text-xs font-medium text-slate-500 flex items-center gap-1 mb-1">
-                <Mail className="w-3 h-3" /> Email
+                <Mail className="w-3 h-3" /> Username
               </label>
               <input
-                type="email"
+                type="text"
                 className="input"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="user@aeroindex.gov.in"
+                placeholder="Any username"
               />
             </div>
             <div>

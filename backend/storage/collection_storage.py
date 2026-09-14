@@ -590,6 +590,8 @@ def finalize_collection_run(
         pending/running   -> RUNNING
     """
 
+    refresh_collection_run_counts(run_id)
+
     with get_connection() as conn:
 
         rows = conn.execute(

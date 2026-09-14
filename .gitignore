@@ -22,11 +22,22 @@ yarn-error.log*
 # Python caches and generated scraper exports
 __pycache__/
 *.py[cod]
+.pytest_cache/
+**/.pytest_cache/
+.mypy_cache/
+.pyre/
+.venv/
+venv/
+backend/.venv/
+backend/venv/
 backend/data/raw/
 backend/data/normalized/
+backend/data/backup/
 backend/logs/
 backend/data/*.db
 backend/data/*.db-*
+backend/data/*.sqlite
+backend/data/*.sqlite3
 
 # Local browser sessions used by the scrapers
 .airindia_playwright_profile/

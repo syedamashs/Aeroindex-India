@@ -1,0 +1,4034 @@
+{
+  "report_metadata": {
+    "generated_at": "2026-09-14T07:40:42.386820+00:00",
+    "database_path": "E:\\Projects\\Hackathon\\Aeroindex\\backend\\data\\apix.db",
+    "scoring_version": "1.0"
+  },
+  "dataset_summary": {
+    "observation_count": 924,
+    "source_count": 3,
+    "source_breakdown": {
+      "airindia": 352,
+      "indigo": 560,
+      "spicejet": 12
+    },
+    "route_count": 1,
+    "earliest_search_timestamp": "2026-09-14T07:36:14.919889+00:00",
+    "latest_search_timestamp": "2026-09-14T07:37:41.861852+00:00",
+    "earliest_departure_date": "2026-09-15",
+    "latest_departure_date": "2026-09-21",
+    "collection_run_count": 1,
+    "collection_task_count": 6
+  },
+  "step_results": {
+    "schema_integrity": {
+      "step": "schema_integrity",
+      "status": "COMPLETED",
+      "started_at": "2026-09-14T07:40:38.903933+00:00",
+      "completed_at": "2026-09-14T07:40:38.903933+00:00",
+      "aggregate": {
+        "total": 924,
+        "hard_errors": 0,
+        "warnings": 924,
+        "not_checkable": 0,
+        "flagged": 0,
+        "status_counts": {
+          "VALID_WITH_WARNINGS": 924
+        },
+        "warning_items": [],
+        "limitations": []
+      },
+      "result_count": 924,
+      "sample_results": [
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        },
+        {
+          "is_valid": true,
+          "validation_status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "EMPTY_OPERATIONAL_FIELDS"
+          ],
+          "missing_canonical_fields": [],
+          "missing_operational_fields": [],
+          "unexpected_fields": [],
+          "empty_canonical_identity_fields": [],
+          "empty_operational_fields": [
+            "run_id",
+            "task_id",
+            "route_id",
+            "target_lead_days",
+            "actual_lead_days"
+          ]
+        }
+      ]
+    },
+    "fare_arithmetic_integrity": {
+      "step": "fare_arithmetic_integrity",
+      "status": "COMPLETED",
+      "started_at": "2026-09-14T07:40:38.903933+00:00",
+      "completed_at": "2026-09-14T07:40:38.903933+00:00",
+      "aggregate": {
+        "total": 924,
+        "hard_errors": 0,
+        "warnings": 572,
+        "not_checkable": 572,
+        "flagged": 0,
+        "status_counts": {
+          "VALID": 352,
+          "NOT_CHECKABLE": 572
+        },
+        "warning_items": [],
+        "limitations": []
+      },
+      "result_count": 924,
+      "sample_results": [
+        {
+          "observation_id": "f862660e36e1a2c64dffe7fa86819df6",
+          "status": "VALID",
+          "expected_total": "7190.0",
+          "actual_total": "7190.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "3aec215aa623358b3b625327f0674c86",
+          "status": "VALID",
+          "expected_total": "7610.0",
+          "actual_total": "7610.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "77d7a28cef9670b771d199d146a4bfad",
+          "status": "VALID",
+          "expected_total": "8135.0",
+          "actual_total": "8135.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "798dc818ca37f90981156ff51c6400d5",
+          "status": "VALID",
+          "expected_total": "9185.0",
+          "actual_total": "9185.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "52d22a08ff65ec2d310c60792d59eb2a",
+          "status": "VALID",
+          "expected_total": "7950.0",
+          "actual_total": "7950.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "0aedd86409db659a86e718a3fbfd7d91",
+          "status": "VALID",
+          "expected_total": "8383.0",
+          "actual_total": "8383.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "11a57d463f9e24ed90a5992144d35e31",
+          "status": "VALID",
+          "expected_total": "8924.0",
+          "actual_total": "8924.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "21c57fb6ce0d27d1e03b22ae7021ad0b",
+          "status": "VALID",
+          "expected_total": "10005.0",
+          "actual_total": "10005.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "bc24e19afcb54e437a871fb5780017f2",
+          "status": "VALID",
+          "expected_total": "13414.0",
+          "actual_total": "13414.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "dbf5d80a2a82bf72b474241b03f84e21",
+          "status": "VALID",
+          "expected_total": "15290.0",
+          "actual_total": "15290.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "acb6b0038a4cfa5c32ca90539b392de6",
+          "status": "VALID",
+          "expected_total": "6822.0",
+          "actual_total": "6822.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "ef042708ddd19baadd15f78d82027549",
+          "status": "VALID",
+          "expected_total": "7242.0",
+          "actual_total": "7242.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "a79df195acd0b4a4b6d145cf3e9f2d29",
+          "status": "VALID",
+          "expected_total": "7767.0",
+          "actual_total": "7767.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "0fd4aa5f737c356b01dcde4712d371e2",
+          "status": "VALID",
+          "expected_total": "8817.0",
+          "actual_total": "8817.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "36926efea53eb35083795b8b12285627",
+          "status": "VALID",
+          "expected_total": "11988.0",
+          "actual_total": "11988.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "06af1d7ca97aceac692ecb46f683ec2c",
+          "status": "VALID",
+          "expected_total": "13812.0",
+          "actual_total": "13812.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "f574d4174790939d4ee065609671c6d7",
+          "status": "VALID",
+          "expected_total": "44665.0",
+          "actual_total": "44665.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "9e7286712325dd9ba3be81bad51546a0",
+          "status": "VALID",
+          "expected_total": "46435.0",
+          "actual_total": "46435.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "ba9b4b1c067d07fc65c7ab45f3b22aae",
+          "status": "VALID",
+          "expected_total": "6980.0",
+          "actual_total": "6980.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "6b033279142e5b3aea613be20a7da194",
+          "status": "VALID",
+          "expected_total": "7400.0",
+          "actual_total": "7400.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "eb3cd00413aa02c89931506539e43491",
+          "status": "VALID",
+          "expected_total": "7925.0",
+          "actual_total": "7925.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "730b98536723c52ffe746161bb6d223e",
+          "status": "VALID",
+          "expected_total": "8975.0",
+          "actual_total": "8975.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "16415992faf1520a1693fccb2191e472",
+          "status": "VALID",
+          "expected_total": "6980.0",
+          "actual_total": "6980.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "1d96bc1a37c620383d2e360b0b64a0ea",
+          "status": "VALID",
+          "expected_total": "7400.0",
+          "actual_total": "7400.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "dfcf43aa780b8e220d4e5b90ff419fe5",
+          "status": "VALID",
+          "expected_total": "7925.0",
+          "actual_total": "7925.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "2faa2989bce29e539726db70b46684a1",
+          "status": "VALID",
+          "expected_total": "8975.0",
+          "actual_total": "8975.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "17972d76c17fcbef0dca4eef9577f172",
+          "status": "VALID",
+          "expected_total": "11867.0",
+          "actual_total": "11867.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "4e6690f5d91a4020521e917038198779",
+          "status": "VALID",
+          "expected_total": "13637.0",
+          "actual_total": "13637.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "401b20d21bd71feb308090893088792d",
+          "status": "VALID",
+          "expected_total": "9967.0",
+          "actual_total": "9967.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "8f31f67b056300c36d4a06408bdd1a11",
+          "status": "VALID",
+          "expected_total": "10387.0",
+          "actual_total": "10387.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "b461f91c43df56badbc2b13fb33304cc",
+          "status": "VALID",
+          "expected_total": "10912.0",
+          "actual_total": "10912.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "3024bec80d521691416c67e2bbf555b6",
+          "status": "VALID",
+          "expected_total": "11962.0",
+          "actual_total": "11962.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "0230b81055db1fea1f0f29b4bcf72d47",
+          "status": "VALID",
+          "expected_total": "12628.0",
+          "actual_total": "12628.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "b53847c0383e97332e20a93b9873b65c",
+          "status": "VALID",
+          "expected_total": "14398.0",
+          "actual_total": "14398.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "ad15c89674d2d88baddb939b00ee2375",
+          "status": "VALID",
+          "expected_total": "44665.0",
+          "actual_total": "44665.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "1b3c39e4407aa57c312297def9b2bcbf",
+          "status": "VALID",
+          "expected_total": "46435.0",
+          "actual_total": "46435.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "8f8b814d81ca30e36f4aac3058ccac98",
+          "status": "VALID",
+          "expected_total": "13286.0",
+          "actual_total": "13286.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "00c1457a4a825fcf4bf99a5cfec9333b",
+          "status": "VALID",
+          "expected_total": "13706.0",
+          "actual_total": "13706.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "1df486444175683f81669bee564e05b1",
+          "status": "VALID",
+          "expected_total": "14231.0",
+          "actual_total": "14231.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "5bc4120e09ba0fba338860dd05addaf9",
+          "status": "VALID",
+          "expected_total": "15281.0",
+          "actual_total": "15281.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "de02c7b01216fae62406f615e625de2c",
+          "status": "VALID",
+          "expected_total": "16711.0",
+          "actual_total": "16711.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "e3f4af8bb267b2dcc46339e491e1487b",
+          "status": "VALID",
+          "expected_total": "18481.0",
+          "actual_total": "18481.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "4e5dbd6c85c660111d2613bfb4e4a107",
+          "status": "VALID",
+          "expected_total": "31163.0",
+          "actual_total": "31163.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "e4e6570309bc9642422039d1929b84e3",
+          "status": "VALID",
+          "expected_total": "32933.0",
+          "actual_total": "32933.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "a4b0fc67297092d1c4d79e13bf95d2fb",
+          "status": "VALID",
+          "expected_total": "6709.0",
+          "actual_total": "6709.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "7ccbd7f28fc6e0db10582e6ee37ebee4",
+          "status": "VALID",
+          "expected_total": "7129.0",
+          "actual_total": "7129.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "1a2911ca76eacfe153b984f00cea560a",
+          "status": "VALID",
+          "expected_total": "7654.0",
+          "actual_total": "7654.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "faddd23fa1b04dfbea8f1f0471cc64a0",
+          "status": "VALID",
+          "expected_total": "8704.0",
+          "actual_total": "8704.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "86560fdfa94862a97d93142f5ca98d87",
+          "status": "VALID",
+          "expected_total": "9318.0",
+          "actual_total": "9318.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "7fc7fca9d0c749cfa75fc20cbe3781e4",
+          "status": "VALID",
+          "expected_total": "11088.0",
+          "actual_total": "11088.0",
+          "difference": "0.0",
+          "errors": [],
+          "warnings": []
+        }
+      ]
+    },
+    "date_time_integrity": {
+      "step": "date_time_integrity",
+      "status": "COMPLETED",
+      "started_at": "2026-09-14T07:40:38.903933+00:00",
+      "completed_at": "2026-09-14T07:40:38.903933+00:00",
+      "aggregate": {
+        "total": 924,
+        "hard_errors": 0,
+        "warnings": 572,
+        "not_checkable": 0,
+        "flagged": 0,
+        "status_counts": {
+          "VALID": 352,
+          "VALID_WITH_WARNINGS": 572
+        },
+        "warning_items": [],
+        "limitations": []
+      },
+      "result_count": 924,
+      "sample_results": [
+        {
+          "observation_id": "f862660e36e1a2c64dffe7fa86819df6",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "3aec215aa623358b3b625327f0674c86",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "77d7a28cef9670b771d199d146a4bfad",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "798dc818ca37f90981156ff51c6400d5",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "52d22a08ff65ec2d310c60792d59eb2a",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "0aedd86409db659a86e718a3fbfd7d91",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "11a57d463f9e24ed90a5992144d35e31",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "21c57fb6ce0d27d1e03b22ae7021ad0b",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "bc24e19afcb54e437a871fb5780017f2",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "dbf5d80a2a82bf72b474241b03f84e21",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "acb6b0038a4cfa5c32ca90539b392de6",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "ef042708ddd19baadd15f78d82027549",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "a79df195acd0b4a4b6d145cf3e9f2d29",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "0fd4aa5f737c356b01dcde4712d371e2",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "36926efea53eb35083795b8b12285627",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "06af1d7ca97aceac692ecb46f683ec2c",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "f574d4174790939d4ee065609671c6d7",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "9e7286712325dd9ba3be81bad51546a0",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "ba9b4b1c067d07fc65c7ab45f3b22aae",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "6b033279142e5b3aea613be20a7da194",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "eb3cd00413aa02c89931506539e43491",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "730b98536723c52ffe746161bb6d223e",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "16415992faf1520a1693fccb2191e472",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "1d96bc1a37c620383d2e360b0b64a0ea",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "dfcf43aa780b8e220d4e5b90ff419fe5",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "2faa2989bce29e539726db70b46684a1",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "17972d76c17fcbef0dca4eef9577f172",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "4e6690f5d91a4020521e917038198779",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "401b20d21bd71feb308090893088792d",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "8f31f67b056300c36d4a06408bdd1a11",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "b461f91c43df56badbc2b13fb33304cc",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "3024bec80d521691416c67e2bbf555b6",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "0230b81055db1fea1f0f29b4bcf72d47",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "b53847c0383e97332e20a93b9873b65c",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "ad15c89674d2d88baddb939b00ee2375",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "1b3c39e4407aa57c312297def9b2bcbf",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "8f8b814d81ca30e36f4aac3058ccac98",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "00c1457a4a825fcf4bf99a5cfec9333b",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "1df486444175683f81669bee564e05b1",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "5bc4120e09ba0fba338860dd05addaf9",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "de02c7b01216fae62406f615e625de2c",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "e3f4af8bb267b2dcc46339e491e1487b",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "4e5dbd6c85c660111d2613bfb4e4a107",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "e4e6570309bc9642422039d1929b84e3",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "a4b0fc67297092d1c4d79e13bf95d2fb",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "7ccbd7f28fc6e0db10582e6ee37ebee4",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "1a2911ca76eacfe153b984f00cea560a",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "faddd23fa1b04dfbea8f1f0471cc64a0",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "86560fdfa94862a97d93142f5ca98d87",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "observation_id": "7fc7fca9d0c749cfa75fc20cbe3781e4",
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        }
+      ]
+    },
+    "flight_identity_integrity": {
+      "step": "flight_identity_integrity",
+      "status": "COMPLETED",
+      "started_at": "2026-09-14T07:40:38.919168+00:00",
+      "completed_at": "2026-09-14T07:40:38.920601+00:00",
+      "aggregate": {
+        "total": 924,
+        "hard_errors": 0,
+        "warnings": 1264,
+        "not_checkable": 0,
+        "flagged": 0,
+        "status_counts": {
+          "VALID_WITH_WARNINGS": 912,
+          "VALID": 12
+        },
+        "warning_items": [],
+        "limitations": []
+      },
+      "result_count": 924,
+      "sample_results": [
+        {
+          "observation_id": "f862660e36e1a2c64dffe7fa86819df6",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "3aec215aa623358b3b625327f0674c86",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "77d7a28cef9670b771d199d146a4bfad",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "798dc818ca37f90981156ff51c6400d5",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "52d22a08ff65ec2d310c60792d59eb2a",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "0aedd86409db659a86e718a3fbfd7d91",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "11a57d463f9e24ed90a5992144d35e31",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "21c57fb6ce0d27d1e03b22ae7021ad0b",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "bc24e19afcb54e437a871fb5780017f2",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "dbf5d80a2a82bf72b474241b03f84e21",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "acb6b0038a4cfa5c32ca90539b392de6",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "ef042708ddd19baadd15f78d82027549",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "a79df195acd0b4a4b6d145cf3e9f2d29",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "0fd4aa5f737c356b01dcde4712d371e2",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "36926efea53eb35083795b8b12285627",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "06af1d7ca97aceac692ecb46f683ec2c",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "f574d4174790939d4ee065609671c6d7",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "9e7286712325dd9ba3be81bad51546a0",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "ba9b4b1c067d07fc65c7ab45f3b22aae",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "6b033279142e5b3aea613be20a7da194",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "eb3cd00413aa02c89931506539e43491",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "730b98536723c52ffe746161bb6d223e",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "16415992faf1520a1693fccb2191e472",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "1d96bc1a37c620383d2e360b0b64a0ea",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "dfcf43aa780b8e220d4e5b90ff419fe5",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "2faa2989bce29e539726db70b46684a1",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "17972d76c17fcbef0dca4eef9577f172",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "4e6690f5d91a4020521e917038198779",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "401b20d21bd71feb308090893088792d",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "8f31f67b056300c36d4a06408bdd1a11",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "b461f91c43df56badbc2b13fb33304cc",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "3024bec80d521691416c67e2bbf555b6",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "0230b81055db1fea1f0f29b4bcf72d47",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "b53847c0383e97332e20a93b9873b65c",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "ad15c89674d2d88baddb939b00ee2375",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "1b3c39e4407aa57c312297def9b2bcbf",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "8f8b814d81ca30e36f4aac3058ccac98",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "00c1457a4a825fcf4bf99a5cfec9333b",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "1df486444175683f81669bee564e05b1",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "5bc4120e09ba0fba338860dd05addaf9",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "de02c7b01216fae62406f615e625de2c",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "e3f4af8bb267b2dcc46339e491e1487b",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "4e5dbd6c85c660111d2613bfb4e4a107",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "e4e6570309bc9642422039d1929b84e3",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "a4b0fc67297092d1c4d79e13bf95d2fb",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "7ccbd7f28fc6e0db10582e6ee37ebee4",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "1a2911ca76eacfe153b984f00cea560a",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "faddd23fa1b04dfbea8f1f0471cc64a0",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "86560fdfa94862a97d93142f5ca98d87",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        },
+        {
+          "observation_id": "7fc7fca9d0c749cfa75fc20cbe3781e4",
+          "status": "VALID_WITH_WARNINGS",
+          "errors": [],
+          "warnings": [
+            "MISSING_FARE_AVAILABILITY_KEY",
+            "MISSING_FARE_PRODUCT_CLASS"
+          ]
+        }
+      ]
+    },
+    "sold_out_handling": {
+      "step": "sold_out_handling",
+      "status": "COMPLETED",
+      "started_at": "2026-09-14T07:40:38.920601+00:00",
+      "completed_at": "2026-09-14T07:40:38.920601+00:00",
+      "aggregate": {
+        "total": 924,
+        "hard_errors": 0,
+        "warnings": 352,
+        "not_checkable": 352,
+        "flagged": 0,
+        "status_counts": {
+          "NOT_CHECKABLE": 352,
+          "AVAILABLE": 572
+        },
+        "warning_items": [],
+        "limitations": []
+      },
+      "result_count": 924,
+      "sample_results": [
+        {
+          "observation_id": "f862660e36e1a2c64dffe7fa86819df6",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "3aec215aa623358b3b625327f0674c86",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "77d7a28cef9670b771d199d146a4bfad",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "798dc818ca37f90981156ff51c6400d5",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "52d22a08ff65ec2d310c60792d59eb2a",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "0aedd86409db659a86e718a3fbfd7d91",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "11a57d463f9e24ed90a5992144d35e31",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "21c57fb6ce0d27d1e03b22ae7021ad0b",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "bc24e19afcb54e437a871fb5780017f2",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "dbf5d80a2a82bf72b474241b03f84e21",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "acb6b0038a4cfa5c32ca90539b392de6",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "ef042708ddd19baadd15f78d82027549",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "a79df195acd0b4a4b6d145cf3e9f2d29",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "0fd4aa5f737c356b01dcde4712d371e2",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "36926efea53eb35083795b8b12285627",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "06af1d7ca97aceac692ecb46f683ec2c",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "f574d4174790939d4ee065609671c6d7",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "9e7286712325dd9ba3be81bad51546a0",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "ba9b4b1c067d07fc65c7ab45f3b22aae",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "6b033279142e5b3aea613be20a7da194",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "eb3cd00413aa02c89931506539e43491",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "730b98536723c52ffe746161bb6d223e",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "16415992faf1520a1693fccb2191e472",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "1d96bc1a37c620383d2e360b0b64a0ea",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "dfcf43aa780b8e220d4e5b90ff419fe5",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "2faa2989bce29e539726db70b46684a1",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "17972d76c17fcbef0dca4eef9577f172",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "4e6690f5d91a4020521e917038198779",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "401b20d21bd71feb308090893088792d",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "8f31f67b056300c36d4a06408bdd1a11",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "b461f91c43df56badbc2b13fb33304cc",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "3024bec80d521691416c67e2bbf555b6",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "0230b81055db1fea1f0f29b4bcf72d47",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "b53847c0383e97332e20a93b9873b65c",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "ad15c89674d2d88baddb939b00ee2375",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "1b3c39e4407aa57c312297def9b2bcbf",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "8f8b814d81ca30e36f4aac3058ccac98",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "00c1457a4a825fcf4bf99a5cfec9333b",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "1df486444175683f81669bee564e05b1",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "5bc4120e09ba0fba338860dd05addaf9",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "de02c7b01216fae62406f615e625de2c",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "e3f4af8bb267b2dcc46339e491e1487b",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "4e5dbd6c85c660111d2613bfb4e4a107",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "e4e6570309bc9642422039d1929b84e3",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "a4b0fc67297092d1c4d79e13bf95d2fb",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "7ccbd7f28fc6e0db10582e6ee37ebee4",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "1a2911ca76eacfe153b984f00cea560a",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "faddd23fa1b04dfbea8f1f0471cc64a0",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "86560fdfa94862a97d93142f5ca98d87",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        },
+        {
+          "observation_id": "7fc7fca9d0c749cfa75fc20cbe3781e4",
+          "status": "NOT_CHECKABLE",
+          "reason": "NO_INTERPRETABLE_SOLD_FLAG",
+          "warnings": [
+            "SOLD_STATUS_UNKNOWN"
+          ]
+        }
+      ]
+    },
+    "outlier_quality": {
+      "step": "outlier_quality",
+      "status": "COMPLETED",
+      "started_at": "2026-09-14T07:40:38.920601+00:00",
+      "completed_at": "2026-09-14T07:40:41.769941+00:00",
+      "aggregate": {
+        "total": 924,
+        "hard_errors": 0,
+        "warnings": 198,
+        "not_checkable": 0,
+        "flagged": 198,
+        "status_counts": {
+          "NORMAL": 726,
+          "SUSPECT": 198
+        },
+        "warning_items": [],
+        "limitations": []
+      },
+      "result_count": 924,
+      "sample_results": [
+        {
+          "observation_id": "f862660e36e1a2c64dffe7fa86819df6",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": -0.8156453703703703,
+          "median_fare": 9802.0,
+          "mad": 2160.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "3aec215aa623358b3b625327f0674c86",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": -0.6844925925925925,
+          "median_fare": 9802.0,
+          "mad": 2160.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "77d7a28cef9670b771d199d146a4bfad",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": -0.5205516203703704,
+          "median_fare": 9802.0,
+          "mad": 2160.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "798dc818ca37f90981156ff51c6400d5",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": -0.19266967592592593,
+          "median_fare": 9802.0,
+          "mad": 2160.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "52d22a08ff65ec2d310c60792d59eb2a",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": -0.5783212962962963,
+          "median_fare": 9802.0,
+          "mad": 2160.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "0aedd86409db659a86e718a3fbfd7d91",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": -0.4431090277777778,
+          "median_fare": 9802.0,
+          "mad": 2160.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "11a57d463f9e24ed90a5992144d35e31",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": -0.27417175925925924,
+          "median_fare": 9802.0,
+          "mad": 2160.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "21c57fb6ce0d27d1e03b22ae7021ad0b",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": 0.0745015909090909,
+          "median_fare": 9762.0,
+          "mad": 2200.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "bc24e19afcb54e437a871fb5780017f2",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": 1.11967,
+          "median_fare": 9762.0,
+          "mad": 2200.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "dbf5d80a2a82bf72b474241b03f84e21",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": 1.6948345454545455,
+          "median_fare": 9762.0,
+          "mad": 2200.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "acb6b0038a4cfa5c32ca90539b392de6",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": -0.9305601851851851,
+          "median_fare": 9802.0,
+          "mad": 2160.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "ef042708ddd19baadd15f78d82027549",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": -0.7994074074074075,
+          "median_fare": 9802.0,
+          "mad": 2160.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "a79df195acd0b4a4b6d145cf3e9f2d29",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": -0.6354664351851852,
+          "median_fare": 9802.0,
+          "mad": 2160.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "0fd4aa5f737c356b01dcde4712d371e2",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": -0.30758449074074073,
+          "median_fare": 9802.0,
+          "mad": 2160.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "36926efea53eb35083795b8b12285627",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": 0.6824713636363636,
+          "median_fare": 9762.0,
+          "mad": 2200.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "06af1d7ca97aceac692ecb46f683ec2c",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": 1.2416931818181818,
+          "median_fare": 9762.0,
+          "mad": 2200.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "f574d4174790939d4ee065609671c6d7",
+          "status": "SUSPECT",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_ABOVE_THRESHOLD",
+          "score": 10.7009425,
+          "median_fare": 9762.0,
+          "mad": 2200.0,
+          "comparison_count": 157,
+          "warnings": [
+            "STATISTICAL_SCREEN_ONLY"
+          ]
+        },
+        {
+          "observation_id": "9e7286712325dd9ba3be81bad51546a0",
+          "status": "SUSPECT",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_ABOVE_THRESHOLD",
+          "score": 11.243608409090909,
+          "median_fare": 9762.0,
+          "mad": 2200.0,
+          "comparison_count": 157,
+          "warnings": [
+            "STATISTICAL_SCREEN_ONLY"
+          ]
+        },
+        {
+          "observation_id": "ba9b4b1c067d07fc65c7ab45f3b22aae",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": -0.8812217592592593,
+          "median_fare": 9802.0,
+          "mad": 2160.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "6b033279142e5b3aea613be20a7da194",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": -0.7500689814814814,
+          "median_fare": 9802.0,
+          "mad": 2160.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "eb3cd00413aa02c89931506539e43491",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": -0.5861280092592592,
+          "median_fare": 9802.0,
+          "mad": 2160.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "730b98536723c52ffe746161bb6d223e",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": -0.2582460648148148,
+          "median_fare": 9802.0,
+          "mad": 2160.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "16415992faf1520a1693fccb2191e472",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": -0.8812217592592593,
+          "median_fare": 9802.0,
+          "mad": 2160.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "1d96bc1a37c620383d2e360b0b64a0ea",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": -0.7500689814814814,
+          "median_fare": 9802.0,
+          "mad": 2160.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "dfcf43aa780b8e220d4e5b90ff419fe5",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": -0.5861280092592592,
+          "median_fare": 9802.0,
+          "mad": 2160.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "2faa2989bce29e539726db70b46684a1",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": -0.2582460648148148,
+          "median_fare": 9802.0,
+          "mad": 2160.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "17972d76c17fcbef0dca4eef9577f172",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": 0.6453738636363636,
+          "median_fare": 9762.0,
+          "mad": 2200.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "4e6690f5d91a4020521e917038198779",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": 1.1880397727272727,
+          "median_fare": 9762.0,
+          "mad": 2200.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "401b20d21bd71feb308090893088792d",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": 0.06285113636363637,
+          "median_fare": 9762.0,
+          "mad": 2200.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "8f31f67b056300c36d4a06408bdd1a11",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": 0.19161931818181818,
+          "median_fare": 9762.0,
+          "mad": 2200.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "b461f91c43df56badbc2b13fb33304cc",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": 0.35257954545454545,
+          "median_fare": 9762.0,
+          "mad": 2200.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "3024bec80d521691416c67e2bbf555b6",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": 0.6745,
+          "median_fare": 9762.0,
+          "mad": 2200.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "0230b81055db1fea1f0f29b4bcf72d47",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": 0.8786895454545455,
+          "median_fare": 9762.0,
+          "mad": 2200.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "b53847c0383e97332e20a93b9873b65c",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": 1.4213554545454545,
+          "median_fare": 9762.0,
+          "mad": 2200.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "ad15c89674d2d88baddb939b00ee2375",
+          "status": "SUSPECT",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_ABOVE_THRESHOLD",
+          "score": 10.7009425,
+          "median_fare": 9762.0,
+          "mad": 2200.0,
+          "comparison_count": 157,
+          "warnings": [
+            "STATISTICAL_SCREEN_ONLY"
+          ]
+        },
+        {
+          "observation_id": "1b3c39e4407aa57c312297def9b2bcbf",
+          "status": "SUSPECT",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_ABOVE_THRESHOLD",
+          "score": 11.243608409090909,
+          "median_fare": 9762.0,
+          "mad": 2200.0,
+          "comparison_count": 157,
+          "warnings": [
+            "STATISTICAL_SCREEN_ONLY"
+          ]
+        },
+        {
+          "observation_id": "8f8b814d81ca30e36f4aac3058ccac98",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": 1.0804263636363636,
+          "median_fare": 9762.0,
+          "mad": 2200.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "00c1457a4a825fcf4bf99a5cfec9333b",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": 1.2091945454545454,
+          "median_fare": 9762.0,
+          "mad": 2200.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "1df486444175683f81669bee564e05b1",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": 1.3701547727272727,
+          "median_fare": 9762.0,
+          "mad": 2200.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "5bc4120e09ba0fba338860dd05addaf9",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": 1.6920752272727273,
+          "median_fare": 9762.0,
+          "mad": 2200.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "de02c7b01216fae62406f615e625de2c",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": 2.130500227272727,
+          "median_fare": 9762.0,
+          "mad": 2200.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "e3f4af8bb267b2dcc46339e491e1487b",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": 2.6731661363636365,
+          "median_fare": 9762.0,
+          "mad": 2200.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "4e5dbd6c85c660111d2613bfb4e4a107",
+          "status": "SUSPECT",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_ABOVE_THRESHOLD",
+          "score": 6.561352045454545,
+          "median_fare": 9762.0,
+          "mad": 2200.0,
+          "comparison_count": 157,
+          "warnings": [
+            "STATISTICAL_SCREEN_ONLY"
+          ]
+        },
+        {
+          "observation_id": "e4e6570309bc9642422039d1929b84e3",
+          "status": "SUSPECT",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_ABOVE_THRESHOLD",
+          "score": 7.104017954545455,
+          "median_fare": 9762.0,
+          "mad": 2200.0,
+          "comparison_count": 157,
+          "warnings": [
+            "STATISTICAL_SCREEN_ONLY"
+          ]
+        },
+        {
+          "observation_id": "a4b0fc67297092d1c4d79e13bf95d2fb",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": -0.9658465277777779,
+          "median_fare": 9802.0,
+          "mad": 2160.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "7ccbd7f28fc6e0db10582e6ee37ebee4",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": -0.83469375,
+          "median_fare": 9802.0,
+          "mad": 2160.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "1a2911ca76eacfe153b984f00cea560a",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": -0.6707527777777778,
+          "median_fare": 9802.0,
+          "mad": 2160.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "faddd23fa1b04dfbea8f1f0471cc64a0",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": -0.34287083333333335,
+          "median_fare": 9802.0,
+          "mad": 2160.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "86560fdfa94862a97d93142f5ca98d87",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": -0.15113796296296295,
+          "median_fare": 9802.0,
+          "mad": 2160.0,
+          "comparison_count": 157,
+          "warnings": []
+        },
+        {
+          "observation_id": "7fc7fca9d0c749cfa75fc20cbe3781e4",
+          "status": "NORMAL",
+          "method": "MEDIAN_MAD_SAME_CARRIER",
+          "reason": "ROBUST_DEVIATION_WITHIN_THRESHOLD",
+          "score": 0.4065395454545454,
+          "median_fare": 9762.0,
+          "mad": 2200.0,
+          "comparison_count": 157,
+          "warnings": []
+        }
+      ]
+    },
+    "duplicate_integrity": {
+      "step": "duplicate_integrity",
+      "status": "COMPLETED",
+      "started_at": "2026-09-14T07:40:41.769941+00:00",
+      "completed_at": "2026-09-14T07:40:41.769941+00:00",
+      "aggregate": {
+        "total": 924,
+        "hard_errors": 0,
+        "warnings": 0,
+        "not_checkable": 0,
+        "flagged": 0,
+        "status_counts": {
+          "DUPLICATE_GROUPS": 0
+        },
+        "warning_items": [],
+        "limitations": []
+      },
+      "result": {
+        "total_observations": 924,
+        "unique_keys": 924,
+        "duplicate_groups": [],
+        "duplicate_group_count": 0,
+        "duplicate_rows": 0,
+        "extra_duplicate_rows": 0
+      }
+    },
+    "cross_source_consistency": {
+      "step": "cross_source_consistency",
+      "status": "COMPLETED",
+      "started_at": "2026-09-14T07:40:41.769941+00:00",
+      "completed_at": "2026-09-14T07:40:42.359559+00:00",
+      "aggregate": {
+        "total": 104344,
+        "hard_errors": 0,
+        "warnings": 1659,
+        "not_checkable": 102588,
+        "flagged": 1714,
+        "status_counts": {
+          "NOT_CHECKABLE": 102588,
+          "DISCREPANT": 1659,
+          "MINOR_DIFFERENCE": 55,
+          "AGREE": 42
+        },
+        "warning_items": [],
+        "limitations": [
+          "CROSS_SOURCE_MATCHING_IS_RESTRICTED_TO_COMPARABLE_SCHEDULES"
+        ]
+      },
+      "result_count": 104344,
+      "sample_results": [
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "b473de724138dd187429ac4854c927cf",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "b820d57e3a00d2918f5b6d3d9a1cad3b",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "c9ac85d36110c308e5156737ed6226d7",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "878e9dfafe7a49f0eb5d630d2ba2cb96",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "adc37732d20497a47100287925d7b42f",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "697104d4355cedf93bbf214f2b884f8d",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "64475c0982162c612e2f30199b37d3f9",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "8f5109a2482ee48c0b2df12d4bb1dcb8",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "540cd40fb487e4fb18c00fc940c39cb2",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "2124b25fb7ae8e7c5a26521d3b66fdce",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "524976e56685c3c49f0cb57d638c4ebc",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "adf6628c781eaf72c38d3fe8968041fa",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "896fe8771949f9dce64f9503ecbabc3a",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "02e43f2e0b2295f9e81b2f151359384b",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "9e97219e368759b85ed3505bea21083f",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "7686cfcef16b7c49116c2e29ebce78b1",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "2a5c31ac26c3d4062f8a4b343c03a7cd",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "7d9a1804ada92e323126d07a0d7a8e17",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "5948626d94f683d6886c224c6d206a6a",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "f049670d77a34dc1dc83a5d9e041762d",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "d7c16487a8db0bb70df0f58e58f9ef4f",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "c4d43eedd26a694a68904481ed9026c6",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "bb9caf4df79fadbaca8ae0addeae36d3",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "2a0b2adf2215d2e8c1eac8c338a99443",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "5090ad021ff91054ff2bab9c7d74c05b",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "8c8f125982623bab3873318618cdffe2",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "55520f82d612c606be4648a0fde6d5e5",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "911656b895027ef678bd0ef470a64a42",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "1694b1ce1588d118a7da3def519b78a7",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "350d2de4adb9fc08a791081871f67c80",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "ab283ea9785fb32fc50634430530cc8d",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "0907fb61901a2f75937755493d8c8499",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "91b87aaf604405cf7e619c8b83be4410",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "280c01b1513af25540f1b7567c33a7fb",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "c7001893fe5900a7752154da81d8d1ce",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "dc06a7e205f8da6cb1810dc59ab73c99",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "5d7e3a5177e92c6b0690230cc6412145",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "8f1041f4e1633b96e6992e40fd2b23f5",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "e646b57de3f2ca27fa397f7ed4f222cc",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "518c905f482f3c892175d35261db84e0",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "fcc3b0cd0d2838576b4427c62112104a",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "9f1bf40048594463a0b1100da4f85b1a",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "51d99f2118a91cf6dc1159387b33086e",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "a5db0e18f60101a963f374ac8609d30f",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "5721685961a19955380e06535d01a44d",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "a6d9fa4afb62f8ece9b47b6e4256658b",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "625f48bf76209350478cd15a79aa667d",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "f61149b926f0862d5cfab377818b7ff5",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "164cef7c6a389dbdad508a7efce2a802",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        },
+        {
+          "source_a": "airindia",
+          "source_b": "indigo",
+          "observation_id_a": "f862660e36e1a2c64dffe7fa86819df6",
+          "observation_id_b": "7d1cd6b96b5dd210a36589e8dc617856",
+          "status": "NOT_CHECKABLE",
+          "absolute_difference": null,
+          "percentage_difference": null,
+          "reason": "INSUFFICIENT_MATCHING_IDENTITY",
+          "warnings": []
+        }
+      ]
+    }
+  },
+  "quality_scores": {
+    "schema_integrity": {
+      "name": "schema_integrity",
+      "score": 80.0,
+      "status": "PASS_WITH_WARNINGS",
+      "weight": 0.15,
+      "numerator": 924,
+      "denominator": 924,
+      "hard_errors": 0,
+      "warnings": 924,
+      "not_checkable": 0,
+      "flagged": 0,
+      "scoring_explanation": "Score = 100 - 100*(hard_errors/assessable) - 20*(warnings/assessable); NOT_CHECKABLE is excluded from the penalty denominator.",
+      "warnings_list": [],
+      "limitations": []
+    },
+    "fare_arithmetic_integrity": {
+      "name": "fare_arithmetic_integrity",
+      "score": 80.0,
+      "status": "PASS_WITH_WARNINGS",
+      "weight": 0.15,
+      "numerator": 352,
+      "denominator": 352,
+      "hard_errors": 0,
+      "warnings": 572,
+      "not_checkable": 572,
+      "flagged": 0,
+      "scoring_explanation": "Score = 100 - 100*(hard_errors/assessable) - 20*(warnings/assessable); NOT_CHECKABLE is excluded from the penalty denominator.",
+      "warnings_list": [],
+      "limitations": []
+    },
+    "date_time_integrity": {
+      "name": "date_time_integrity",
+      "score": 87.62,
+      "status": "PASS_WITH_WARNINGS",
+      "weight": 0.12,
+      "numerator": 924,
+      "denominator": 924,
+      "hard_errors": 0,
+      "warnings": 572,
+      "not_checkable": 0,
+      "flagged": 0,
+      "scoring_explanation": "Score = 100 - 100*(hard_errors/assessable) - 20*(warnings/assessable); NOT_CHECKABLE is excluded from the penalty denominator.",
+      "warnings_list": [],
+      "limitations": []
+    },
+    "flight_identity_integrity": {
+      "name": "flight_identity_integrity",
+      "score": 80.0,
+      "status": "PASS_WITH_WARNINGS",
+      "weight": 0.12,
+      "numerator": 924,
+      "denominator": 924,
+      "hard_errors": 0,
+      "warnings": 1264,
+      "not_checkable": 0,
+      "flagged": 0,
+      "scoring_explanation": "Score = 100 - 100*(hard_errors/assessable) - 20*(warnings/assessable); NOT_CHECKABLE is excluded from the penalty denominator.",
+      "warnings_list": [],
+      "limitations": []
+    },
+    "duplicate_integrity": {
+      "name": "duplicate_integrity",
+      "score": 100.0,
+      "status": "PASS",
+      "weight": 0.12,
+      "numerator": 924,
+      "denominator": 924,
+      "hard_errors": 0,
+      "warnings": 0,
+      "not_checkable": 0,
+      "flagged": 0,
+      "scoring_explanation": "Score = 100 - 100*(hard_errors/assessable) - 20*(warnings/assessable); NOT_CHECKABLE is excluded from the penalty denominator.",
+      "warnings_list": [],
+      "limitations": []
+    },
+    "sold_out_handling": {
+      "name": "sold_out_handling",
+      "score": 87.69,
+      "status": "PASS_WITH_WARNINGS",
+      "weight": 0.1,
+      "numerator": 572,
+      "denominator": 572,
+      "hard_errors": 0,
+      "warnings": 352,
+      "not_checkable": 352,
+      "flagged": 0,
+      "scoring_explanation": "Score = 100 - 100*(hard_errors/assessable) - 20*(warnings/assessable); NOT_CHECKABLE is excluded from the penalty denominator.",
+      "warnings_list": [],
+      "limitations": []
+    },
+    "outlier_quality": {
+      "name": "outlier_quality",
+      "score": 95.71,
+      "status": "PASS_WITH_WARNINGS",
+      "weight": 0.12,
+      "numerator": 924,
+      "denominator": 924,
+      "hard_errors": 0,
+      "warnings": 198,
+      "not_checkable": 0,
+      "flagged": 198,
+      "scoring_explanation": "Score = 100 - 100*(hard_errors/assessable) - 20*(warnings/assessable); NOT_CHECKABLE is excluded from the penalty denominator.",
+      "warnings_list": [
+        "FLAGGED_RESULTS_ARE_NOT_AUTOMATICALLY_INVALID"
+      ],
+      "limitations": []
+    },
+    "cross_source_consistency": {
+      "name": "cross_source_consistency",
+      "score": 81.1,
+      "status": "PASS_WITH_WARNINGS",
+      "weight": 0.12,
+      "numerator": 1756,
+      "denominator": 1756,
+      "hard_errors": 0,
+      "warnings": 1659,
+      "not_checkable": 102588,
+      "flagged": 1714,
+      "scoring_explanation": "Score = 100 - 100*(hard_errors/assessable) - 20*(warnings/assessable); NOT_CHECKABLE is excluded from the penalty denominator.",
+      "warnings_list": [
+        "FLAGGED_RESULTS_ARE_NOT_AUTOMATICALLY_INVALID"
+      ],
+      "limitations": [
+        "CROSS_SOURCE_MATCHING_IS_RESTRICTED_TO_COMPARABLE_SCHEDULES"
+      ]
+    }
+  },
+  "overall_score": 86.1,
+  "overall_status": "PASS_WITH_WARNINGS",
+  "key_findings": [
+    "schema_integrity: {'VALID_WITH_WARNINGS': 924}",
+    "fare_arithmetic_integrity: {'VALID': 352, 'NOT_CHECKABLE': 572}",
+    "date_time_integrity: {'VALID': 352, 'VALID_WITH_WARNINGS': 572}",
+    "flight_identity_integrity: {'VALID_WITH_WARNINGS': 912, 'VALID': 12}",
+    "sold_out_handling: {'NOT_CHECKABLE': 352, 'AVAILABLE': 572}",
+    "outlier_quality: {'NORMAL': 726, 'SUSPECT': 198}",
+    "duplicate_integrity: {'DUPLICATE_GROUPS': 0}",
+    "cross_source_consistency: {'NOT_CHECKABLE': 102588, 'DISCREPANT': 1659, 'MINOR_DIFFERENCE': 55, 'AGREE': 42}"
+  ],
+  "warnings": [
+    "FLAGGED_RESULTS_ARE_NOT_AUTOMATICALLY_INVALID"
+  ],
+  "limitations": [
+    "CROSS_SOURCE_MATCHING_IS_RESTRICTED_TO_COMPARABLE_SCHEDULES"
+  ],
+  "audit_trail": {
+    "run_at": "2026-09-14T07:40:42.386820+00:00",
+    "database_path": "E:\\Projects\\Hackathon\\Aeroindex\\backend\\data\\apix.db",
+    "observation_count": 924,
+    "steps_ran": [
+      "schema_integrity",
+      "fare_arithmetic_integrity",
+      "date_time_integrity",
+      "flight_identity_integrity",
+      "sold_out_handling",
+      "outlier_quality",
+      "duplicate_integrity",
+      "cross_source_consistency"
+    ],
+    "runtime_errors": [],
+    "scoring_version": "1.0"
+  },
+  "database_read_only": true
+}

@@ -67,54 +67,64 @@ def finalize(rows, task):
 def task_ts(task):
     return task.get("search_timestamp") or task.get("collection_timestamp") or datetime.now(timezone.utc).isoformat()
 
+def airindia_sold_status(availability_details):
+    """Map only explicit sold/unavailable statuses; leave source codes unknown."""
+    sold_values = {"SOLD", "SOLD_OUT", "UNAVAILABLE", "NOT_AVAILABLE"}
+    for detail in availability_details:
+        status = detail.get("statusCode")
+        if status is not None and str(status).strip().upper() in sold_values:
+            return True
+    return None
+
 def normalize_airindia(raw: Dict[str, Any], task: Dict[str, Any]):
-    rows=[]; ts=task_ts(task)
-    ro, rd = task.get("origin"), task.get("destination")
-    flights=(raw.get("dictionaries") or {}).get("flight",{}) or {}
-    services=(raw.get("dictionaries") or {}).get("service",{}) or {}
-    for payload in raw.get("responsePayload",[]) or []:
-      for group in payload.get("airBoundGroups",[]) or []:
-        bd=group.get("boundDetails",{}) or {}; o=bd.get("originLocationCode"); d=bd.get("destinationLocationCode")
-        if ro and str(o).upper()!=str(ro).upper(): continue
-        if rd and str(d).upper()!=str(rd).upper(): continue
-        for bound in group.get("airBounds",[]) or []:
-          offer=bound.get("airOffer",{}) or {}; prices=offer.get("prices",{}) or {}
-          ps=prices.get("totalPrices") or []
-          if not ps: continue
-          p=ps[0] or {}; base=safe_float(p.get("base")); taxes=safe_float(p.get("totalTaxes"))
-          fees=safe_float(p.get("totalFees")); total=safe_float(p.get("total"))
-          fis=bound.get("fareInfos") or [{}]
-          for fi in fis:
-            fids=fi.get("flightIds") or []
-            if not fids:
-              fids=[a.get("flightId") for a in (bound.get("availabilityDetails") or []) if a.get("flightId")]
-            if not fids: fids=[None]
-            for fid in fids:
-              f=flights.get(fid,{}) if fid else {}
-              dep=f.get("departure"); arr=f.get("arrival")
-              dep=dep.get("dateTime") if isinstance(dep,dict) else dep
-              arr=arr.get("dateTime") if isinstance(arr,dict) else arr
-              dur=safe_int(f.get("duration")); dur=dur//60 if dur and dur>1000 else dur
-              row=blank(); row.update({
-                "observation_id":stable_id("airindia",task.get("run_id"),task.get("task_id"),o,d,fid,fi.get("fareClass"),total),
-                "source":"airindia","source_url":task.get("source_url"),"search_timestamp":ts,
-                "extraction_status":"success","currency":p.get("currencyCode") or "INR",
-                "origin":o,"destination":d,"departure_datetime":iso(dep),"arrival_datetime":iso(arr),
-                "departure_utc":utc_iso(dep),"arrival_utc":utc_iso(arr),"duration_minutes":dur,
-                "flight_number":f.get("marketingFlightNumber"),"carrier_code":f.get("marketingAirlineCode"),
-                "marketing_airline":f.get("marketingAirlineCode"),"operating_airline":f.get("operatingAirlineCode"),
-                "flight_id":fid,"journey_id":bound.get("airBoundId"),"aircraft_code":f.get("aircraftCode"),
-                "stops":0,"flight_type":"NonStop","departure_terminal":f.get("departureTerminal"),
-                "arrival_terminal":f.get("arrivalTerminal"),
-                "code_share_indicator": (f.get("marketingAirlineCode")!=f.get("operatingAirlineCode")
-                    if f.get("operatingAirlineCode") else None),
-                "fare_product_class":fi.get("cabin") or fi.get("fareCabinName"),
-                "fare_class":fi.get("fareClass") or fi.get("bookingClass"),
-                "fare_family":fi.get("fareType"),"source_offer_id":bound.get("airBoundId"),
-                "fare_availability_key":fi.get("fareAvailabilityKey"),"base_fare":base,"taxes":taxes,
-                "total_fees":fees,"total_fare":total,
-                "is_cheapest_offer":offer.get("isCheapestOffer"),
-                "service_charges":json.dumps(fi.get("serviceIds"),default=str) if fi.get("serviceIds") else None,
-                "original_fare_amount":total,"original_published_amount":base,"passenger_type":"ADT"
-              }); rows.append(row)
-    return finalize(rows,task)
+        rows=[]; ts=task_ts(task)
+        ro, rd = task.get("origin"), task.get("destination")
+        flights=(raw.get("dictionaries") or {}).get("flight",{}) or {}
+        for payload in raw.get("responsePayload",[]) or []:
+            for group in payload.get("airBoundGroups",[]) or []:
+                bd=group.get("boundDetails",{}) or {}; o=bd.get("originLocationCode"); d=bd.get("destinationLocationCode")
+                if ro and str(o).upper()!=str(ro).upper(): continue
+                if rd and str(d).upper()!=str(rd).upper(): continue
+                for bound in group.get("airBounds",[]) or []:
+                    offer=bound.get("airOffer",{}) or {}; prices=offer.get("prices",{}) or {}
+                    ps=prices.get("totalPrices") or []
+                    if not ps: continue
+                    p=ps[0] or {}; base=safe_float(p.get("base")); taxes=safe_float(p.get("totalTaxes"))
+                    fees=safe_float(p.get("totalFees")); total=safe_float(p.get("total"))
+                    availability_details=bound.get("availabilityDetails") or []
+                    fis=bound.get("fareInfos") or [{}]
+                    for fi in fis:
+                        fids=fi.get("flightIds") or []
+                        if not fids:
+                            fids=[a.get("flightId") for a in availability_details if a.get("flightId")]
+                        if not fids: fids=[None]
+                        for fid in fids:
+                            f=flights.get(fid,{}) if fid else {}
+                            matching_availability=[detail for detail in availability_details if not fids or detail.get("flightId") in fids]
+                            availability_evidence={"service_ids":fi.get("serviceIds"),"availability_details":matching_availability}
+                            dep=f.get("departure"); arr=f.get("arrival")
+                            dep=dep.get("dateTime") if isinstance(dep,dict) else dep
+                            arr=arr.get("dateTime") if isinstance(arr,dict) else arr
+                            dur=safe_int(f.get("duration")); dur=dur//60 if dur and dur>1000 else dur
+                            row=blank(); row.update({
+                                "observation_id":stable_id("airindia",task.get("run_id"),task.get("task_id"),o,d,fid,fi.get("fareClass"),total),
+                                "source":"airindia","source_url":task.get("source_url"),"search_timestamp":ts,
+                                "extraction_status":"success","currency":p.get("currencyCode") or "INR",
+                                "origin":o,"destination":d,"departure_datetime":iso(dep),"arrival_datetime":iso(arr),
+                                "departure_utc":utc_iso(dep),"arrival_utc":utc_iso(arr),"duration_minutes":dur,
+                                "flight_number":f.get("marketingFlightNumber"),"carrier_code":f.get("marketingAirlineCode"),
+                                "marketing_airline":f.get("marketingAirlineCode"),"operating_airline":f.get("operatingAirlineCode"),
+                                "flight_id":fid,"journey_id":bound.get("airBoundId"),"aircraft_code":f.get("aircraftCode"),
+                                "stops":0,"flight_type":"NonStop","departure_terminal":f.get("departureTerminal"),
+                                "arrival_terminal":f.get("arrivalTerminal"),
+                                "code_share_indicator":(f.get("marketingAirlineCode")!=f.get("operatingAirlineCode") if f.get("operatingAirlineCode") else None),
+                                "fare_product_class":fi.get("cabin") or fi.get("fareCabinName"),
+                                "fare_class":fi.get("fareClass") or fi.get("bookingClass"),
+                                "fare_family":fi.get("fareType"),"source_offer_id":bound.get("airBoundId"),
+                                "fare_availability_key":fi.get("fareAvailabilityKey"),"base_fare":base,"taxes":taxes,
+                                "total_fees":fees,"total_fare":total,"is_cheapest_offer":offer.get("isCheapestOffer"),
+                                "is_sold":airindia_sold_status(matching_availability),
+                                "service_charges":json.dumps(availability_evidence,default=str) if matching_availability or fi.get("serviceIds") else None,
+                                "original_fare_amount":total,"original_published_amount":base,"passenger_type":"ADT"
+                            }); rows.append(row)
+        return finalize(rows,task)

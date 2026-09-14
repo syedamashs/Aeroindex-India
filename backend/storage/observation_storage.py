@@ -66,6 +66,16 @@ APIX_COLUMNS = (
     "passenger_type",
 )
 
+PROVENANCE_COLUMNS = (
+    "run_id",
+    "task_id",
+    "route_id",
+    "target_lead_days",
+    "actual_lead_days",
+)
+
+INSERT_COLUMNS = APIX_COLUMNS + PROVENANCE_COLUMNS
+
 
 # ============================================================
 # SOURCE-SPECIFIC COLUMNS
@@ -144,7 +154,7 @@ def validate_observation(observation: dict[str, Any]) -> None:
 
     missing = [
         column
-        for column in APIX_COLUMNS
+        for column in INSERT_COLUMNS
         if column not in observation
     ]
 
@@ -241,10 +251,10 @@ def insert_observation(
     ]
 
     placeholders = ", ".join(
-        ["?"] * len(APIX_COLUMNS)
+        ["?"] * len(INSERT_COLUMNS)
     )
 
-    columns_sql = ", ".join(APIX_COLUMNS)
+    columns_sql = ", ".join(INSERT_COLUMNS)
 
     sql = f"""
         INSERT OR IGNORE INTO apix_observations (
@@ -289,10 +299,10 @@ def insert_observations(
     for observation in observations:
         validate_observation(observation)
 
-    columns_sql = ", ".join(APIX_COLUMNS)
+    columns_sql = ", ".join(INSERT_COLUMNS)
 
     placeholders = ", ".join(
-        ["?"] * len(APIX_COLUMNS)
+        ["?"] * len(INSERT_COLUMNS)
     )
 
     sql = f"""
@@ -316,7 +326,7 @@ def insert_observations(
                     serialize_value(
                         observation.get(column)
                     )
-                    for column in APIX_COLUMNS
+                        for column in INSERT_COLUMNS
                 ]
 
                 cursor = connection.execute(
