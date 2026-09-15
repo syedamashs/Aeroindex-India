@@ -47,6 +47,11 @@ backend/data/*.sqlite3
 **/*diagnostic*.py
 **/reports/
 
+# Non-production analysis and demo runners
+**/run_*_dqe.py
+**/run_*_analysis.py
+**/run_index_demo.py
+
 # Local browser sessions used by the scrapers
 .airindia_playwright_profile/
 .spicejet_playwright_profile/
