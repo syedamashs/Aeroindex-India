@@ -72,7 +72,7 @@ export function TelemetryFeed({ maxLogs = 12 }: { maxLogs?: number }) {
           </div>
           <div className="flex items-center gap-1.5 text-slate-300 font-semibold text-xs ml-2">
             <Terminal className="w-3.5 h-3.5 text-accent-400" />
-            <span>AeroIndex Telemetry Ingest Stream</span>
+            <span>Vayuyaan Telemetry Ingest Stream</span>
           </div>
         </div>
 

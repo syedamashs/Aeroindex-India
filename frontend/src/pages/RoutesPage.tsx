@@ -123,7 +123,7 @@ export function RoutesPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'aeroindex-route-analysis.csv';
+    a.download = 'vayuyaan-route-analysis.csv';
     a.click();
     URL.revokeObjectURL(url);
     fireConfetti({ spread: 55, origin: { y: 0.3 } });

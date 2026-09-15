@@ -62,7 +62,7 @@ export function MethodologyPage() {
             </div>
 
             <h1 className="font-display font-extrabold text-3xl lg:text-4xl tracking-tight text-white">
-              AeroIndex Mathematical Methodology
+              Vayuyaan Mathematical Methodology
             </h1>
             <p className="text-sm text-navy-200 leading-relaxed">
               Formal mathematical specification detailing how raw multi-source flight observations are cleaned, matched into identity cohorts, and aggregated into national price indices.
@@ -129,8 +129,8 @@ export function MethodologyPage() {
       </MethodSection>
 
       <MethodSection title="3. Laspeyres & Jevons Estimator Formulations">
-        <p>AeroIndex implements weighted Laspeyres aggregation across representative high-density passenger trunk corridors:</p>
-        <Formula>AeroIndex(t) = [ ∑ ( w_r × I(r, t) ) / ∑ w_r ] × 100</Formula>
+        <p>Vayuyaan implements weighted Laspeyres aggregation across representative high-density passenger trunk corridors:</p>
+        <Formula>Vayuyaan(t) = [ ∑ ( w_r × I(r, t) ) / ∑ w_r ] × 100</Formula>
         <p>Where <em>w_r</em> represents the official DGCA passenger volume weight for route <em>r</em>, and <em>I(r, t)</em> is the route-level elementary relative.</p>
       </MethodSection>
 

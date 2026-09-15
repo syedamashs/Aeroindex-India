@@ -69,7 +69,7 @@ export function LoginPage() {
             <Plane className="w-7 h-7 text-accent-400" />
           </div>
           <h1 className="font-display font-extrabold text-2xl lg:text-3xl text-white tracking-tight">
-            AeroIndex India
+            Vayuyaan India
           </h1>
           <p className="text-navy-300 text-xs mt-1">National Airfare Price Intelligence Command Terminal</p>
         </div>

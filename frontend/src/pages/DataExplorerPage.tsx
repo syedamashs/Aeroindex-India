@@ -82,7 +82,7 @@ export function DataExplorerPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'aeroindex-observations.csv';
+    a.download = 'vayuyaan-observations.csv';
     a.click();
     URL.revokeObjectURL(url);
     fireConfetti({ spread: 60, origin: { y: 0.3 } });

@@ -245,9 +245,9 @@ export function AlertsPage() {
                     </div>
                   </div>
 
-                  {a.route && (
+                  {a.route && a.route !== 'National' && (
                     <button
-                      onClick={() => navigate(`/routes/${a.route.replace(' ', '-')}`)}
+                      onClick={() => navigate(`/routes/${a.route}`)}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-xs font-bold text-navy-800 hover:bg-slate-50 shadow-sm whitespace-nowrap self-end sm:self-center"
                     >
                       <span>Investigate Corridor</span>

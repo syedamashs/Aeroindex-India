@@ -89,7 +89,7 @@ export function LandingPage() {
             </div>
             <div>
               <span className="font-display font-extrabold text-lg tracking-tight text-white flex items-center gap-1.5">
-                AeroIndex India
+                Vayuyaan India
                 <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-accent-500/20 text-accent-400 border border-accent-500/30">SIH 2026</span>
               </span>
             </div>
@@ -132,7 +132,7 @@ export function LandingPage() {
               </h1>
 
               <p className="landing-reveal landing-delay-2 text-base sm:text-lg text-slate-300 max-w-xl leading-relaxed">
-                AeroIndex turns millions of airfare observations into a clear national index, route pressure map, and policy-ready alert stream for Indian aviation.
+                Vayuyaan turns millions of airfare observations into a clear national index, route pressure map, and policy-ready alert stream for Indian aviation.
               </p>
 
               <div className="landing-reveal landing-delay-3 flex flex-wrap items-center gap-4">
@@ -305,7 +305,7 @@ export function LandingPage() {
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
           <div className="flex items-center gap-2">
             <Shield className="w-4 h-4 text-accent-400" />
-            <span>AeroIndex India • Smart India Hackathon (SIH 2026) Prototype</span>
+            <span>Vayuyaan India • Smart India Hackathon (SIH 2026) Prototype</span>
           </div>
           <p>Ministry of Civil Aviation / DGCA Tariff Transparency Framework</p>
         </div>

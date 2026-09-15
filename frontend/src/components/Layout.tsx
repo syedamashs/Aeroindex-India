@@ -83,7 +83,7 @@ export function Layout({ children }: { children: ReactNode }) {
             </div>
             <div>
               <h1 className="font-display font-extrabold text-lg leading-tight tracking-tight text-white flex items-center gap-1.5">
-                AeroIndex
+                Vayuyaan
                 <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-accent-500/20 text-accent-400 border border-accent-500/30">IN</span>
               </h1>
               <p className="text-[11px] font-medium text-navy-400">National Aviation Grid</p>
@@ -163,7 +163,7 @@ export function Layout({ children }: { children: ReactNode }) {
       <div className="lg:hidden fixed top-0 inset-x-0 z-30 bg-navy-950 text-white px-4 py-3 flex items-center justify-between border-b border-navy-800">
         <div className="flex items-center gap-2.5">
           <Plane className="w-5 h-5 text-accent-400" />
-          <span className="font-display font-extrabold text-white">AeroIndex India</span>
+          <span className="font-display font-extrabold text-white">Vayuyaan India</span>
         </div>
         <button onClick={() => setMobileOpen(!mobileOpen)} className="p-1 rounded-lg text-slate-300 hover:text-white">
           {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}

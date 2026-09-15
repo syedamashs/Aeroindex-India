@@ -317,7 +317,7 @@ export function DashboardPage() {
               <div>
                 <div className="flex items-center gap-2">
                   <h2 className="text-lg font-display font-bold text-navy-950">
-                    {chartMode === 'index' ? 'India Airfare Price Index (AeroIndex)' : 'National Average Ticket Fare Trend'}
+                    {chartMode === 'index' ? 'India Airfare Price Index (Vayuyaan)' : 'National Average Ticket Fare Trend'}
                   </h2>
                   <span className="badge badge-navy">Base 2026</span>
                 </div>
