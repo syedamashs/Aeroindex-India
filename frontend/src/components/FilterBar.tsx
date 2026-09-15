@@ -1,10 +1,11 @@
+import { useEffect, useState } from 'react';
 import { useApp } from '@/context/AppContext';
-import { AIRPORTS } from '@/data/airports';
-import { AIRLINES } from '@/data/airlines';
+import { apiAirlines, apiMap } from '@/lib/api';
 import { Calendar, Plane, Building2, Armchair, Clock, RotateCcw } from 'lucide-react';
 import type { DatePreset } from '@/data/types';
 
 const PRESETS: { value: DatePreset; label: string }[] = [
+  { value: 'all', label: 'All Available Data' },
   { value: 'today', label: 'Today' },
   { value: '7d', label: 'Last 7 Days' },
   { value: '30d', label: 'Last 30 Days' },
@@ -15,6 +16,18 @@ const PRESETS: { value: DatePreset; label: string }[] = [
 
 export function FilterBar() {
   const { filters, setFilters, resetFilters } = useApp();
+  const [airports, setAirports] = useState<Array<{ code: string; city: string }>>([]);
+  const [airlines, setAirlines] = useState<Array<{ code: string; name: string }>>([]);
+
+  useEffect(() => {
+    Promise.all([apiMap(), apiAirlines()]).then(([map, airlineResponse]) => {
+      setAirports(map.data.airports.map(({ code, city }) => ({ code, city })));
+      setAirlines(airlineResponse.data.map(({ code, name }) => ({ code, name })));
+    }).catch(() => {
+      setAirports([]);
+      setAirlines([]);
+    });
+  }, []);
 
   return (
     <div className="card p-4 mb-6">
@@ -67,7 +80,7 @@ export function FilterBar() {
             onChange={(e) => setFilters({ origin: e.target.value })}
           >
             <option value="all">All Origins</option>
-            {AIRPORTS.map((a) => (
+            {airports.map((a) => (
               <option key={a.code} value={a.code}>{a.city} ({a.code})</option>
             ))}
           </select>
@@ -83,7 +96,7 @@ export function FilterBar() {
             onChange={(e) => setFilters({ destination: e.target.value })}
           >
             <option value="all">All Destinations</option>
-            {AIRPORTS.map((a) => (
+            {airports.map((a) => (
               <option key={a.code} value={a.code}>{a.city} ({a.code})</option>
             ))}
           </select>
@@ -99,7 +112,7 @@ export function FilterBar() {
             onChange={(e) => setFilters({ airline: e.target.value })}
           >
             <option value="all">All Airlines</option>
-            {AIRLINES.map((a) => (
+            {airlines.map((a) => (
               <option key={a.code} value={a.code}>{a.name}</option>
             ))}
           </select>

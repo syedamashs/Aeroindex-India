@@ -69,6 +69,32 @@
   .table-row {
     @apply border-t border-slate-100 hover:bg-slate-50 transition-colors;
   }
+
+  /* SIH Modern UI System */
+  .glass-card {
+    @apply bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200/80 shadow-sm transition-all duration-300;
+  }
+  .glass-card:hover {
+    @apply shadow-lg border-slate-300 -translate-y-0.5;
+  }
+  .glow-navy {
+    box-shadow: 0 0 25px -5px rgba(36, 70, 128, 0.25);
+  }
+  .glow-accent {
+    box-shadow: 0 0 25px -5px rgba(34, 197, 94, 0.25);
+  }
+  .glow-warning {
+    box-shadow: 0 0 25px -5px rgba(245, 158, 11, 0.25);
+  }
+  .pill-tab {
+    @apply px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-200;
+  }
+  .pill-tab-active {
+    @apply bg-navy-900 text-white shadow-sm;
+  }
+  .pill-tab-inactive {
+    @apply bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-navy-900;
+  }
 }
 
 /* Leaflet overrides for professional look */
@@ -76,47 +102,351 @@
   font-family: 'Inter', system-ui, sans-serif;
   font-size: 12px;
 }
+
 .leaflet-popup-content-wrapper {
   border-radius: 10px;
   box-shadow: 0 4px 16px rgba(15, 29, 56, 0.15);
 }
+
 .leaflet-popup-content {
   margin: 12px 14px;
 }
+
 .leaflet-bar a {
   border-radius: 6px !important;
 }
 
 /* Scrollbar */
-::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 5px; }
-::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+html:has(.data-explorer-page),
+body:has(.data-explorer-page) {
+  scrollbar-width: none;
+  overflow-x: hidden;
+}
+body:has(.data-explorer-page)::-webkit-scrollbar { width: 0; height: 0; }
 
 /* Recharts tooltip */
 .recharts-default-tooltip {
-  border-radius: 8px !important;
+  border-radius: 12px !important;
   border: 1px solid #e2e8f0 !important;
-  box-shadow: 0 4px 12px rgba(15, 29, 56, 0.08) !important;
+  box-shadow: 0 8px 24px rgba(15, 29, 56, 0.12) !important;
+  backdrop-filter: blur(8px);
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
+  from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
+@keyframes pageTransition {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes appGridDrift {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: 72px 72px, 72px 72px; }
+}
+@keyframes navSignal {
+  from { transform: translateX(0); }
+  to { transform: translateX(420%); }
+}
+@keyframes syncPulse {
+  0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.6); }
+  70% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
 .animate-fade-in {
-  animation: fadeIn 0.3s ease-out;
+  animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes pulse-soft {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  50% { opacity: 0.4; }
 }
 .animate-pulse-soft {
   animation: pulse-soft 2s ease-in-out infinite;
 }
 
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.animate-shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.app-main-shell {
+  position: relative;
+  isolation: isolate;
+}
+.app-main-shell::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.28;
+  background-image: linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: linear-gradient(to bottom, black, transparent 70%);
+  animation: appGridDrift 28s linear infinite;
+}
+.page-transition {
+  animation: pageTransition 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.app-nav-item {
+  position: relative;
+  overflow: hidden;
+}
+.app-nav-item::after {
+  content: '';
+  position: absolute;
+  left: -40%;
+  bottom: 0;
+  width: 34%;
+  height: 1px;
+  background: #4ade80;
+  box-shadow: 0 0 10px #4ade80;
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+.app-nav-item:hover::after,
+.app-nav-item[aria-current='page']::after {
+  opacity: 1;
+  animation: navSignal 1.8s linear infinite;
+}
+.app-sync-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.app-sync-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #22c55e;
+  box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.6);
+  animation: syncPulse 1.8s ease-out infinite;
+}
+.card {
+  transition: transform 260ms ease, box-shadow 260ms ease, border-color 260ms ease;
+}
+.card:hover {
+  border-color: rgba(148, 163, 184, 0.75);
+  box-shadow: 0 12px 30px rgba(15, 29, 56, 0.09), 0 2px 6px rgba(15, 29, 56, 0.04);
+}
+
+.landing-hero {
+  isolation: isolate;
+}
+.landing-grid {
+  opacity: 0.22;
+  background-image: linear-gradient(rgba(148, 163, 184, 0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(148, 163, 184, 0.12) 1px, transparent 1px);
+  background-size: 54px 54px;
+  mask-image: linear-gradient(to bottom, black, transparent 85%);
+}
+.landing-scanline {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(74, 222, 128, 0.65), transparent);
+  box-shadow: 0 0 22px rgba(74, 222, 128, 0.5);
+  animation: landingScan 7s ease-in-out infinite;
+}
+.landing-reveal {
+  animation: landingReveal 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.landing-delay-1 { animation-delay: 120ms; }
+.landing-delay-2 { animation-delay: 220ms; }
+.landing-delay-3 { animation-delay: 320ms; }
+.landing-delay-4 { animation-delay: 430ms; }
+.landing-orbit {
+  position: absolute;
+  border: 1px solid rgba(74, 222, 128, 0.18);
+  border-radius: 999px;
+  pointer-events: none;
+}
+.landing-orbit-one {
+  width: 27rem;
+  height: 27rem;
+  right: -8rem;
+  top: -8rem;
+  animation: landingOrbit 18s linear infinite;
+}
+.landing-orbit-two {
+  width: 19rem;
+  height: 19rem;
+  right: -4rem;
+  top: -4rem;
+  border-color: rgba(56, 189, 248, 0.16);
+  animation: landingOrbit 12s linear infinite reverse;
+}
+.landing-bar {
+  transform-origin: bottom;
+  animation: landingBar 2.4s ease-in-out infinite alternate;
+}
+.landing-ticker {
+  animation: landingTicker 34s linear infinite;
+}
+.landing-pipeline-card {
+  animation: landingPipeline 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.landing-pipeline-line {
+  background-size: 200% 100%;
+  animation: landingLine 4s ease-in-out infinite;
+}
+@keyframes landingReveal {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes landingScan {
+  0%, 100% { transform: translateY(0); opacity: 0.25; }
+  50% { transform: translateY(38rem); opacity: 0.8; }
+}
+@keyframes landingOrbit {
+  from { transform: rotate(0deg) translateX(4px); }
+  to { transform: rotate(360deg) translateX(4px); }
+}
+@keyframes landingBar {
+  from { transform: scaleY(0.82); opacity: 0.55; }
+  to { transform: scaleY(1); opacity: 1; }
+}
+@keyframes landingTicker {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes landingPipeline {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes landingLine {
+  0%, 100% { background-position: 0% 50%; opacity: 0.55; }
+  50% { background-position: 100% 50%; opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing-reveal,
+  .landing-scanline,
+  .landing-orbit,
+  .landing-bar {
+    animation: none;
+  }
+  .landing-ticker,
+  .landing-pipeline-card,
+  .landing-pipeline-line {
+    animation: none;
+  }
+}
+
+.login-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.14;
+  pointer-events: none;
+  background-image: linear-gradient(rgba(148, 163, 184, 0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(148, 163, 184, 0.12) 1px, transparent 1px);
+  background-size: 46px 46px;
+  mask-image: linear-gradient(to bottom, black, transparent 82%);
+  animation: loginGridDrift 18s linear infinite;
+}
+.login-brand {
+  animation: landingReveal 0.7s 80ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.login-card {
+  position: relative;
+  overflow: hidden;
+  animation: loginCardReveal 0.75s 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.login-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -28%;
+  width: 24%;
+  height: 2px;
+  background: #4ade80;
+  box-shadow: 0 0 18px 3px rgba(74, 222, 128, 0.7);
+  animation: loginCardScan 3.8s ease-in-out infinite;
+  pointer-events: none;
+}
+.login-submit {
+  position: relative;
+  overflow: hidden;
+}
+.login-submit::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 30%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateX(-180%) skewX(-18deg);
+  animation: loginButtonSweep 4s ease-in-out infinite;
+  pointer-events: none;
+}
+.login-role {
+  transition: transform 180ms ease, border-color 180ms ease, background-color 180ms ease;
+}
+.login-role:hover {
+  transform: translateX(4px);
+}
+@keyframes loginGridDrift {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: 46px 46px, 46px 46px; }
+}
+@keyframes loginCardReveal {
+  from { opacity: 0; transform: translateY(16px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes loginCardScan {
+  0%, 12% { transform: translateX(0); opacity: 0; }
+  22% { opacity: 1; }
+  78%, 100% { transform: translateX(535%); opacity: 0; }
+}
+@keyframes loginButtonSweep {
+  0%, 58% { transform: translateX(-180%) skewX(-18deg); }
+  78%, 100% { transform: translateX(430%) skewX(-18deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .login-page::before,
+  .login-brand,
+  .login-card,
+  .login-card::before,
+  .login-submit::after {
+    animation: none;
+  }
+  .login-role { transition: none; }
+}
+
 @media print {
   .no-print { display: none !important; }
   .print-full { width: 100% !important; max-width: none !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-main-shell::before,
+  .page-transition,
+  .app-nav-item::after,
+  .app-sync-dot {
+    animation: none;
+  }
+  .card,
+  .app-nav-item,
+  .login-role {
+    transition: none;
+  }
 }

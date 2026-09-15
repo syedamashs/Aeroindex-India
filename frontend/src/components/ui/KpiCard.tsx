@@ -8,9 +8,10 @@ interface KpiCardProps {
   change?: number;
   icon?: ReactNode;
   accent?: 'navy' | 'success' | 'warning' | 'danger';
+  valueClassName?: string;
 }
 
-export function KpiCard({ label, value, sublabel, change, icon, accent = 'navy' }: KpiCardProps) {
+export function KpiCard({ label, value, sublabel, change, icon, accent = 'navy', valueClassName = '' }: KpiCardProps) {
   const accentColors = {
     navy: 'bg-navy-50 text-navy-700',
     success: 'bg-success-500/10 text-success-600',
@@ -28,7 +29,7 @@ export function KpiCard({ label, value, sublabel, change, icon, accent = 'navy' 
           </div>
         )}
       </div>
-      <div className="kpi-value">{value}</div>
+      <div className={`kpi-value ${valueClassName}`}>{value}</div>
       <div className="flex items-center gap-2 text-xs">
         {change !== undefined && (
           <span

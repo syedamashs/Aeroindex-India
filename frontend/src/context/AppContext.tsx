@@ -1,6 +1,5 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
 import type { Filters } from '@/data/types';
-import { appendNewObservations } from '@/data/generator';
 
 interface ToastMsg {
   message: string;
@@ -25,9 +24,9 @@ const DEFAULT_FILTERS: Filters = {
   airline: 'all',
   travelClass: 'all',
   bookingWindow: 'all',
-  preset: '180d',
+  preset: 'all',
   customStart: '2026-01-01',
-  customEnd: '2026-08-31',
+  customEnd: '2026-12-31',
 };
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -51,9 +50,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const triggerUpdate = useCallback(
     (count = 200) => {
-      appendNewObservations(count);
       setLastUpdate(Date.now());
-      showToast(`${count} new airfare observations received and processed.`, 'success');
+      showToast(`Database refresh requested. Showing the latest SQLite observations.`, 'success');
     },
     [showToast],
   );

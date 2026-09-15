@@ -49,6 +49,7 @@ from storage.collection_storage import (
 from storage.observation_storage import (
     insert_observations,
 )
+from database.connection import sync_scheduler_run_to_backup
 
 
 # ============================================================
@@ -66,7 +67,9 @@ STAGE_A_AIRLINES = (
 STAGE_A_LEAD_TIMES = (
     1,
     7,
+    15,
     30,
+    45,
 )
 
 
@@ -138,6 +141,11 @@ def load_raw_response(scraper_result):
     raw_file = scraper_result.get("raw_file")
 
     if not raw_file:
+        scraper_error = scraper_result.get("error")
+        if scraper_error:
+            raise RuntimeError(
+                f"Scraper failed before producing raw output: {scraper_error}"
+            )
         raise ValueError(
             "Scraper did not return a raw_file path."
         )
@@ -350,7 +358,7 @@ def run_stage_a():
 
         DELHI_MUMBAI
         × 3 airlines
-        × T+1 and T+7
+        × T+1, T+7, T+15, T+30, and T+45
         × one run
     """
 
@@ -446,6 +454,9 @@ def run_stage_a():
     for task in tasks:
         create_collection_task(task)
 
+    # Copy only this scheduler run; synthetic live-only rows are excluded.
+    sync_scheduler_run_to_backup(run_id)
+
     # --------------------------------------------------------
     # EXECUTE TASKS SEQUENTIALLY
     # --------------------------------------------------------
@@ -467,6 +478,10 @@ def run_stage_a():
         before = total_inserted
 
         inserted = execute_task(task)
+
+        # Copy only this scheduler run after every task, so an interrupted
+        # run leaves both databases aligned without copying synthetic rows.
+        sync_scheduler_run_to_backup(run_id)
 
         total_inserted += inserted
 

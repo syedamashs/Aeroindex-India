@@ -33,11 +33,19 @@ backend/venv/
 backend/data/raw/
 backend/data/normalized/
 backend/data/backup/
+backend/data/*
 backend/logs/
 backend/data/*.db
 backend/data/*.db-*
 backend/data/*.sqlite
 backend/data/*.sqlite3
+
+# Tests, diagnostics, and generated reports
+**/tests/
+**/test_*.py
+**/*_test.py
+**/*diagnostic*.py
+**/reports/
 
 # Local browser sessions used by the scrapers
 .airindia_playwright_profile/

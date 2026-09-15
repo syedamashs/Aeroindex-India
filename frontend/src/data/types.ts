@@ -136,7 +136,7 @@ export interface DateRange {
   end: string;
 }
 
-export type DatePreset = 'today' | '7d' | '30d' | '90d' | '180d' | 'custom';
+export type DatePreset = 'all' | 'today' | '7d' | '30d' | '90d' | '180d' | 'custom';
 
 export interface Filters {
   origin: string;

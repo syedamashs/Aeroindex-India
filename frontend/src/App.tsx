@@ -16,6 +16,10 @@ import { DataExplorerPage } from '@/pages/DataExplorerPage';
 import { AlertsPage } from '@/pages/AlertsPage';
 import { MethodologyPage } from '@/pages/MethodologyPage';
 import { AuditLogPage } from '@/pages/AuditLogPage';
+import { FareStatePage } from '@/pages/FareStatePage';
+import { DqePage } from '@/pages/DqePage';
+import { InsightsPage } from '@/pages/InsightsPage';
+import { SystemPage } from '@/pages/SystemPage';
 import type { JSX } from 'react';
 
 function ProtectedRoute({ children }: { children: JSX.Element }) {
@@ -40,6 +44,10 @@ function AppRoutes() {
       <Route path="/alerts" element={<ProtectedRoute><AlertsPage /></ProtectedRoute>} />
       <Route path="/methodology" element={<ProtectedRoute><MethodologyPage /></ProtectedRoute>} />
       <Route path="/audit" element={<ProtectedRoute><AuditLogPage /></ProtectedRoute>} />
+      <Route path="/fare-state" element={<ProtectedRoute><FareStatePage /></ProtectedRoute>} />
+      <Route path="/dqe" element={<ProtectedRoute><DqePage /></ProtectedRoute>} />
+      <Route path="/insights" element={<ProtectedRoute><InsightsPage /></ProtectedRoute>} />
+      <Route path="/system" element={<ProtectedRoute><SystemPage /></ProtectedRoute>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

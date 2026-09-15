@@ -28,6 +28,10 @@ export async function apiHealth() {
   return request<{ ok: boolean; service: string; timestamp: string }>('/api/health');
 }
 
+export async function apiRunScheduler() {
+  return request<{ message: string }>('/api/scheduler/run', { method: 'POST' });
+}
+
 export interface ApiFilters {
   origin?: string;
   destination?: string;
@@ -43,6 +47,45 @@ export interface ApiFilters {
   pageSize?: number;
   sortBy?: string;
   sortDir?: 'asc' | 'desc';
+  groupBy?: 'airline' | 'source';
+}
+
+export interface ApiRouteStats {
+  routeId: string;
+  origin: string;
+  destination: string;
+  averageFare: number;
+  medianFare: number;
+  minFare: number;
+  maxFare: number;
+  index: number;
+  momChange: number;
+  yoyChange: number;
+  observations: number;
+  volatility: number;
+  trend: string;
+  risk: string;
+  distanceKm: number;
+  category: string;
+  weight: number;
+}
+
+export interface ApiObservation {
+  id: string;
+  collectionDate: string;
+  origin: string;
+  destination: string;
+  airline: string;
+  travelDate: string;
+  bookingWindow: number;
+  travelClass: string;
+  baseFare: number;
+  taxes: number;
+  fees: number;
+  totalFare: number;
+  currency: string;
+  source: string;
+  status: string;
 }
 
 function buildQueryString(params: ApiFilters): string {
@@ -63,7 +106,12 @@ export async function apiIndex(filters?: ApiFilters) {
 
 export async function apiRoutes(filters?: ApiFilters) {
   const qs = buildQueryString(filters || {});
-  return request<{ data: Array<{ routeId: string; origin: string; destination: string; averageFare: number; medianFare: number; minFare: number; maxFare: number; index: number; momChange: number; yoyChange: number; observations: number; volatility: number; trend: string; risk: string }> }>(`/api/routes${qs}`);
+  return request<{ data: ApiRouteStats[] }>(`/api/routes${qs}`);
+}
+
+export async function apiRouteDetail(routeId: string, filters?: ApiFilters) {
+  const qs = buildQueryString(filters || {});
+  return request<{ data: { route: ApiRouteStats | null; observations: ApiObservation[] } }>(`/api/routes/${encodeURIComponent(routeId)}${qs}`);
 }
 
 export async function apiAirlines(filters?: ApiFilters) {
@@ -78,7 +126,7 @@ export async function apiBookingWindow(filters?: ApiFilters) {
 
 export async function apiObservations(filters?: ApiFilters) {
   const qs = buildQueryString(filters || {});
-  return request<{ data: { rows: Array<any>; total: number; page: number; pageSize: number } }>(`/api/observations${qs}`);
+  return request<{ data: { rows: ApiObservation[]; total: number; page: number; pageSize: number } }>(`/api/observations${qs}`);
 }
 
 export async function apiAlerts(filters?: ApiFilters) {
@@ -93,10 +141,56 @@ export async function apiInsights(filters?: ApiFilters) {
 
 export async function apiStatistics(filters?: ApiFilters) {
   const qs = buildQueryString(filters || {});
-  return request<{ data: { index: number; momChange: number; routesMonitored: number; airlinesMonitored: number; totalObservations: number; highPriceRoutes: number; dataFreshness: string; dataQuality: number } }>(`/api/statistics${qs}`);
+  return request<{ data: { index: number; momChange: number; routesMonitored: number; airlinesMonitored: number; totalObservations: number; highPriceRoutes: number; dataFreshness: string; dataQuality: number; minFare: number; maxFare: number; averageFare: number } }>(`/api/statistics${qs}`);
+}
+
+export async function apiDataSource() {
+  return request<{ data: { name: string; path: string; readOnly: boolean; observations: string } }>('/api/data-source');
+}
+
+export async function apiFareStateSummary() {
+  return request<{ data: {
+    previous_run: Record<string, unknown> | null;
+    current_run: Record<string, unknown> | null;
+    persisted_transition_count: number;
+    overall: { total_transitions: number; price_observable_transitions: number };
+    transition_counts: Record<string, number>;
+    fep: { percentage: number | null };
+    fare_movement: {
+      price_observable: Record<string, number | null>;
+      price_increase: Record<string, number | null>;
+      price_decrease: Record<string, number | null>;
+      mean_fare_change: number | null;
+      median_fare_change: number | null;
+      mean_percentage_change: number | null;
+      median_percentage_change: number | null;
+    };
+    by_source: Array<Record<string, unknown>>;
+    by_route: Array<Record<string, unknown>>;
+    by_lead_time: Array<Record<string, unknown>>;
+    by_source_lead_time: Array<Record<string, unknown>>;
+    data_quality: Record<string, number>;
+    mode: string;
+  } }>('/api/fare-state/summary');
+}
+
+export async function apiDqeSummary() {
+  return request<{ data: {
+    total_observations: number;
+    source_breakdown: Array<{ source: string; count: number }>;
+    sold_observations: number;
+    invalid_extraction_observations: number;
+    invalid_fare_observations: number;
+    duplicate_identity_groups: number;
+    quality_score: number;
+    mode: string;
+  } }>('/api/dqe/summary');
 }
 
 export async function apiMap(filters?: ApiFilters) {
   const qs = buildQueryString(filters || {});
-  return request<{ data: { airports: Array<any>; routes: Array<any> } }>(`/api/map${qs}`);
+  return request<{ data: {
+    airports: Array<{ code: string; city: string; state: string; lat: number; lng: number; region: string }>;
+    routes: Array<ApiRouteStats & { id: string; avgFare: number }>;
+  } }>(`/api/map${qs}`);
 }
