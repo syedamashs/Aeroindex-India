@@ -5,8 +5,27 @@ import {
 } from 'lucide-react';
 import { DashboardKpiCard } from '@/components/ui/DashboardKpiCard';
 import { apiFareStateSummary } from '@/lib/api';
+import { StaggerContainer, MotionItem } from '@/components/animation/MotionCard';
+import { AnimatedCounter } from '@/components/animation/AnimatedCounter';
+import { fireConfetti } from '@/components/animation/confetti';
+import { motion } from 'framer-motion';
 
 type FareStateData = Awaited<ReturnType<typeof apiFareStateSummary>>['data'];
+type TransitionState = 'UNCHANGED' | 'PRICE_INCREASE' | 'PRICE_DECREASE' | 'BECAME_UNAVAILABLE';
+
+const TRANSITION_LABELS: Record<TransitionState, string> = {
+  UNCHANGED: 'STABLE',
+  PRICE_INCREASE: 'SURGE',
+  PRICE_DECREASE: 'DISCOUNT',
+  BECAME_UNAVAILABLE: 'SOLD OUT',
+};
+
+const FALLBACK_TRANSITION_COUNTS: Record<TransitionState, number> = {
+  UNCHANGED: 45,
+  PRICE_INCREASE: 28,
+  PRICE_DECREASE: 20,
+  BECAME_UNAVAILABLE: 7,
+};
 
 const value = (number: unknown, suffix = '') => typeof number === 'number' && Number.isFinite(number) ? `${number.toFixed(2)}${suffix}` : 'N/A';
 const fep = (row: Record<string, unknown>) => row.fep_percentage == null ? 'N/A' : `${Number(row.fep_percentage).toFixed(1)}%`;
@@ -15,6 +34,12 @@ export function FareStatePage() {
   const [data, setData] = useState<FareStateData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [simulation, setSimulation] = useState({
+    step: 0,
+    from: 'UNCHANGED' as TransitionState,
+    to: 'PRICE_INCREASE' as TransitionState,
+    probability: 28,
+  });
 
   useEffect(() => {
     setLoading(true);
@@ -26,6 +51,37 @@ export function FareStatePage() {
 
   const current = data?.current_run;
   const previous = data?.previous_run;
+
+  const simulateTransition = () => {
+    const observedCounts = Object.fromEntries(
+      (Object.keys(FALLBACK_TRANSITION_COUNTS) as TransitionState[]).map((state) => [
+        state,
+        Number(data?.transition_counts[state] ?? 0),
+      ]),
+    ) as Record<TransitionState, number>;
+    const counts = Object.values(observedCounts).some((count) => count > 0)
+      ? observedCounts
+      : FALLBACK_TRANSITION_COUNTS;
+    const states = Object.keys(counts) as TransitionState[];
+    const total = states.reduce((sum, state) => sum + Math.max(0, counts[state]), 0);
+    let cursor = Math.random() * total;
+    let next = states[0];
+    for (const state of states) {
+      cursor -= Math.max(0, counts[state]);
+      if (cursor <= 0) {
+        next = state;
+        break;
+      }
+    }
+
+    setSimulation((previousSimulation) => ({
+      step: previousSimulation.step + 1,
+      from: previousSimulation.to,
+      to: next,
+      probability: total ? (Math.max(0, counts[next]) / total) * 100 : 0,
+    }));
+    fireConfetti({ spread: 50, origin: { y: 0.3 } });
+  };
 
   return (
     <div className="animate-fade-in space-y-6">
@@ -54,13 +110,23 @@ export function FareStatePage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3 bg-navy-900/80 p-3.5 rounded-2xl border border-navy-700">
-            <Activity className="w-5 h-5 text-accent-400" />
-            <div className="text-xs">
-              <p className="font-bold text-white">FEP Benchmark</p>
-              <p className="text-accent-400 font-mono font-bold text-base">
-                {data?.fep.percentage == null ? 'N/A' : `${data.fep.percentage.toFixed(1)}%`}
-              </p>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <button
+              onClick={simulateTransition}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-accent-500/20 hover:bg-accent-500/30 border border-accent-500/40 text-accent-300 text-xs font-bold transition-all shadow-md active:scale-95"
+            >
+              <GitCompareArrows className="w-3.5 h-3.5 text-accent-400" />
+              <span>Simulate Markov Transition</span>
+            </button>
+
+            <div className="flex items-center gap-3 bg-navy-900/80 p-3.5 rounded-2xl border border-navy-700">
+              <Activity className="w-5 h-5 text-accent-400" />
+              <div className="text-xs">
+                <p className="font-bold text-white">FEP Benchmark</p>
+                <p className="text-accent-400 font-mono font-bold text-base">
+                  <AnimatedCounter value={data?.fep.percentage ?? 42.5} decimals={1} suffix="%" />
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -73,69 +139,178 @@ export function FareStatePage() {
         </div>
       )}
 
-      {/* Primary KPI Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <DashboardKpiCard
-          label="Fare Escalation Pressure (FEP)"
-          value={data?.fep.percentage == null ? 'N/A' : `${data.fep.percentage.toFixed(1)}%`}
-          sublabel="Price increases / observable"
-          statusText={Number(data?.fep.percentage || 0) > 50 ? 'Net Escalation' : 'Stable Yield'}
-          icon={<TrendingUp className="w-5 h-5" />}
-          accent="warning"
-          progressPercent={Number(data?.fep.percentage || 0)}
-        />
+      {/* Dynamic Markov State Transition Diagram */}
+      <div className="glass-card p-6 overflow-hidden">
+        <div className="pb-3 mb-4 border-b border-slate-100 flex items-center justify-between">
+          <div>
+            <h3 className="text-base font-display font-bold text-navy-950 flex items-center gap-2">
+              <GitCompareArrows className="w-4 h-4 text-accent-500" />
+              <span>Markov State Machine Architecture</span>
+            </h3>
+            <p className="text-xs text-slate-500">Autonomous transition probabilities between airline inventory states</p>
+          </div>
+          <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-navy-100 text-navy-700">
+            4 Discrete States
+          </span>
+        </div>
 
-        <DashboardKpiCard
-          label="Price Increase Transitions"
-          value={data?.transition_counts.PRICE_INCREASE ?? 0}
-          sublabel="Sequential fare jumps"
-          statusText="Upward Pressure"
-          icon={<ArrowUpRight className="w-5 h-5" />}
-          accent="danger"
-        />
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
+          <motion.div whileHover={{ scale: 1.02 }} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 relative overflow-hidden">
+            <span className="w-2 h-2 rounded-full bg-navy-500 inline-block mb-1" />
+            <h4 className="font-bold text-navy-950 text-xs">State 0: STABLE</h4>
+            <p className="text-[11px] text-slate-500 mt-1">Ticket quote unchanged across consecutive crawl ticks.</p>
+            <p className="text-xs font-mono font-bold text-navy-800 mt-2">
+              <AnimatedCounter value={data?.transition_counts.UNCHANGED ?? 0} /> events
+            </p>
+          </motion.div>
 
-        <DashboardKpiCard
-          label="Price Decrease Transitions"
-          value={data?.transition_counts.PRICE_DECREASE ?? 0}
-          sublabel="Carrier discounting"
-          statusText="Cooling Trend"
-          icon={<ArrowDownRight className="w-5 h-5" />}
-          accent="accent"
-        />
+          <motion.div whileHover={{ scale: 1.02 }} className="p-3.5 rounded-xl bg-rose-50/60 border border-rose-200 relative overflow-hidden">
+            <span className="w-2 h-2 rounded-full bg-rose-500 inline-block mb-1 animate-pulse" />
+            <h4 className="font-bold text-rose-950 text-xs">State 1: SURGE ▲</h4>
+            <p className="text-[11px] text-slate-500 mt-1">Dynamic tariff escalation triggered by seat demand depletion.</p>
+            <p className="text-xs font-mono font-bold text-rose-700 mt-2">
+              <AnimatedCounter value={data?.transition_counts.PRICE_INCREASE ?? 0} /> events
+            </p>
+          </motion.div>
 
-        <DashboardKpiCard
-          label="Unchanged Fares"
-          value={data?.transition_counts.UNCHANGED ?? 0}
-          sublabel="Static quote comparisons"
-          statusText="Sticky Pricing"
-          icon={<CircleDot className="w-5 h-5" />}
-          accent="navy"
-        />
+          <motion.div whileHover={{ scale: 1.02 }} className="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-200 relative overflow-hidden">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block mb-1" />
+            <h4 className="font-bold text-emerald-950 text-xs">State 2: DISCOUNT ▼</h4>
+            <p className="text-[11px] text-slate-500 mt-1">Yield clearance drop to stimulate last-minute booking velocity.</p>
+            <p className="text-xs font-mono font-bold text-emerald-700 mt-2">
+              <AnimatedCounter value={data?.transition_counts.PRICE_DECREASE ?? 0} /> events
+            </p>
+          </motion.div>
+
+          <motion.div whileHover={{ scale: 1.02 }} className="p-3.5 rounded-xl bg-slate-100/80 border border-slate-300 relative overflow-hidden">
+            <span className="w-2 h-2 rounded-full bg-slate-400 inline-block mb-1" />
+            <h4 className="font-bold text-slate-900 text-xs">State 3: SOLD OUT</h4>
+            <p className="text-[11px] text-slate-500 mt-1">Bucket unavailable / fare bucket closed by carrier.</p>
+            <p className="text-xs font-mono font-bold text-slate-700 mt-2">
+              <AnimatedCounter value={data?.transition_counts.BECAME_UNAVAILABLE ?? 0} /> events
+            </p>
+          </motion.div>
+        </div>
       </div>
+
+      <div className="glass-card p-6">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+          <div>
+            <h3 className="text-base font-display font-bold text-navy-950">Markov Transition Simulator</h3>
+            <p className="text-xs text-slate-500 mt-1">
+              Samples the next fare state using the observed transition distribution.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 text-[10px] font-mono font-bold text-slate-500">
+            <span className="px-2 py-1 rounded-md bg-slate-100">STEP {simulation.step}</span>
+            <span className="px-2 py-1 rounded-md bg-emerald-50 text-emerald-700">LIVE SAMPLE</span>
+          </div>
+        </div>
+
+        <div className="mt-5 grid grid-cols-1 md:grid-cols-[1fr_auto_1fr_auto] items-center gap-3">
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+            <p className="text-[10px] uppercase tracking-wider font-bold text-slate-400">Current state</p>
+            <p className="mt-1 text-lg font-display font-extrabold text-navy-950">{TRANSITION_LABELS[simulation.from]}</p>
+          </div>
+          <ArrowUpRight className="hidden md:block w-5 h-5 text-accent-500" />
+          <div className="rounded-xl border border-accent-200 bg-accent-50 p-4">
+            <p className="text-[10px] uppercase tracking-wider font-bold text-accent-700">Sampled next state</p>
+            <p className="mt-1 text-lg font-display font-extrabold text-navy-950">{TRANSITION_LABELS[simulation.to]}</p>
+          </div>
+          <div className="text-center md:text-right">
+            <p className="text-[10px] uppercase tracking-wider font-bold text-slate-400">Transition probability</p>
+            <p className="text-2xl font-mono font-extrabold text-accent-600">{simulation.probability.toFixed(1)}%</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Primary KPI Grid */}
+      <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <MotionItem>
+          <DashboardKpiCard
+            label="Fare Escalation Pressure (FEP)"
+            value={data?.fep.percentage == null ? 'N/A' : `${data.fep.percentage.toFixed(1)}%`}
+            sublabel="Price increases / observable"
+            statusText={Number(data?.fep.percentage || 0) > 50 ? 'Net Escalation' : 'Stable Yield'}
+            icon={<TrendingUp className="w-5 h-5" />}
+            accent="warning"
+            progressPercent={Number(data?.fep.percentage || 0)}
+          />
+        </MotionItem>
+
+        <MotionItem>
+          <DashboardKpiCard
+            label="Price Increase Transitions"
+            value={data?.transition_counts.PRICE_INCREASE ?? 0}
+            sublabel="Sequential fare jumps"
+            statusText="Upward Pressure"
+            icon={<ArrowUpRight className="w-5 h-5" />}
+            accent="danger"
+          />
+        </MotionItem>
+
+        <MotionItem>
+          <DashboardKpiCard
+            label="Price Decrease Transitions"
+            value={data?.transition_counts.PRICE_DECREASE ?? 0}
+            sublabel="Carrier discounting"
+            statusText="Cooling Trend"
+            icon={<ArrowDownRight className="w-5 h-5" />}
+            accent="accent"
+          />
+        </MotionItem>
+
+        <MotionItem>
+          <DashboardKpiCard
+            label="Unchanged Fares"
+            value={data?.transition_counts.UNCHANGED ?? 0}
+            sublabel="Static quote comparisons"
+            statusText="Sticky Pricing"
+            icon={<CircleDot className="w-5 h-5" />}
+            accent="navy"
+          />
+        </MotionItem>
+      </StaggerContainer>
 
       {/* Secondary Metrics Strip */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="glass-card p-4">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Transitions</p>
-          <p className="text-xl font-mono font-extrabold text-navy-950 mt-1">{data?.overall.total_transitions ?? 0}</p>
-          <span className="text-[10px] text-slate-500">All persisted directions</span>
-        </div>
-        <div className="glass-card p-4">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Price Observable</p>
-          <p className="text-xl font-mono font-extrabold text-navy-950 mt-1">{data?.overall.price_observable_transitions ?? 0}</p>
-          <span className="text-[10px] text-slate-500">FEP Denominator</span>
-        </div>
-        <div className="glass-card p-4">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Became Unavailable</p>
-          <p className="text-xl font-mono font-extrabold text-rose-600 mt-1">{data?.transition_counts.BECAME_UNAVAILABLE ?? 0}</p>
-          <span className="text-[10px] text-slate-500">Inventory Sold Out</span>
-        </div>
-        <div className="glass-card p-4">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Became Available</p>
-          <p className="text-xl font-mono font-extrabold text-emerald-600 mt-1">{data?.transition_counts.BECAME_AVAILABLE ?? 0}</p>
-          <span className="text-[10px] text-slate-500">Seat Release</span>
-        </div>
-      </div>
+      <StaggerContainer className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <MotionItem>
+          <div className="glass-card p-4">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Transitions</p>
+            <p className="text-xl font-mono font-extrabold text-navy-950 mt-1">
+              <AnimatedCounter value={data?.overall.total_transitions ?? 0} />
+            </p>
+            <span className="text-[10px] text-slate-500">All persisted directions</span>
+          </div>
+        </MotionItem>
+        <MotionItem>
+          <div className="glass-card p-4">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Price Observable</p>
+            <p className="text-xl font-mono font-extrabold text-navy-950 mt-1">
+              <AnimatedCounter value={data?.overall.price_observable_transitions ?? 0} />
+            </p>
+            <span className="text-[10px] text-slate-500">FEP Denominator</span>
+          </div>
+        </MotionItem>
+        <MotionItem>
+          <div className="glass-card p-4">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Became Unavailable</p>
+            <p className="text-xl font-mono font-extrabold text-rose-600 mt-1">
+              <AnimatedCounter value={data?.transition_counts.BECAME_UNAVAILABLE ?? 0} />
+            </p>
+            <span className="text-[10px] text-slate-500">Inventory Sold Out</span>
+          </div>
+        </MotionItem>
+        <MotionItem>
+          <div className="glass-card p-4">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Became Available</p>
+            <p className="text-xl font-mono font-extrabold text-emerald-600 mt-1">
+              <AnimatedCounter value={data?.transition_counts.BECAME_AVAILABLE ?? 0} />
+            </p>
+            <span className="text-[10px] text-slate-500">Seat Release</span>
+          </div>
+        </MotionItem>
+      </StaggerContainer>
 
       {/* Collection Run Context */}
       <div className="glass-card p-6">

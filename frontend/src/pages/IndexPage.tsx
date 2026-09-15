@@ -12,6 +12,10 @@ import { useApp } from '@/context/AppContext';
 import { formatINR, formatPercent } from '@/data/random';
 import { indexTooltipFormatter } from '@/components/chartFormatters';
 import { apiIndex, apiRoutes, type ApiRouteStats } from '@/lib/api';
+import { StaggerContainer, MotionItem } from '@/components/animation/MotionCard';
+import { AnimatedCounter } from '@/components/animation/AnimatedCounter';
+import { fireConfetti } from '@/components/animation/confetti';
+import { motion } from 'framer-motion';
 
 export function IndexPage() {
   const { lastUpdate, showToast } = useApp();
@@ -44,6 +48,7 @@ export function IndexPage() {
 
   const resetWeights = () => {
     setWeights(Object.fromEntries(routeStats.map((route) => [route.routeId, route.weight])));
+    fireConfetti({ spread: 45, origin: { y: 0.4 } });
     showToast('Route weights reset to default DGCA passenger proportions.', 'info');
   };
 
@@ -95,64 +100,88 @@ export function IndexPage() {
 
       {/* Formula Modal / Card */}
       {showFormula && (
-        <div className="glass-card p-6 border-l-4 border-l-navy-600 space-y-3">
+        <div className="glass-card p-6 border-l-4 border-l-navy-600 space-y-4 animate-fade-in">
           <div className="flex items-center justify-between">
             <h3 className="font-display font-bold text-base text-navy-950 flex items-center gap-2">
               <Info className="w-4 h-4 text-navy-600" />
               Laspeyres Weighted Price Relative Formula
             </h3>
-            <button onClick={() => setShowFormula(false)} className="text-xs text-slate-400 hover:text-slate-600">✕ Close</button>
+            <button onClick={() => setShowFormula(false)} className="text-xs text-slate-400 hover:text-slate-600 font-bold">✕ Close</button>
           </div>
-          <div className="bg-navy-950 text-white p-4 rounded-xl font-mono text-sm overflow-x-auto shadow-inner">
-            Index_t = [ ∑ ( w_i × ( P_i,t / P_i,0 ) ) / ∑ w_i ] × 100
+          <div className="bg-navy-950 text-white p-4 rounded-xl font-mono text-sm overflow-x-auto shadow-inner text-center">
+            <span className="text-accent-400">Index_t</span> = [ ∑ ( <span className="text-sky-300">w_i</span> × ( <span className="text-emerald-300">P_i,t</span> / <span className="text-amber-300">P_i,0</span> ) ) / ∑ <span className="text-sky-300">w_i</span> ] × 100
           </div>
-          <p className="text-xs text-slate-600 leading-relaxed">
-            Where <strong>P_i,t</strong> is the average fare on route <em>i</em> during period <em>t</em>, <strong>P_i,0</strong> is the base price (January 2026), and <strong>w_i</strong> is the traffic weight reflecting historical annual passenger volume on corridor <em>i</em>.
-          </p>
+          {/* Animated 4-Node Formula Breakdown */}
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 pt-1 text-xs">
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+              <span className="text-amber-600 font-bold font-mono">P_i,0 (Base Price)</span>
+              <p className="text-[11px] text-slate-500 mt-1">January 2026 domestic fare cohort benchmark.</p>
+            </div>
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+              <span className="text-emerald-600 font-bold font-mono">P_i,t (Current Period)</span>
+              <p className="text-[11px] text-slate-500 mt-1">Weighted mean observation across booking horizons.</p>
+            </div>
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+              <span className="text-sky-600 font-bold font-mono">w_i (Passenger Weight)</span>
+              <p className="text-[11px] text-slate-500 mt-1">DGCA trunk traffic passenger volume allocation.</p>
+            </div>
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+              <span className="text-purple-600 font-bold font-mono">Index_t (Output)</span>
+              <p className="text-[11px] text-slate-500 mt-1">Macro price index relative to base 100.0.</p>
+            </div>
+          </div>
         </div>
       )}
 
       {/* KPI Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <DashboardKpiCard
-          label="Current Composite Index"
-          value={latest?.indexValue.toFixed(1) ?? '100.0'}
-          change={latest?.percentageChange}
-          sublabel="Base Period: Jan 2026 = 100.0"
-          statusText={latest && latest.indexValue > 100 ? 'Inflationary' : 'Deflationary'}
-          icon={<TrendingUp className="w-5 h-5" />}
-          accent="navy"
-          progressPercent={Math.min(100, ((latest?.indexValue ?? 100) / 120) * 100)}
-        />
+      <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <MotionItem>
+          <DashboardKpiCard
+            label="Current Composite Index"
+            value={latest?.indexValue.toFixed(1) ?? '100.0'}
+            change={latest?.percentageChange}
+            sublabel="Base Period: Jan 2026 = 100.0"
+            statusText={latest && latest.indexValue > 100 ? 'Inflationary' : 'Deflationary'}
+            icon={<TrendingUp className="w-5 h-5" />}
+            accent="navy"
+            progressPercent={Math.min(100, ((latest?.indexValue ?? 100) / 120) * 100)}
+          />
+        </MotionItem>
 
-        <DashboardKpiCard
-          label="Monthly Relative Drift"
-          value={formatPercent(latest?.percentageChange ?? 0)}
-          sublabel="Weighted MoM rate of change"
-          statusText={Math.abs(latest?.percentageChange || 0) > 3 ? 'Elevated Drift' : 'Within Band'}
-          icon={<TrendingUp className="w-5 h-5" />}
-          accent={latest && latest.percentageChange > 0 ? 'danger' : 'accent'}
-        />
+        <MotionItem>
+          <DashboardKpiCard
+            label="Monthly Relative Drift"
+            value={formatPercent(latest?.percentageChange ?? 0)}
+            sublabel="Weighted MoM rate of change"
+            statusText={Math.abs(latest?.percentageChange || 0) > 3 ? 'Elevated Drift' : 'Within Band'}
+            icon={<TrendingUp className="w-5 h-5" />}
+            accent={latest && latest.percentageChange > 0 ? 'danger' : 'accent'}
+          />
+        </MotionItem>
 
-        <DashboardKpiCard
-          label="Base Benchmark Price"
-          value={first ? formatINR(first.averageFare) : '₹11,850'}
-          sublabel="January 2026 cohort base"
-          statusText="Standard Reference"
-          icon={<Layers className="w-5 h-5" />}
-          accent="purple"
-        />
+        <MotionItem>
+          <DashboardKpiCard
+            label="Base Benchmark Price"
+            value={first ? formatINR(first.averageFare) : '₹11,850'}
+            sublabel="January 2026 cohort base"
+            statusText="Standard Reference"
+            icon={<Layers className="w-5 h-5" />}
+            accent="purple"
+          />
+        </MotionItem>
 
-        <DashboardKpiCard
-          label="Corridors in Basket"
-          value={`${routeStats.length} Corridors`}
-          sublabel={`Total basket weight: ${totalWeight}`}
-          statusText="100% Normalized"
-          icon={<CheckCircle2 className="w-5 h-5" />}
-          accent="accent"
-          progressPercent={100}
-        />
-      </div>
+        <MotionItem>
+          <DashboardKpiCard
+            label="Corridors in Basket"
+            value={`${routeStats.length} Corridors`}
+            sublabel={`Total basket weight: ${totalWeight}`}
+            statusText="100% Normalized"
+            icon={<CheckCircle2 className="w-5 h-5" />}
+            accent="accent"
+            progressPercent={100}
+          />
+        </MotionItem>
+      </StaggerContainer>
 
       {/* Main Index Area Chart */}
       <div className="glass-card p-6">

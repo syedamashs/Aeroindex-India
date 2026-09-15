@@ -12,6 +12,8 @@ import {
 import { DashboardKpiCard } from '@/components/ui/DashboardKpiCard';
 import { fareTooltipFormatter } from '@/components/chartFormatters';
 import { apiBookingWindow, type ApiFilters } from '@/lib/api';
+import { StaggerContainer, MotionItem } from '@/components/animation/MotionCard';
+import { AnimatedCounter } from '@/components/animation/AnimatedCounter';
 
 export function BookingWindowPage() {
   const { filters, lastUpdate } = useApp();
@@ -87,44 +89,52 @@ export function BookingWindowPage() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <DashboardKpiCard
-          label="Last-Minute Surge Delta"
-          value={`+${priceDiff.toFixed(0)}%`}
-          sublabel="T+1 vs T+45 average ticket price"
-          statusText="Urgency Premium"
-          icon={<TrendingUp className="w-5 h-5" />}
-          accent="danger"
-          progressPercent={Math.min(100, priceDiff)}
-        />
+      <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <MotionItem>
+          <DashboardKpiCard
+            label="Last-Minute Surge Delta"
+            value={`+${priceDiff.toFixed(0)}%`}
+            sublabel="T+1 vs T+45 average ticket price"
+            statusText="Urgency Premium"
+            icon={<TrendingUp className="w-5 h-5" />}
+            accent="danger"
+            progressPercent={Math.min(100, priceDiff)}
+          />
+        </MotionItem>
 
-        <DashboardKpiCard
-          label="Mean Last-Minute Fare (T+1)"
-          value={t1 ? formatINR(t1.averageFare) : '—'}
-          sublabel="1 day prior to departure"
-          statusText="Peak Tariff"
-          icon={<Clock className="w-5 h-5" />}
-          accent="warning"
-        />
+        <MotionItem>
+          <DashboardKpiCard
+            label="Mean Last-Minute Fare (T+1)"
+            value={t1 ? formatINR(t1.averageFare) : '—'}
+            sublabel="1 day prior to departure"
+            statusText="Peak Tariff"
+            icon={<Clock className="w-5 h-5" />}
+            accent="warning"
+          />
+        </MotionItem>
 
-        <DashboardKpiCard
-          label="Mean Advance Fare (T+45)"
-          value={t45 ? formatINR(t45.averageFare) : '—'}
-          sublabel="45 days advance booking"
-          statusText="Baseline Tier"
-          icon={<CheckCircle2 className="w-5 h-5" />}
-          accent="accent"
-        />
+        <MotionItem>
+          <DashboardKpiCard
+            label="Mean Advance Fare (T+45)"
+            value={t45 ? formatINR(t45.averageFare) : '—'}
+            sublabel="45 days advance booking"
+            statusText="Baseline Tier"
+            icon={<CheckCircle2 className="w-5 h-5" />}
+            accent="accent"
+          />
+        </MotionItem>
 
-        <DashboardKpiCard
-          label="Recommended Window"
-          value="T+21 to T+30"
-          sublabel="Lowest volatility & optimal seat yield"
-          statusText="Best Value"
-          icon={<Info className="w-5 h-5" />}
-          accent="navy"
-        />
-      </div>
+        <MotionItem>
+          <DashboardKpiCard
+            label="Recommended Window"
+            value="T+21 to T+30"
+            sublabel="Lowest volatility & optimal seat yield"
+            statusText="Best Value"
+            icon={<Info className="w-5 h-5" />}
+            accent="navy"
+          />
+        </MotionItem>
+      </StaggerContainer>
 
       <FilterBar />
 

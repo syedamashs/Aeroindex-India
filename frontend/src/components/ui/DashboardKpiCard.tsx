@@ -1,5 +1,6 @@
 import { type ReactNode } from 'react';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { AnimatedCounter } from '@/components/animation/AnimatedCounter';
 
 interface DashboardKpiCardProps {
   label: string;
@@ -66,7 +67,7 @@ export function DashboardKpiCard({
 
   return (
     <div
-      className={`group relative bg-white rounded-2xl border border-slate-200/80 border-t-4 ${currentTheme.border} p-5 flex flex-col justify-between shadow-sm hover:border-slate-300 transition-all duration-300 hover:-translate-y-1 ${currentTheme.glow}`}
+      className={`group relative bg-white rounded-2xl border border-slate-200/80 border-t-4 ${currentTheme.border} p-5 flex flex-col justify-between shadow-sm hover:border-slate-300 transition-all duration-300 hover:-translate-y-1.5 ${currentTheme.glow}`}
     >
       <div>
         <div className="flex items-center justify-between mb-2">
@@ -82,7 +83,7 @@ export function DashboardKpiCard({
 
         <div className="flex items-baseline gap-2">
           <div className={`text-3xl font-display font-extrabold text-navy-950 tracking-tight ${valueClassName}`}>
-            {value}
+            <AnimatedCounter value={value} />
           </div>
           {statusText && (
             <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-md ${currentTheme.badge}`}>

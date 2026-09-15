@@ -11,6 +11,10 @@ import {
 import { DashboardKpiCard } from '@/components/ui/DashboardKpiCard';
 import type { RouteStats } from '@/data/types';
 import { apiRoutes, type ApiFilters } from '@/lib/api';
+import { StaggerContainer, MotionItem, MotionCard } from '@/components/animation/MotionCard';
+import { AnimatedCounter } from '@/components/animation/AnimatedCounter';
+import { fireConfetti } from '@/components/animation/confetti';
+import { motion } from 'framer-motion';
 
 type SortKey = keyof Pick<RouteStats, 'averageFare' | 'index' | 'momChange' | 'yoyChange' | 'observations' | 'volatility'>;
 
@@ -122,6 +126,7 @@ export function RoutesPage() {
     a.download = 'aeroindex-route-analysis.csv';
     a.click();
     URL.revokeObjectURL(url);
+    fireConfetti({ spread: 55, origin: { y: 0.3 } });
   };
 
   const maxFareAcrossAll = useMemo(() => {
@@ -175,45 +180,53 @@ export function RoutesPage() {
       </div>
 
       {/* Surveillance KPI Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <DashboardKpiCard
-          label="Corridors Monitored"
-          value={`${routeStats.length} Corridors`}
-          sublabel="Trunk & regional connections"
-          statusText="Active Coverage"
-          icon={<RouteIcon className="w-5 h-5" />}
-          accent="navy"
-          progressPercent={100}
-        />
+      <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <MotionItem>
+          <DashboardKpiCard
+            label="Corridors Monitored"
+            value={`${routeStats.length} Corridors`}
+            sublabel="Trunk & regional connections"
+            statusText="Active Coverage"
+            icon={<RouteIcon className="w-5 h-5" />}
+            accent="navy"
+            progressPercent={100}
+          />
+        </MotionItem>
 
-        <DashboardKpiCard
-          label="Highest Surge Corridor"
-          value={topSurgeRoute ? `${topSurgeRoute.origin} → ${topSurgeRoute.destination}` : '—'}
-          change={topSurgeRoute?.momChange}
-          sublabel={topSurgeRoute ? `Avg ${formatINR(topSurgeRoute.averageFare)}` : undefined}
-          statusText="Max MoM Spike"
-          icon={<AlertTriangle className="w-5 h-5" />}
-          accent="danger"
-        />
+        <MotionItem>
+          <DashboardKpiCard
+            label="Highest Surge Corridor"
+            value={topSurgeRoute ? `${topSurgeRoute.origin} → ${topSurgeRoute.destination}` : '—'}
+            change={topSurgeRoute?.momChange}
+            sublabel={topSurgeRoute ? `Avg ${formatINR(topSurgeRoute.averageFare)}` : undefined}
+            statusText="Max MoM Spike"
+            icon={<AlertTriangle className="w-5 h-5" />}
+            accent="danger"
+          />
+        </MotionItem>
 
-        <DashboardKpiCard
-          label="Top Volatility Corridor"
-          value={mostVolatileRoute ? `${mostVolatileRoute.origin} → ${mostVolatileRoute.destination}` : '—'}
-          sublabel={mostVolatileRoute ? `Volatility ${formatINR(mostVolatileRoute.volatility)}` : undefined}
-          statusText="Dynamic Pricing"
-          icon={<TrendingUp className="w-5 h-5" />}
-          accent="warning"
-        />
+        <MotionItem>
+          <DashboardKpiCard
+            label="Top Volatility Corridor"
+            value={mostVolatileRoute ? `${mostVolatileRoute.origin} → ${mostVolatileRoute.destination}` : '—'}
+            sublabel={mostVolatileRoute ? `Volatility ${formatINR(mostVolatileRoute.volatility)}` : undefined}
+            statusText="Dynamic Pricing"
+            icon={<TrendingUp className="w-5 h-5" />}
+            accent="warning"
+          />
+        </MotionItem>
 
-        <DashboardKpiCard
-          label="Best Value Corridor"
-          value={bestValueRoute ? `${bestValueRoute.origin} → ${bestValueRoute.destination}` : '—'}
-          sublabel={bestValueRoute ? `Lowest Avg ${formatINR(bestValueRoute.averageFare)}` : undefined}
-          statusText="Economical Trunk"
-          icon={<CheckCircle2 className="w-5 h-5" />}
-          accent="accent"
-        />
-      </div>
+        <MotionItem>
+          <DashboardKpiCard
+            label="Best Value Corridor"
+            value={bestValueRoute ? `${bestValueRoute.origin} → ${bestValueRoute.destination}` : '—'}
+            sublabel={bestValueRoute ? `Lowest Avg ${formatINR(bestValueRoute.averageFare)}` : undefined}
+            statusText="Economical Trunk"
+            icon={<CheckCircle2 className="w-5 h-5" />}
+            accent="accent"
+          />
+        </MotionItem>
+      </StaggerContainer>
 
       <FilterBar />
 

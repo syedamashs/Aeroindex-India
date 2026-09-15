@@ -1,534 +1,385 @@
 # AeroIndex India
 
-AeroIndex India is a prototype airfare price intelligence platform for monitoring domestic airfares across India. It converts airfare observations into a national price index, route-level analysis, airline comparisons, booking-window insights, alerts, maps, and policy-oriented summaries.
+## SIH 2026 Submission
 
-The project is presented as a prototype for **SIH 2026, Problem Statement SIH26056**.
+AeroIndex India is an airfare intelligence and price-indexing platform for India's domestic aviation market. It turns flight-fare observations into a transparent, auditable set of indicators for analysts, policymakers, airlines, and informed travellers.
 
-> Important: the current application uses deterministic mock airfare data. It does not scrape live airline or OTA websites.
+The platform connects the complete journey from collection to decision support:
 
-## What The Project Does
-
-AeroIndex India models the complete flow from airfare observation to decision support:
-
-1. Generate or receive airfare observations.
-2. Validate, clean, and deduplicate those observations.
-3. Normalize fare components such as base fare, taxes, and fees.
-4. Calculate route-level statistics and a weighted national airfare index.
-5. Compare routes, airlines, travel classes, and booking windows.
-6. Display movements through charts, tables, alerts, and an India map.
-7. Present plain-English insights for analysts and policymakers.
-
-The application is a client-side React prototype. Its data source is designed behind a `DataSource` interface so a permitted live API or feed can be connected later.
-
-## Project Structure
-
-This project is now organized into a clear frontend/backend split:
-
-- `frontend/` - React + Vite UI
-- `backend/` - Express API server, scrapers, database, and data pipeline structure
-- `backend/database/` - JSON data for users, airports, routes, airlines, and observations
-- `backend/data/generate_mock_data.py` - deterministic dataset generator
-- `README.md` - project overview and run instructions
-
-## Local Development Setup
-
-### 1. Start backend
-
-```bash
-cd backend
-node server.js
+```text
+Route configuration
+        |
+        v
+Scraping and raw-response capture
+        |
+        v
+Airline-specific normalization
+        |
+        v
+Canonical SQLite observations
+        |
+        +--> Data-quality and integrity controls
+        |
+        +--> Fare-state and transition analytics
+        |
+        +--> Price relatives and index engine
+                         |
+                         v
+              Express API + React dashboard
 ```
 
-The backend runs on port `4002` in the current prototype setup.
+## Why AeroIndex
 
-The backend reads the JSON files from `backend/database/` and combines them into the API data model at runtime. To regenerate the deterministic dataset, run `python backend/data/generate_mock_data.py` from the project root.
+Airfare is not a single number. It changes by route direction, carrier, travel date, booking lead time, fare family, availability, and collection timestamp. A useful public indicator therefore needs more than a dashboard of averages. It needs:
 
-### 2. Start frontend
+- A repeatable collection pipeline.
+- A common fare representation across sources.
+- Explicit identity and comparability rules.
+- Protection against duplicate, invalid, sold-out, and incomplete observations.
+- A declared index methodology with route weights and a visible base period.
+- Coverage and quality diagnostics alongside every headline result.
+- Drill-down views that explain the movement behind the national number.
 
-```bash
-cd frontend
-npm install
-npm run dev -- --host 0.0.0.0
+AeroIndex is designed around those principles. Every layer is separated so that collection, validation, estimation, storage, and presentation can be reviewed independently.
+
+## What The Platform Delivers
+
+### National airfare index
+
+The index engine produces a headline national airfare index from route-level movements. The base period is declared as 100, and the headline estimator is a route-weighted Jevons index. The system also exposes route coverage, represented weight, missing routes, and estimator status so a number is never presented without its context.
+
+### Route and airline intelligence
+
+Users can compare routes, directional markets, airlines, fare levels, volatility, minimum and maximum fares, and month-over-month or year-over-year movement. Route detail pages connect the aggregate result to monthly trends, airline comparisons, and booking-window behaviour.
+
+### Booking-window analysis
+
+The platform keeps lead-time buckets separate:
+
+- `T+1` - one day before departure
+- `T+7` - seven days before departure
+- `T+15` - fifteen days before departure
+- `T+30` - thirty days before departure
+- `T+45` - forty-five days before departure
+
+This shows how fare levels change as departure approaches without mixing incomparable booking windows.
+
+### Fare-state analytics
+
+Repeated collection runs are matched using flight, route, timing, fare identity, passenger type, source, and lead-time rules. Matched snapshots produce transitions such as price increase, price decrease, unchanged fare, becoming available, and becoming unavailable. The fare-state layer also reports matching coverage and the Fare Event Probability (FEP), which measures the share of comparable observations that experienced an upward fare transition.
+
+### Data-quality governance
+
+The data-quality engine checks schema integrity, fare arithmetic, date and time validity, flight identity, duplicates, sold-out handling, outliers, and cross-source consistency. Results are summarized with statuses, hard errors, warnings, flagged records, limitations, and an audit timestamp.
+
+## End-to-End Architecture
+
+### 1. Route configuration and collection planning
+
+Reference files define airports, cities, routes, route direction, and route weights. The scheduler builds collection tasks for a route, airline/source, departure date, and target lead-time bucket. Each collection run receives a unique run identifier, and each task records its lifecycle, attempts, errors, and timestamps.
+
+### 2. Scraping and raw-response capture
+
+The scraper layer contains source-specific collectors for Air India, IndiGo, and SpiceJet, together with a dispatcher and shared scraper utilities. The collection process records the requested route, source, departure, lead time, URL, search timestamp, response metadata, storage path, checksum, and extraction status.
+
+Raw responses are kept separate from canonical observations. This preserves provenance and makes it possible to investigate a normalized value without losing the original collection context.
+
+### 3. Normalization into a canonical contract
+
+Each source has different field names and response structures. The normalizers convert those responses into one canonical observation model containing:
+
+- Observation and collection identifiers.
+- Source and source URL.
+- Search timestamp and departure/arrival times.
+- Origin, destination, route, flight, carrier, and journey identity.
+- Fare product, fare class, fare family, and offer identity.
+- Passenger type, currency, base fare, taxes, fees, and total fare.
+- Sold-out and availability signals.
+- Target and actual lead time.
+- Extraction status and collection provenance.
+
+The canonical consumer price is `total_fare`. Component fields remain available for arithmetic validation and explanation.
+
+### 4. SQLite storage
+
+The database schema separates reference data, collection management, raw responses, canonical observations, fare-state snapshots, transitions, and index outputs. Foreign keys connect observations to collection tasks and route definitions. This provides a traceable path from a dashboard number back to the run and task that produced it.
+
+The primary observation table is `apix_observations`. Important supporting tables include:
+
+| Area | Tables | Purpose |
+|---|---|---|
+| Reference data | `dgca_route_master`, `apix_route_basket`, `airport_city_master` | Route coverage, weights, and airport metadata |
+| Collection | `collection_runs`, `collection_tasks` | Run/task lifecycle and error tracking |
+| Provenance | `raw_scrape_responses` | Raw response metadata and storage references |
+| Canonical data | `apix_observations` | Normalized, queryable fare observations |
+| Fare state | Snapshot and transition tables | Comparable repeated-run changes |
+| Indexing | Index output tables | Reproducible route and national results |
+
+### 5. Data quality and validation
+
+Quality checks run before analytical results are trusted. The validators address:
+
+- Schema and required-field integrity.
+- `total_fare = base_fare + taxes + total_fees` arithmetic.
+- Positive, finite, usable prices.
+- Date/time consistency and lead-time boundaries.
+- Flight and journey identity completeness.
+- Duplicate observations and repeated records.
+- Sold-out and missing-fare treatment.
+- Suspicious outliers.
+- Cross-source consistency for comparable flight groups.
+
+Invalid or incomplete records are not silently converted into zero prices. Sold-out or missing-fare records remain useful for availability analysis but do not become price observations. Duplicate counts and rejected records remain visible in diagnostics.
+
+### 6. Fare-state matching and transitions
+
+The fare-state layer compares two successful collection runs. Comparability is established using a hierarchy that preserves source, route direction, departure date, lead time, carrier, flight number, timing, passenger type, and fare identity.
+
+Fare identity uses the strongest available key:
+
+1. `fare_availability_key`.
+2. `source_offer_id`.
+3. Fare product, fare class, and fare family.
+
+If an observation cannot be compared reliably, it is excluded from the transition calculation and counted as a coverage limitation. The system does not invent missing fares, lead times, passenger types, or route movements.
+
+### 7. Index calculation
+
+The index engine is composed of small, testable modules for price relatives, Jevons, Laspeyres, Paasche, Fisher, route indices, national aggregation, lead-time indices, inflation, sampling, persistence, and confidence.
+
+The production headline is the route-weighted Jevons index. Laspeyres, Paasche, and Fisher are robustness estimators and are reported for comparison when their required weights are available.
+
+## Index Methodology
+
+### Eligible price observations
+
+An observation can contribute to a price-relative calculation only when it has:
+
+- A valid route and direction.
+- A usable positive finite `total_fare`.
+- Sufficient flight, fare, source, and temporal identity.
+- A valid comparison observation in the adjacent period.
+- A compatible lead-time bucket when lead time is populated.
+
+Repeated records from the same collection run are not treated as independent time periods. Search or observation timestamps establish temporal order; scheduler completion time does not replace observation time.
+
+### Elementary price relative
+
+For comparable fare identity $i$ between periods $t-1$ and $t$:
+
+$$
+r_{i,t} = \frac{p_{i,t}}{p_{i,t-1}}
+$$
+
+where $p$ is the positive, finite `total_fare`. Missing, non-positive, or non-finite prices produce no price relative and are recorded in quality coverage.
+
+### Jevons primary estimator
+
+For $n$ comparable price relatives in a period:
+
+$$
+J_t = \left(\prod_{i=1}^{n} r_{i,t}\right)^{1/n}
+$$
+
+The implementation uses the logarithmic form for numerical stability:
+
+$$
+\ln J_t = \frac{1}{n}\sum_{i=1}^{n}\ln(r_{i,t})
+$$
+
+Jevons measures proportional movement and prevents a few high-value fares from dominating through absolute additions.
+
+### Route-level index
+
+For route $r$, direction $d$, lead-time bucket $b$, and period $t$, the route relative is calculated from eligible comparable fares in that slice. The route index is chained from the declared base:
+
+$$
+I_{r,d,b,t} = I_{r,d,b,t-1} \times J_{r,d,b,t}
+$$
+
+with the selected base period set to 100. Direction is preserved: `DEL -> BOM` and `BOM -> DEL` are separate markets.
+
+### National AeroIndex
+
+The national index aggregates available route-level indices using the configured route or passenger-traffic weights:
+
+$$
+APIx_t =
+\frac{\sum_{r \in R_t} W_r I_{r,t}}
+{\sum_{r \in R_t} W_r}
+$$
+
+Only routes with valid required data participate in $R_t$. The result reports the number of represented routes, represented weight share, missing routes, quality flag, and base-period definition. A missing route is not assigned zero movement or copied movement.
+
+### Robustness estimators
+
+When defensible base and current weights exist, the same eligible population can be evaluated with:
+
+- Laspeyres for previous-period weighting.
+- Paasche for current-period weighting.
+- Fisher as the geometric mean of Laspeyres and Paasche.
+
+These are diagnostics for estimator stability. They do not replace the declared Jevons headline merely because one produces a preferred result.
+
+### Inflation and lead-time series
+
+Index levels and inflation rates are distinct. Month-over-month movement is calculated from adjacent index levels:
+
+$$
+MoM_t = \left(\frac{I_t}{I_{t-1}} - 1\right) \times 100
+$$
+
+Year-over-year movement requires the declared historical comparison period:
+
+$$
+YoY_t = \left(\frac{I_t}{I_{t-12}} - 1\right) \times 100
+$$
+
+Each lead-time bucket has its own series when data exists. A missing bucket is reported as unavailable rather than filled from another bucket.
+
+## Product Experience
+
+The React and TypeScript frontend provides the following workflows:
+
+| View | Purpose |
+|---|---|
+| Dashboard | National index, route coverage, freshness, quality, alerts, and current KPIs |
+| Airfare Index | Base period, route basket, weights, national trend, and contributions |
+| Route Analysis | Search, sort, risk, volatility, export, and route drill-down |
+| Route Detail | Fare trend, airline comparison, booking-window curve, and daily movement |
+| Airline Analysis | Carrier-level fare, index, range, and volatility comparison |
+| Booking Window | Fare behaviour from T+1 through T+45 |
+| India Map | Geographic route movements, airports, and regional summary |
+| Data Explorer | Filterable and exportable canonical observations |
+| Alerts | Price spikes, drops, thresholds, volatility, and quality events |
+| Policy Insights | Plain-language interpretation of current indicators |
+| Fare State | Comparable snapshot transitions and fare-event measures |
+| Data Quality | Integrity checks, coverage, and validation status |
+| Methodology | Public explanation of the measurement approach |
+| System/API | Pipeline status, processing controls, and endpoint view |
+| Audit Log | Session activity and governance visibility |
+
+Shared filters support date ranges, origin, destination, airline, travel class, and booking window. Route tables and observation tables can be exported as CSV for review.
+
+## API Layer
+
+The Express backend exposes the dashboard's operational data and health surface. It reads canonical observations and analytical tables from SQLite, normalizes airline and airport metadata for presentation, and returns route, airline, index, fare-state, alerts, insights, map, and dashboard summaries.
+
+The API layer is intentionally kept separate from the React presentation layer. The frontend communicates through the API client, while the Python calculation modules remain reusable for scheduled processing, diagnostics, and reproducible analysis.
+
+## Repository Structure
+
+```text
+.
+├── backend/
+│   ├── server.js                 Express API and SQLite read layer
+│   ├── alert.py                  Alert generation support
+│   ├── config/                   Airport, route, and runtime configuration
+│   ├── database/                 Connection helpers and schema
+│   ├── data_quality/             Validators, scoring, and DQE orchestration
+│   ├── fare_state/               Snapshot matching and transition analytics
+│   ├── index_engine/             Price relatives, estimators, indices, and inflation
+│   ├── normalizers/              Source-to-canonical fare normalization
+│   ├── scheduler/                Collection task planning and execution
+│   ├── scrapers/                 Source adapters and dispatcher
+│   └── storage/                  Observation and collection persistence
+├── frontend/
+│   ├── src/pages/                Dashboard and analysis workflows
+│   ├── src/components/           Shared layout, filters, charts, and UI primitives
+│   ├── src/context/              Auth, filters, updates, and notifications
+│   └── src/data/                 Frontend types, API client, and formatting helpers
+├── requirements.txt              Python dependencies
+└── README.md                     Project and methodology documentation
 ```
 
-The frontend runs on `http://localhost:5173` by default.
-
-### 3. Access the app
-
-- Frontend: `http://localhost:5173`
-- Backend health: `http://localhost:4002/api/health`
-- Login endpoint: `POST http://localhost:4002/api/login`
-
-## Main Technologies
-
-- React 18 with TypeScript
-- Vite for development and production builds
-- React Router for page navigation
-- Tailwind CSS for styling
-- Recharts for charts
-- React Leaflet and Leaflet for the India route map
-- Lucide React for icons
-- In-memory deterministic mock data
-- Session storage for demo login and audit history
-
-## Getting Started
+## Local Setup
 
 ### Requirements
 
+- Node.js 18 or later.
+- npm.
+- Python 3.10 or later.
+- A local SQLite database at `backend/data/apix.db` containing the schema and required observation tables.
+
+The runtime database and generated collection files are intentionally excluded from Git. They should be supplied through the deployment environment or initialized locally before starting the backend.
+
+### Install dependencies
+
+From the project root:
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+
+cd backend
+npm install
+
+cd ..\frontend
 npm install
 ```
 
-### Start the development server
+### Start the backend
 
 ```bash
+cd backend
+npm start
+```
+
+The Express server listens on port `4002` by default.
+
+### Start the frontend
+
+In a second terminal:
+
+```bash
+cd frontend
 npm run dev
 ```
 
-Open the local URL printed by Vite, usually `http://localhost:5173`.
+Vite serves the frontend at `http://localhost:5173` by default. The backend health endpoint is available at `http://localhost:4002/api/health`.
 
-### Other commands
+### Frontend commands
 
 ```bash
 npm run typecheck
+npm run lint
 npm run build
 npm run preview
-npm run lint
 ```
 
-`typecheck` validates TypeScript. `build` creates the production bundle. `preview` serves the production build locally. `lint` checks the entire project with ESLint.
+## Demonstration Access
 
-## First-Time User Flow
+The interface includes role-oriented demonstration accounts:
 
-4. After login, the protected dashboard opens at `/dashboard`.
-5. Use the desktop sidebar or mobile menu to move between modules.
-6. Use **Simulate Update** to append mock observations and refresh the analytics.
-7. Select **Logout** from the sidebar or mobile menu to return to the landing page.
+| Role | Email | Password |
+|---|---|---|
+| Administrator | `admin@aeroindex.gov.in` | `admin123` |
+| Analyst | `analyst@aeroindex.gov.in` | `analyst123` |
+| Viewer | `viewer@aeroindex.gov.in` | `viewer123` |
 
-## Demo Accounts
+Authentication and audit history are implemented for the demonstration experience. A production deployment should replace these credentials with managed identity, server-side authorization, and durable audit storage.
 
-| Role | Email | Password | Intended use |
-|---|---|---|---|
-| Administrator | `admin@aeroindex.gov.in` | `admin123` | Full prototype exploration |
-| Analyst | `analyst@aeroindex.gov.in` | `analyst123` | Analytics and exports |
-| Viewer | `viewer@aeroindex.gov.in` | `viewer123` | Read-only demonstration |
+## Responsible Data Collection
 
-The current prototype uses these accounts for authentication. The role labels are displayed in the interface, but fine-grained permission enforcement is not yet implemented for every action.
+The scraper architecture is designed for permitted sources and controlled collection. Any deployment connected to external airline, OTA, GDS, or licensed feeds must respect applicable terms of service, robots.txt rules, rate limits, API licences, privacy requirements, and data-retention obligations.
 
-## Navigation And Pages
+## Submission Scope
 
-The protected application uses a fixed desktop sidebar and a collapsible mobile navigation menu. The following pages are available from the side tabs.
+The Git repository contains the application source, configuration, schema, frontend, calculation modules, and operational documentation required to review the solution. Local databases, raw collection output, generated reports, test modules, diagnostic runners, and superseded standalone methodology files are excluded through `.gitignore`.
 
-### 1. Dashboard
+This keeps the submission focused on the reproducible product and its core implementation while allowing runtime storage and engineering diagnostics to remain local or deployment-managed.
 
-**Path:** `/dashboard`
+## Future Production Enhancements
 
-**Sidebar label:** Dashboard
-
-The Dashboard is the main overview of the platform. It combines the current national airfare situation with the most important route and data-quality signals.
-
-It contains:
-
-- Current Airfare Index, using January 2026 as the base period with a value of 100.
-- Monthly index movement compared with the previous month.
-- Number of monitored routes.
-- Number of monitored airlines.
-- Total price observations and the currently filtered observation count.
-- Number of high-price routes with a monthly increase greater than 5%.
-- Data freshness indicator.
-- Data quality percentage and valid-record count.
-- A monthly India Airfare Price Index area chart.
-- A monthly history table containing index, change percentage, and average fare.
-- A Top Monitored Routes table with links to route detail pages.
-- A Recent Alerts preview with a link to the complete Alerts page.
-
-The shared filter bar appears here and lets users filter the observation summary by date preset, custom date range, origin, destination, airline, travel class, and booking window.
-
-### 2. Airfare Index
-
-**Path:** `/index`
-
-**Sidebar label:** Airfare Index
-
-This page explains and exposes the national index calculation. It is intended for users who need to understand how the headline number is produced.
-
-It contains:
-
-- A plain-English explanation of route price relatives.
-- The January 2026 base-period definition: `January 2026 = 100`.
-- A monthly line chart of the composite index.
-- A button to show or hide the route basket and weight controls.
-- Editable route weights for testing index sensitivity.
-- Weight percentage, average fare, route index, and contribution for each route.
-- A Reset button that restores the default route weights.
-- Monthly index history with month-over-month changes and average fares.
-
-Changing weights recalculates the index in the browser. This is useful for explaining how route importance affects the national result.
-
-### 3. Route Analysis
-
-**Path:** `/routes`
-
-**Sidebar label:** Route Analysis
-
-This page provides a sortable, searchable table for all monitored domestic routes.
-
-Users can:
-
-- Search by city name or airport code.
-- Sort by average fare.
-- Sort by route index.
-- Sort by month-over-month change.
-- Sort by year-over-year change.
-- Sort by observation count.
-- Sort by volatility.
-- Review minimum and maximum observed fare.
-- Review route risk classification: low, medium, or high.
-- Export the currently filtered route table as `route-analysis.csv`.
-- Select any row to open the detailed route page.
-
-The table uses directional indicators and color badges to distinguish fare increases, decreases, and stable movements.
-
-#### Route Detail
-
-**Path:** `/routes/:routeId`
-
-This is the drill-down page opened from Route Analysis or selected route links elsewhere in the application.
-
-It contains:
-
-- Route name, airport codes, distance, and route category.
-- Current average fare.
-- Route airfare index.
-- Cheapest and highest observed fares.
-- Price volatility.
-- Observation count.
-- Month-over-month change.
-- Median fare.
-- Monthly average-fare trend chart.
-- Airline comparison bar chart for the selected route.
-- Booking-window fare curve for the selected route.
-- Daily fare trend chart.
-- Back to Routes navigation.
-
-If an unknown route ID is entered, the page shows a route-not-found message and a button back to the route list.
-
-### 4. Airline Analysis
-
-**Path:** `/airlines`
-
-**Sidebar label:** Airline Analysis
-
-This page compares monitored carriers across the domestic network.
-
-Users can:
-
-- Select or deselect individual airlines.
-- Compare average and median fare in a bar chart.
-- Review a detailed comparison table.
-- Compare minimum fare, maximum fare, volatility, observation count, and average index.
-- View the national index trend for context.
-
-Airline colors are defined in the project data and are reused in the selectors and charts.
-
-### 5. Booking Window
-
-**Path:** `/booking-window`
-
-**Sidebar label:** Booking Window
-
-This page explains how the observed fare changes according to the number of days between booking and departure.
-
-The available windows are:
-
-- `T+1`: one day before departure
-- `T+7`: seven days before departure
-- `T+15`: fifteen days before departure
-- `T+30`: thirty days before departure
-- `T+45`: forty-five days before departure
-
-It contains:
-
-- A definition of the booking-window concept.
-- Shared filters for route and airline selection.
-- A key insight comparing T+1 and T+45 prices.
-- A booking-window versus average-fare line chart.
-- A bar-chart comparison of each window.
-- A detailed table with average fare and observation count.
-
-The page is designed to show the premium associated with booking closer to departure.
-
-### 6. India Map
-
-**Path:** `/map`
-
-**Sidebar label:** India Map
-
-This page shows the geographic distribution of the monitored airfare network.
-
-It contains:
-
-- A Leaflet map centered on India.
-- Airport indicators for monitored airports.
-- Route lines connecting origin and destination airports.
-- Green lines for decreasing or stable movements.
-- Yellow lines for moderate increases.
-- Red lines for significant increases.
-- Route tooltips showing route name, average fare, and monthly change.
-- Airport popups showing city, airport code, state, and region.
-- Clickable route lines that open a route summary in the side panel.
-- A regional summary counting routes by trend category.
-
-The map uses OpenStreetMap and CARTO tiles. It requires network access to load the map tiles in a browser.
-
-### 7. Data Explorer
-
-**Path:** `/explorer`
-
-**Sidebar label:** Data Explorer
-
-This page exposes the underlying airfare observations instead of only the aggregated results.
-
-Users can:
-
-- Search by observation ID, origin, destination, or airline.
-- Filter by origin airport.
-- Filter by destination airport.
-- Filter by airline.
-- Filter by observation status.
-- Sort by ID, collection date, route, airline, travel date, booking window, total fare, or status.
-- Move through paginated results, with 20 records per page.
-- Export the filtered observations as `observations.csv`.
-
-Each row displays collection date, route, airline, travel date, booking window, travel class, total fare, source, and status.
-
-Possible observation statuses are `valid`, `invalid`, `duplicate`, and `pending`.
-
-### 8. Alerts
-
-**Path:** `/alerts`
-
-**Sidebar label:** Alerts
-
-This page lists significant movements detected by the analytics layer.
-
-It contains:
-
-- Counts for high, medium, and low severity alerts.
-- Severity filter buttons for All, High, Medium, and Low.
-- Alert type labels.
-- Alert dates.
-- Route information when an alert is route-specific.
-- Color-coded alert icons and left borders.
-
-Alert types include price spikes, price drops, index thresholds, volatility, and data-quality events.
-
-### 9. Policy Insights
-
-**Path:** `/insights`
-
-**Sidebar label:** Policy Insights
-
-This page converts calculated metrics into short, plain-English observations.
-
-It contains:
-
-- A prototype-data disclaimer.
-- Current national index.
-- Monthly movement.
-- Route with the highest increase.
-- Route with the largest decrease.
-- Most volatile route.
-- Lowest and highest average-fare routes.
-- Cheapest monitored airline.
-- Automatically generated key observations grouped by category.
-- Booking-window impact comparing fares booked one day and 45 days before departure.
-
-These statements are generated from the mock dataset and should not be treated as official government findings.
-
-### 10. Methodology
-
-**Path:** `/methodology`
-
-**Sidebar label:** Methodology
-
-This page explains how the platform works for non-technical readers. It is also available publicly from the landing page and does not require login.
-
-The explanation is organized into four phases:
-
-1. **Foundation**: the problem, why airfare is difficult to measure, and data collection.
-2. **Data Processing**: validation, cleaning, fare normalization, route selection, and index calculation.
-3. **Analysis**: route analysis, airline analysis, and booking-window analysis.
-4. **Decision Support**: geographic visualization, alerts, policy insights, and future live-data integration.
-
-The page also shows a future production flow from airline or OTA sources through automated collection, validation, database storage, and index calculation. It clearly states that the current prototype does not scrape live sources.
-
-### 11. System/API
-
-**Path:** `/system`
-
-**Sidebar label:** System/API
-
-This page documents and demonstrates the technical architecture behind the application.
-
-It contains:
-
-- The active data source name and whether it is live.
-- A visual data pipeline from source to dashboard.
-- A **Run Data Processing** button that simulates a processing cycle.
-- Counts for collected, processed, duplicate, invalid, and valid records.
-- Last update time and data-quality percentage.
-- A layered system architecture view.
-- Cross-cutting modules such as Alerts, Maps, Policy Insights, and Exports.
-- A table of simulated REST API endpoints.
-
-The listed endpoint groups include index, routes, airlines, booking window, observations, alerts, insights, map, and dashboard statistics.
-
-In the current prototype, these endpoints are represented by functions in `src/data/api.ts`. They are not served by a separate HTTP server.
-
-### 12. Audit Log
-
-**Path:** `/audit`
-
-**Sidebar location:** Below the main navigation, with the shield icon
-
-The Audit Log provides session-level governance information.
-
-It contains:
-
-- The current user name, email, and role.
-- Descriptions of Administrator, Analyst, and Viewer roles.
-- A chronological activity table.
-- Login and logout events.
-- Action, module, user, and timestamp fields.
-
-Audit entries are stored in browser session storage and are limited to the current browser session. They are not yet stored in a server database.
-
-## Shared Controls And Behavior
-
-### Sidebar navigation
-
-On desktop, the sidebar stays fixed on the left. On smaller screens, the navigation is available through the menu button in the mobile header. The active page is highlighted.
-
-### Simulate Price Update
-
-The **Simulate Price Update** control is available in the sidebar and top bar after login. It appends mock observations, updates the application timestamp, refreshes calculated metrics, and displays a success toast.
-
-### Toast notifications
-
-Toast messages appear for actions such as simulated updates, weight resets, and data-processing runs.
-
-### Filters
-
-The shared filter bar supports:
-
-- Date presets: Today, Last 7 Days, Last 30 Days, Last 3 Months, Last 6 Months, and Custom Range.
-- Custom start and end dates.
-- Origin airport.
-- Destination airport.
-- Airline.
-- Travel class.
-- Booking window.
-- Reset to defaults.
-
-Not every page uses every filter. Each page applies the filters relevant to its analysis.
-
-## Data And Analytics
-
-### Mock observations
-
-The mock generator creates deterministic observations from a seeded random process. It models:
-
-- 25 representative domestic routes.
-- Major Indian airports and regions.
-- Multiple airlines.
-- Economy, Premium Economy, and Business travel classes.
-- T+1, T+7, T+15, T+30, and T+45 booking windows.
-- Base fare, taxes, fees, total fare, source, and status.
-- Seasonal and holiday effects.
-- Airline, travel-class, route, and booking-window price multipliers.
-
-The generated data covers January 2026 through August 2026 in the current prototype.
-
-### Main calculations
-
-The analytics layer calculates:
-
-- National monthly airfare index.
-- Route average, median, minimum, maximum, and volatility.
-- Month-over-month and year-over-year movement.
-- Route trend and risk classifications.
-- Airline fare and index comparisons.
-- Booking-window averages.
-- Data pipeline quality statistics.
-- Alerts and policy insights.
-
-The national index compares route averages with January 2026 base-period averages and combines them using route weights.
-
-## Project Structure
-
-```text
-src/
-  App.tsx                         Application routes and providers
-  main.tsx                        React entrypoint and global imports
-  index.css                       Tailwind layers and shared styles
-  components/
-    Layout.tsx                    Protected app shell and sidebar
-    FilterBar.tsx                 Shared analytics filters
-    chartFormatters.ts             Chart tooltip formatters
-    ui/                           Reusable cards, KPI cards, and toasts
-  context/
-    AppContext.tsx                Filters, updates, demo mode, and toasts
-    AuthContext.tsx               Demo authentication and audit history
-  data/
-    airlines.ts                   Airline definitions
-    airports.ts                   Airport definitions
-    analytics.ts                  Aggregation and insight calculations
-    api.ts                        In-memory API-style data functions
-    datasource.ts                  Mock/live data-source abstraction
-    generator.ts                  Deterministic observation generation
-    random.ts                     Seeded random values and formatters
-    routes.ts                     Monitored route definitions
-    types.ts                      Shared TypeScript types
-  pages/                          Public, dashboard, analysis, and system pages
-public/                            Static assets
-```
-
-## Data Source Architecture
-
-The `DataSource` interface defines two operations:
-
-- `fetchObservations()` for retrieving observations.
-- `simulateUpdate(count)` for update simulation.
-
-The current implementation is `MockAirfareDataSource`. A `LiveAirfareDataSource` placeholder is included for future integration, but it intentionally throws an error until a permitted source is configured.
-
-Any future live integration must follow applicable website terms, robots.txt rules, rate limits, API licensing, privacy requirements, and ethical data-collection practices.
-
-## Important Prototype Limitations
-
-- Data is generated in memory and is not persistent.
-- The live data source is not configured.
-- The API endpoint list is documentation for a future backend, not an active HTTP API.
-- Authentication is demo-only and uses hard-coded accounts.
-- Role-based access restrictions are not fully enforced.
-- Audit history is stored only in session storage.
-- Map tiles require external network access.
-- CSV export is generated in the browser.
-- The displayed analytics are for demonstration and must not be interpreted as official statistics.
-
-## Production Direction
-
-A production implementation could add:
-
-- Permitted airline, OTA, GDS, or licensed API connectors.
-- A backend service and persistent normalized database.
-- Scheduled collection jobs and monitoring.
-- Real authentication and role-based authorization.
-- Server-side audit logs.
-- API pagination, caching, rate limiting, and validation.
-- Versioned index methodology and reproducible calculation snapshots.
-- Automated tests for data quality, calculations, exports, and access control.
+- Deploy permitted source connectors with scheduling, retries, rate limiting, and monitoring.
+- Move secrets and credentials to managed configuration.
+- Add server-side authentication, authorization, and audit persistence.
+- Add versioned methodology and calculation snapshots for each published index.
+- Persist quality reports and expose signed provenance for published values.
+- Add automated CI for normalization contracts, database migrations, index calculations, and API contracts.
+- Add observability for collection latency, source availability, matching coverage, and index confidence.
 
 ## License
 
-No license is currently specified for this prototype.
+No license is currently specified for this submission.

@@ -8,6 +8,11 @@ import {
 import { DashboardKpiCard } from '@/components/ui/DashboardKpiCard';
 import type { AlertItem } from '@/data/types';
 import { apiAlerts, type ApiFilters } from '@/lib/api';
+import { StaggerContainer, MotionItem } from '@/components/animation/MotionCard';
+import { AnimatedCounter } from '@/components/animation/AnimatedCounter';
+import { fireConfetti } from '@/components/animation/confetti';
+import { motion } from 'framer-motion';
+import { Zap } from 'lucide-react';
 
 const alertIcons: Record<AlertItem['type'], typeof AlertTriangle> = {
   price_spike: TrendingUp,
@@ -76,55 +81,77 @@ export function AlertsPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3 bg-navy-900/80 p-3.5 rounded-2xl border border-navy-700">
-            <Bell className="w-5 h-5 text-accent-400" />
-            <div className="text-xs">
-              <p className="font-bold text-white">Active Queue</p>
-              <p className="text-accent-400 font-mono font-bold text-base">{alerts.length} Incidents</p>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <button
+              onClick={() => {
+                fireConfetti({ spread: 50, origin: { y: 0.3 } });
+              }}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-accent-500/20 hover:bg-accent-500/30 border border-accent-500/40 text-accent-300 text-xs font-bold transition-all shadow-md active:scale-95"
+            >
+              <Zap className="w-3.5 h-3.5 text-accent-400" />
+              <span>Acknowledge Signal Queue</span>
+            </button>
+
+            <div className="flex items-center gap-3 bg-navy-900/80 p-3.5 rounded-2xl border border-navy-700">
+              <Bell className="w-5 h-5 text-accent-400" />
+              <div className="text-xs">
+                <p className="font-bold text-white">Active Queue</p>
+                <p className="text-accent-400 font-mono font-bold text-base">
+                  <AnimatedCounter value={alerts.length} /> Incidents
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <DashboardKpiCard
-          label="Total Incidents Flagged"
-          value={counts.total}
-          sublabel="Cross-corridor active signals"
-          statusText="Active Queue"
-          icon={<Bell className="w-5 h-5" />}
-          accent="navy"
-          progressPercent={100}
-        />
+      <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <MotionItem>
+          <DashboardKpiCard
+            label="Total Incidents Flagged"
+            value={counts.total}
+            sublabel="Cross-corridor active signals"
+            statusText="Active Queue"
+            icon={<Bell className="w-5 h-5" />}
+            accent="navy"
+            progressPercent={100}
+          />
+        </MotionItem>
 
-        <DashboardKpiCard
-          label="Critical Surge Spikes"
-          value={counts.high}
-          sublabel=">15% sudden tariff spike"
-          statusText={counts.high > 0 ? 'Action Required' : 'Nominal'}
-          icon={<AlertTriangle className="w-5 h-5" />}
-          accent="danger"
-        />
+        <MotionItem>
+          <DashboardKpiCard
+            label="Critical Surge Spikes"
+            value={counts.high}
+            sublabel=">15% sudden tariff spike"
+            statusText={counts.high > 0 ? 'Action Required' : 'Nominal'}
+            icon={<AlertTriangle className="w-5 h-5" />}
+            accent="danger"
+          />
+        </MotionItem>
 
-        <DashboardKpiCard
-          label="Moderate Volatility"
-          value={counts.medium}
-          sublabel="5% to 15% fluctuation"
-          statusText="Watching"
-          icon={<Activity className="w-5 h-5" />}
-          accent="warning"
-        />
+        <MotionItem>
+          <DashboardKpiCard
+            label="Moderate Volatility"
+            value={counts.medium}
+            sublabel="5% to 15% fluctuation"
+            statusText="Watching"
+            icon={<Activity className="w-5 h-5" />}
+            accent="warning"
+          />
+        </MotionItem>
 
-        <DashboardKpiCard
-          label="Informational & Safe"
-          value={counts.low}
-          sublabel="Nominal trajectory"
-          statusText="Within Spec"
-          icon={<ShieldCheck className="w-5 h-5" />}
-          accent="accent"
-        />
-      </div>
+        <MotionItem>
+          <DashboardKpiCard
+            label="Informational & Safe"
+            value={counts.low}
+            sublabel="Nominal trajectory"
+            statusText="Within Spec"
+            icon={<ShieldCheck className="w-5 h-5" />}
+            accent="accent"
+          />
+        </MotionItem>
+      </StaggerContainer>
 
       {/* Filter Tabs */}
       <div className="glass-card p-5">

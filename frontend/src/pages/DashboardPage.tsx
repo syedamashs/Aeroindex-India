@@ -16,6 +16,10 @@ import { indexTooltipFormatter, genericFareTooltipFormatter } from '@/components
 import {
   apiIndex, apiRoutes, apiAlerts, apiStatistics, apiAirlines, type ApiFilters,
 } from '@/lib/api';
+import { RadarScanner } from '@/components/animation/RadarScanner';
+import { StaggerContainer, MotionItem } from '@/components/animation/MotionCard';
+import { AnimatedCounter } from '@/components/animation/AnimatedCounter';
+import { fireConfetti } from '@/components/animation/confetti';
 
 export function DashboardPage() {
   const { filters, lastUpdate, triggerUpdate } = useApp();
@@ -33,6 +37,7 @@ export function DashboardPage() {
   // Interactive controls
   const [chartMode, setChartMode] = useState<'index' | 'fare'>('index');
   const [alertFilter, setAlertFilter] = useState<'all' | 'high' | 'medium'>('all');
+  const [showRadar, setShowRadar] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -77,6 +82,7 @@ export function DashboardPage() {
   const handleManualRefresh = () => {
     setIsRefreshing(true);
     triggerUpdate(200);
+    fireConfetti({ spread: 60, origin: { y: 0.35 } });
     setTimeout(() => setIsRefreshing(false), 800);
   };
 
@@ -125,6 +131,18 @@ export function DashboardPage() {
           {/* Quick Action Hub */}
           <div className="flex flex-wrap items-center gap-3">
             <button
+              onClick={() => setShowRadar(!showRadar)}
+              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border text-xs font-semibold transition-all backdrop-blur-sm active:scale-95 ${
+                showRadar
+                  ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300 ring-2 ring-emerald-500/20'
+                  : 'bg-white/10 hover:bg-white/20 border-white/15 text-white'
+              }`}
+            >
+              <Activity className="w-3.5 h-3.5 text-emerald-400" />
+              <span>{showRadar ? 'Hide ATC Radar' : 'Launch ATC Radar'}</span>
+            </button>
+
+            <button
               onClick={handleManualRefresh}
               disabled={isRefreshing}
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-semibold transition-all backdrop-blur-sm active:scale-95"
@@ -149,6 +167,34 @@ export function DashboardPage() {
           </div>
         </div>
 
+        {/* Dynamic ATC Radar HUD Dropdown Drawer */}
+        {showRadar && (
+          <div className="relative z-10 mt-6 p-6 rounded-2xl bg-navy-950/95 border border-emerald-500/30 flex flex-col md:flex-row items-center justify-around gap-6 shadow-2xl animate-fade-in">
+            <RadarScanner size={260} />
+            <div className="max-w-md space-y-3 text-xs">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+                <h4 className="font-display font-bold text-white text-sm">
+                  Active Air Corridor Surveillance Radar
+                </h4>
+              </div>
+              <p className="text-slate-300 leading-relaxed">
+                360° radar sweep tracking domestic scheduled flights across trunk corridors (Delhi, Mumbai, Bengaluru, Kolkata, Hyderabad, Chennai, Goa). Fares are scanned at high frequency for algorithmic tariff gouging detection.
+              </p>
+              <div className="grid grid-cols-2 gap-2 pt-2 border-t border-navy-800 text-[11px] font-mono">
+                <div className="bg-navy-900/80 p-2 rounded-lg border border-navy-800">
+                  <span className="text-slate-400">Scan Frequency:</span>
+                  <p className="text-emerald-400 font-bold">4.5 sec / sweep</p>
+                </div>
+                <div className="bg-navy-900/80 p-2 rounded-lg border border-navy-800">
+                  <span className="text-slate-400">Corridors Locked:</span>
+                  <p className="text-white font-bold">27 Trunk Corridors</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Live National Summary Ticker Strip */}
         <div className="relative z-10 mt-6 pt-5 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
           <div className="flex items-center gap-3">
@@ -158,7 +204,7 @@ export function DashboardPage() {
             <div>
               <p className="text-navy-400 text-[11px] font-medium uppercase tracking-wider">Average Ticket</p>
               <p className="text-white font-mono font-bold text-sm">
-                {statistics?.averageFare ? formatINR(statistics.averageFare) : '₹12,450'}
+                <AnimatedCounter value={statistics?.averageFare ?? 12450} prefix="₹" />
               </p>
             </div>
           </div>
@@ -180,7 +226,7 @@ export function DashboardPage() {
             <div>
               <p className="text-navy-400 text-[11px] font-medium uppercase tracking-wider">Data Quality Score</p>
               <p className="text-white font-mono font-bold text-sm">
-                {statistics?.dataQuality ?? 99.4}% Verified
+                <AnimatedCounter value={statistics?.dataQuality ?? 99.4} decimals={1} suffix="% Verified" />
               </p>
             </div>
           </div>
@@ -216,46 +262,54 @@ export function DashboardPage() {
           )}
 
           {/* Primary High-Impact KPI Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <DashboardKpiCard
-              label="National Airfare Index"
-              value={latest?.indexValue?.toFixed(1) ?? '100.0'}
-              change={latest?.percentageChange}
-              sublabel="Baseline: Jan 2026 = 100.0"
-              statusText={latest?.indexValue > 100 ? 'Above Base' : 'Sub-Base'}
-              icon={<Activity className="w-5 h-5" />}
-              accent="navy"
-              progressPercent={Math.min(100, ((latest?.indexValue ?? 100) / 120) * 100)}
-            />
+          <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <MotionItem>
+              <DashboardKpiCard
+                label="National Airfare Index"
+                value={latest?.indexValue?.toFixed(1) ?? '100.0'}
+                change={latest?.percentageChange}
+                sublabel="Baseline: Jan 2026 = 100.0"
+                statusText={latest?.indexValue > 100 ? 'Above Base' : 'Sub-Base'}
+                icon={<Activity className="w-5 h-5" />}
+                accent="navy"
+                progressPercent={Math.min(100, ((latest?.indexValue ?? 100) / 120) * 100)}
+              />
+            </MotionItem>
 
-            <DashboardKpiCard
-              label="Monthly Velocity (MoM)"
-              value={formatPercent(latest?.percentageChange ?? 0)}
-              sublabel="vs preceding monthly cohort"
-              statusText={Math.abs(latest?.percentageChange || 0) > 4 ? 'High Volatility' : 'Normal Fluctuations'}
-              icon={<TrendingUp className="w-5 h-5" />}
-              accent={latest && latest.percentageChange > 0 ? 'danger' : 'accent'}
-            />
+            <MotionItem>
+              <DashboardKpiCard
+                label="Monthly Velocity (MoM)"
+                value={formatPercent(latest?.percentageChange ?? 0)}
+                sublabel="vs preceding monthly cohort"
+                statusText={Math.abs(latest?.percentageChange || 0) > 4 ? 'High Volatility' : 'Normal Fluctuations'}
+                icon={<TrendingUp className="w-5 h-5" />}
+                accent={latest && latest.percentageChange > 0 ? 'danger' : 'accent'}
+              />
+            </MotionItem>
 
-            <DashboardKpiCard
-              label="Active Observations"
-              value={formatNumber(statistics?.totalObservations ?? 0)}
-              sublabel={`${statistics?.routesMonitored ?? 0} corridors • ${statistics?.airlinesMonitored ?? 0} carriers`}
-              statusText="Verified Ingestion"
-              icon={<Database className="w-5 h-5" />}
-              accent="purple"
-              progressPercent={statistics?.dataQuality ?? 98}
-            />
+            <MotionItem>
+              <DashboardKpiCard
+                label="Active Observations"
+                value={formatNumber(statistics?.totalObservations ?? 0)}
+                sublabel={`${statistics?.routesMonitored ?? 0} corridors • ${statistics?.airlinesMonitored ?? 0} carriers`}
+                statusText="Verified Ingestion"
+                icon={<Database className="w-5 h-5" />}
+                accent="purple"
+                progressPercent={statistics?.dataQuality ?? 98}
+              />
+            </MotionItem>
 
-            <DashboardKpiCard
-              label="High-Surge Corridors"
-              value={highPriceRoutes}
-              sublabel="Routes with >5% price jump"
-              statusText={highPriceRoutes > 4 ? 'Surveillance Alert' : 'Safe Threshold'}
-              icon={<AlertTriangle className="w-5 h-5" />}
-              accent={highPriceRoutes > 4 ? 'warning' : 'accent'}
-            />
-          </div>
+            <MotionItem>
+              <DashboardKpiCard
+                label="High-Surge Corridors"
+                value={highPriceRoutes}
+                sublabel="Routes with >5% price jump"
+                statusText={highPriceRoutes > 4 ? 'Surveillance Alert' : 'Safe Threshold'}
+                icon={<AlertTriangle className="w-5 h-5" />}
+                accent={highPriceRoutes > 4 ? 'warning' : 'accent'}
+              />
+            </MotionItem>
+          </StaggerContainer>
 
           {/* Main Airfare Index Command Center Chart */}
           <div className="glass-card p-6">

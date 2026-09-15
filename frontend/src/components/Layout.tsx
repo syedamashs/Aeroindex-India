@@ -23,6 +23,9 @@ import {
 import { useAuth } from '@/context/AuthContext';
 import { useApp } from '@/context/AppContext';
 import { apiRunScheduler } from '@/lib/api';
+import { motion, AnimatePresence } from 'framer-motion';
+import { AviationTickerTape } from '@/components/animation/AviationTickerTape';
+import { fireConfetti } from '@/components/animation/confetti';
 
 const NAV_ITEMS = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -60,6 +63,7 @@ export function Layout({ children }: { children: ReactNode }) {
 
     try {
       await apiRunScheduler();
+      fireConfetti();
       window.alert('Scheduler started. Collection is running in the backend.');
     } catch (error) {
       window.alert(error instanceof Error ? error.message : 'Unable to start the scheduler.');
@@ -217,7 +221,7 @@ export function Layout({ children }: { children: ReactNode }) {
       )}
 
       {/* Main content */}
-      <div className="flex-1 lg:ml-64 flex flex-col min-h-screen">
+      <div className="flex-1 min-w-0 lg:ml-64 flex flex-col min-h-screen">
         {/* Top bar */}
         <header className="sticky top-0 z-20 bg-white/90 backdrop-blur-md border-b border-slate-200/80 px-4 lg:px-8 py-3 flex items-center justify-between shadow-sm">
           <div className="hidden lg:flex items-center gap-2.5">
@@ -242,10 +246,21 @@ export function Layout({ children }: { children: ReactNode }) {
           </div>
         </header>
 
-        <main className="app-main-shell p-4 lg:p-8 mt-14 lg:mt-0 max-w-[1600px] w-full mx-auto flex-1">
-          <div key={location.pathname} className="page-transition">
-            {children}
-          </div>
+        {/* Live Domestic Aviation Ticker Tape */}
+        <AviationTickerTape />
+
+        <main className="app-main-shell min-w-0 p-4 lg:p-8 mt-14 lg:mt-0 max-w-[1600px] w-full mx-auto flex-1">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={location.pathname}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
         </main>
       </div>
     </div>

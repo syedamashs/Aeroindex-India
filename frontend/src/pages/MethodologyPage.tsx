@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { ArrowRight, Database, ShieldCheck, BookOpen, Code2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { apiDqeSummary, apiRoutes, apiStatistics } from '@/lib/api';
+import { AnimatedCounter } from '@/components/animation/AnimatedCounter';
 
 function MethodSection({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -84,27 +85,39 @@ export function MethodologyPage() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 pt-2">
           <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
             <p className="text-[10px] uppercase font-bold text-slate-400">Routes Monitored</p>
-            <p className="text-base font-mono font-bold text-navy-950 mt-0.5">{statistics.routesMonitored.toLocaleString('en-IN')}</p>
+            <p className="text-base font-mono font-bold text-navy-950 mt-0.5">
+              <AnimatedCounter value={statistics.routesMonitored} />
+            </p>
           </div>
           <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
             <p className="text-[10px] uppercase font-bold text-slate-400">Total Observations</p>
-            <p className="text-base font-mono font-bold text-navy-950 mt-0.5">{statistics.totalObservations.toLocaleString('en-IN')}</p>
+            <p className="text-base font-mono font-bold text-navy-950 mt-0.5">
+              <AnimatedCounter value={statistics.totalObservations} />
+            </p>
           </div>
           <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
             <p className="text-[10px] uppercase font-bold text-slate-400">Valid Fare Rows</p>
-            <p className="text-base font-mono font-bold text-emerald-600 mt-0.5">{quality.valid.toLocaleString('en-IN')}</p>
+            <p className="text-base font-mono font-bold text-emerald-600 mt-0.5">
+              <AnimatedCounter value={quality.valid} />
+            </p>
           </div>
           <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
             <p className="text-[10px] uppercase font-bold text-slate-400">Invalid Records</p>
-            <p className="text-base font-mono font-bold text-rose-600 mt-0.5">{quality.invalid.toLocaleString('en-IN')}</p>
+            <p className="text-base font-mono font-bold text-rose-600 mt-0.5">
+              <AnimatedCounter value={quality.invalid} />
+            </p>
           </div>
           <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
             <p className="text-[10px] uppercase font-bold text-slate-400">Duplicate Groups</p>
-            <p className="text-base font-mono font-bold text-amber-600 mt-0.5">{quality.duplicates.toLocaleString('en-IN')}</p>
+            <p className="text-base font-mono font-bold text-amber-600 mt-0.5">
+              <AnimatedCounter value={quality.duplicates} />
+            </p>
           </div>
           <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
             <p className="text-[10px] uppercase font-bold text-slate-400">Route Weight Sum</p>
-            <p className="text-base font-mono font-bold text-navy-950 mt-0.5">{routeWeight.toLocaleString('en-IN')}</p>
+            <p className="text-base font-mono font-bold text-navy-950 mt-0.5">
+              <AnimatedCounter value={routeWeight} />
+            </p>
           </div>
         </div>
       </MethodSection>

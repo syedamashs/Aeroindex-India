@@ -10,7 +10,9 @@ import {
 } from 'lucide-react';
 import { DashboardKpiCard } from '@/components/ui/DashboardKpiCard';
 import { fareTooltipFormatter } from '@/components/chartFormatters';
-import { apiRouteDetail, type ApiObservation, type ApiRouteStats } from '@/lib/api';
+import { apiRouteDetail, apiRoutes, type ApiObservation, type ApiRouteStats } from '@/lib/api';
+import { FlightPathTrajectory } from '@/components/animation/FlightPathTrajectory';
+import { StaggerContainer, MotionItem } from '@/components/animation/MotionCard';
 
 export function RouteDetailPage() {
   const { routeId } = useParams();
@@ -24,6 +26,23 @@ export function RouteDetailPage() {
     if (!routeId) return;
     setLoading(true);
     apiRouteDetail(routeId)
+      .then(async (response) => {
+        if (response.data.route) {
+          return response;
+        }
+
+        const airportCodeMatch = routeId.match(/^([A-Z]{3})-([A-Z]{3})$/i);
+        if (!airportCodeMatch) return response;
+
+        const routesResponse = await apiRoutes();
+        const [origin, destination] = airportCodeMatch.slice(1).map((code) => code.toUpperCase());
+        const monitoredRoute = routesResponse.data.find(
+          (candidate) => candidate.origin === origin && candidate.destination === destination,
+        ) ?? routesResponse.data.find(
+          (candidate) => candidate.origin === destination && candidate.destination === origin,
+        );
+        return monitoredRoute ? apiRouteDetail(monitoredRoute.routeId) : response;
+      })
       .then((response) => {
         setRoute(response.data.route);
         setObservations(response.data.observations);
@@ -141,46 +160,64 @@ export function RouteDetailPage() {
         </div>
       </div>
 
+      {/* Interactive Great Circle Flight Trajectory Animation */}
+      <FlightPathTrajectory
+        origin={route.origin}
+        destination={route.destination}
+        distanceKm={route.distanceKm || 1150}
+        fare={route.averageFare}
+        duration={route.distanceKm && route.distanceKm > 1500 ? '2h 45m' : '1h 55m'}
+        altitude="FL340 (34,000 ft)"
+      />
+
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <DashboardKpiCard
-          label="Corridor Average Fare"
-          value={formatINR(route.averageFare)}
-          change={route.momChange}
-          sublabel="Current monitored cohort"
-          statusText="Weighted Mean"
-          icon={<TrendingUp className="w-5 h-5" />}
-          accent="navy"
-          progressPercent={100}
-        />
+      <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <MotionItem>
+          <DashboardKpiCard
+            label="Corridor Average Fare"
+            value={formatINR(route.averageFare)}
+            change={route.momChange}
+            sublabel="Current monitored cohort"
+            statusText="Weighted Mean"
+            icon={<TrendingUp className="w-5 h-5" />}
+            accent="navy"
+            progressPercent={100}
+          />
+        </MotionItem>
 
-        <DashboardKpiCard
-          label="Corridor Index Score"
-          value={route.index.toFixed(1)}
-          sublabel="Base Jan 2026 = 100.0"
-          statusText={route.index > 100 ? 'Surge Trend' : 'Below Base'}
-          icon={<Activity className="w-5 h-5" />}
-          accent="purple"
-        />
+        <MotionItem>
+          <DashboardKpiCard
+            label="Corridor Index Score"
+            value={route.index.toFixed(1)}
+            sublabel="Base Jan 2026 = 100.0"
+            statusText={route.index > 100 ? 'Surge Trend' : 'Below Base'}
+            icon={<Activity className="w-5 h-5" />}
+            accent="purple"
+          />
+        </MotionItem>
 
-        <DashboardKpiCard
-          label="Price Spread (Min – Max)"
-          value={`${formatINR(route.minFare)} – ${formatINR(route.maxFare)}`}
-          sublabel="Dynamic tariff range"
-          statusText="Spread Bounds"
-          icon={<BarChart2 className="w-5 h-5" />}
-          accent="accent"
-        />
+        <MotionItem>
+          <DashboardKpiCard
+            label="Price Spread (Min – Max)"
+            value={`${formatINR(route.minFare)} – ${formatINR(route.maxFare)}`}
+            sublabel="Dynamic tariff range"
+            statusText="Spread Bounds"
+            icon={<BarChart2 className="w-5 h-5" />}
+            accent="accent"
+          />
+        </MotionItem>
 
-        <DashboardKpiCard
-          label="Volatility Index (σ)"
-          value={formatINR(route.volatility)}
-          sublabel="Observed standard deviation"
-          statusText={route.volatility > 2000 ? 'High Dispersion' : 'Stable Band'}
-          icon={<Gauge className="w-5 h-5" />}
-          accent={route.volatility > 2000 ? 'warning' : 'accent'}
-        />
-      </div>
+        <MotionItem>
+          <DashboardKpiCard
+            label="Volatility Index (σ)"
+            value={formatINR(route.volatility)}
+            sublabel="Observed standard deviation"
+            statusText={route.volatility > 2000 ? 'High Dispersion' : 'Stable Band'}
+            icon={<Gauge className="w-5 h-5" />}
+            accent={route.volatility > 2000 ? 'warning' : 'accent'}
+          />
+        </MotionItem>
+      </StaggerContainer>
 
       {/* Monthly Price Curve Chart */}
       <div className="glass-card p-6">

@@ -6,6 +6,8 @@ import {
   Database, ShieldCheck,
 } from 'lucide-react';
 import { apiAirlines, apiMap, apiObservations, type ApiFilters, type ApiObservation } from '@/lib/api';
+import { fireConfetti } from '@/components/animation/confetti';
+import { AnimatedCounter } from '@/components/animation/AnimatedCounter';
 
 const PAGE_SIZE = 20;
 
@@ -83,6 +85,7 @@ export function DataExplorerPage() {
     a.download = 'aeroindex-observations.csv';
     a.click();
     URL.revokeObjectURL(url);
+    fireConfetti({ spread: 60, origin: { y: 0.3 } });
   };
 
   const sortIcon = (key: SortKey) => {
@@ -127,14 +130,21 @@ export function DataExplorerPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <div className="px-3.5 py-2 rounded-xl bg-navy-900/80 border border-navy-700 text-xs text-white">
+              <span className="text-slate-400">Total Ingest: </span>
+              <span className="font-mono font-bold text-accent-400">
+                <AnimatedCounter value={data.total} /> rows
+              </span>
+            </div>
+
             <button
               onClick={exportCSV}
               disabled={loading || data.rows.length === 0}
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white text-navy-900 hover:bg-slate-100 text-xs font-bold transition-all shadow-md active:scale-95 disabled:opacity-50"
             >
               <Download className="w-3.5 h-3.5" />
-              <span>Export CSV ({loading ? '...' : data.total.toLocaleString('en-IN')})</span>
+              <span>Export CSV</span>
             </button>
           </div>
         </div>

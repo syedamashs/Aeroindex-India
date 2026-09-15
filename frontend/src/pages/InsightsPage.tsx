@@ -4,9 +4,13 @@ import { useApp } from '@/context/AppContext';
 import { formatINR, formatPercent } from '@/data/random';
 import {
   Activity, TrendingUp, TrendingDown, Gauge, Lightbulb, BarChart3,
-  ShieldCheck, ArrowUpRight, ArrowDownRight,
+  ShieldCheck, ArrowUpRight, ArrowDownRight, Download,
 } from 'lucide-react';
 import { apiAirlines, apiBookingWindow, apiIndex, apiInsights, apiRoutes, type ApiFilters, type ApiRouteStats } from '@/lib/api';
+import { StaggerContainer, MotionItem } from '@/components/animation/MotionCard';
+import { AnimatedCounter } from '@/components/animation/AnimatedCounter';
+import { fireConfetti } from '@/components/animation/confetti';
+import { motion } from 'framer-motion';
 
 export function InsightsPage() {
   const { filters, lastUpdate } = useApp();
@@ -75,89 +79,116 @@ export function InsightsPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3 bg-navy-900/80 p-3.5 rounded-2xl border border-navy-700">
-            <Lightbulb className="w-5 h-5 text-accent-400" />
-            <div className="text-xs">
-              <p className="font-bold text-white">Active Policy Signals</p>
-              <p className="text-accent-400 font-mono font-bold text-base">{insights.length} Synthesized</p>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <button
+              onClick={() => {
+                fireConfetti({ spread: 55, origin: { y: 0.3 } });
+                window.print();
+              }}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white text-navy-900 hover:bg-slate-100 text-xs font-bold transition-all shadow-md active:scale-95"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Export Policy Briefing</span>
+            </button>
+
+            <div className="flex items-center gap-3 bg-navy-900/80 p-3.5 rounded-2xl border border-navy-700">
+              <Lightbulb className="w-5 h-5 text-accent-400" />
+              <div className="text-xs">
+                <p className="font-bold text-white">Active Policy Signals</p>
+                <p className="text-accent-400 font-mono font-bold text-base">{insights.length} Synthesized</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Executive KPI Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <DashboardKpiCard
-          label="Current Composite Index"
-          value={latest?.indexValue.toFixed(1) ?? '100.0'}
-          change={latest?.percentageChange}
-          sublabel="Base Jan 2026 = 100"
-          statusText="Macro Benchmark"
-          icon={<Activity className="w-5 h-5" />}
-          accent="navy"
-          progressPercent={Math.min(100, ((latest?.indexValue ?? 100) / 120) * 100)}
-        />
+      <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <MotionItem>
+          <DashboardKpiCard
+            label="Current Composite Index"
+            value={latest?.indexValue.toFixed(1) ?? '100.0'}
+            change={latest?.percentageChange}
+            sublabel="Base Jan 2026 = 100"
+            statusText="Macro Benchmark"
+            icon={<Activity className="w-5 h-5" />}
+            accent="navy"
+            progressPercent={Math.min(100, ((latest?.indexValue ?? 100) / 120) * 100)}
+          />
+        </MotionItem>
 
-        <DashboardKpiCard
-          label="Top Inflationary Corridor"
-          value={topIncrease ? `${topIncrease.origin} → ${topIncrease.destination}` : '—'}
-          change={topIncrease?.momChange}
-          sublabel="Highest MoM surge"
-          statusText="Surge Alert"
-          icon={<ArrowUpRight className="w-5 h-5" />}
-          accent="danger"
-        />
+        <MotionItem>
+          <DashboardKpiCard
+            label="Top Inflationary Corridor"
+            value={topIncrease ? `${topIncrease.origin} → ${topIncrease.destination}` : '—'}
+            change={topIncrease?.momChange}
+            sublabel="Highest MoM surge"
+            statusText="Surge Alert"
+            icon={<ArrowUpRight className="w-5 h-5" />}
+            accent="danger"
+          />
+        </MotionItem>
 
-        <DashboardKpiCard
-          label="Top Deflationary Corridor"
-          value={topDecrease ? `${topDecrease.origin} → ${topDecrease.destination}` : '—'}
-          change={topDecrease?.momChange}
-          sublabel="Highest MoM price drop"
-          statusText="Price Relief"
-          icon={<ArrowDownRight className="w-5 h-5" />}
-          accent="accent"
-        />
+        <MotionItem>
+          <DashboardKpiCard
+            label="Top Deflationary Corridor"
+            value={topDecrease ? `${topDecrease.origin} → ${topDecrease.destination}` : '—'}
+            change={topDecrease?.momChange}
+            sublabel="Highest MoM price drop"
+            statusText="Price Relief"
+            icon={<ArrowDownRight className="w-5 h-5" />}
+            accent="accent"
+          />
+        </MotionItem>
 
-        <DashboardKpiCard
-          label="Highest Volatility Corridor"
-          value={mostVolatile ? `${mostVolatile.origin} → ${mostVolatile.destination}` : '—'}
-          sublabel={mostVolatile ? `Volatility σ ${formatINR(mostVolatile.volatility)}` : undefined}
-          statusText="Erratic Quotes"
-          icon={<Gauge className="w-5 h-5" />}
-          accent="warning"
-        />
-      </div>
+        <MotionItem>
+          <DashboardKpiCard
+            label="Highest Volatility Corridor"
+            value={mostVolatile ? `${mostVolatile.origin} → ${mostVolatile.destination}` : '—'}
+            sublabel={mostVolatile ? `Volatility σ ${formatINR(mostVolatile.volatility)}` : undefined}
+            statusText="Erratic Quotes"
+            icon={<Gauge className="w-5 h-5" />}
+            accent="warning"
+          />
+        </MotionItem>
+      </StaggerContainer>
 
       {/* Secondary Metrics Strip */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="glass-card p-4">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Lowest Mean Fare Route</p>
-          <p className="text-base font-display font-extrabold text-navy-950 mt-1">
-            {cheapestRoute ? `${cheapestRoute.origin} → ${cheapestRoute.destination}` : '—'}
-          </p>
-          <span className="text-xs font-mono font-bold text-emerald-600">
-            {cheapestRoute ? formatINR(cheapestRoute.averageFare) : '—'}
-          </span>
-        </div>
-        <div className="glass-card p-4">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Highest Mean Fare Route</p>
-          <p className="text-base font-display font-extrabold text-navy-950 mt-1">
-            {priciestRoute ? `${priciestRoute.origin} → ${priciestRoute.destination}` : '—'}
-          </p>
-          <span className="text-xs font-mono font-bold text-rose-600">
-            {priciestRoute ? formatINR(priciestRoute.averageFare) : '—'}
-          </span>
-        </div>
-        <div className="glass-card p-4">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Value Carrier Leader</p>
-          <p className="text-base font-display font-extrabold text-navy-950 mt-1 capitalize">
-            {cheapestAirline?.name ?? '—'}
-          </p>
-          <span className="text-xs font-mono font-bold text-navy-700">
-            {cheapestAirline ? `Avg ${formatINR(cheapestAirline.averageFare)}` : '—'}
-          </span>
-        </div>
-      </div>
+      <StaggerContainer className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <MotionItem>
+          <div className="glass-card p-4">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Lowest Mean Fare Route</p>
+            <p className="text-base font-display font-extrabold text-navy-950 mt-1">
+              {cheapestRoute ? `${cheapestRoute.origin} → ${cheapestRoute.destination}` : '—'}
+            </p>
+            <span className="text-xs font-mono font-bold text-emerald-600">
+              {cheapestRoute ? formatINR(cheapestRoute.averageFare) : '—'}
+            </span>
+          </div>
+        </MotionItem>
+        <MotionItem>
+          <div className="glass-card p-4">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Highest Mean Fare Route</p>
+            <p className="text-base font-display font-extrabold text-navy-950 mt-1">
+              {priciestRoute ? `${priciestRoute.origin} → ${priciestRoute.destination}` : '—'}
+            </p>
+            <span className="text-xs font-mono font-bold text-rose-600">
+              {priciestRoute ? formatINR(priciestRoute.averageFare) : '—'}
+            </span>
+          </div>
+        </MotionItem>
+        <MotionItem>
+          <div className="glass-card p-4">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Value Carrier Leader</p>
+            <p className="text-base font-display font-extrabold text-navy-950 mt-1 capitalize">
+              {cheapestAirline?.name ?? '—'}
+            </p>
+            <span className="text-xs font-mono font-bold text-navy-700">
+              {cheapestAirline ? `Avg ${formatINR(cheapestAirline.averageFare)}` : '—'}
+            </span>
+          </div>
+        </MotionItem>
+      </StaggerContainer>
 
       {/* Key Policy Observations */}
       <div className="glass-card p-6">

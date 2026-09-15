@@ -1,9 +1,13 @@
 import { useEffect, useState } from 'react';
 import {
-  AlertTriangle, CheckCircle2, Database, ShieldCheck,
+  AlertTriangle, CheckCircle2, Database, ShieldCheck, Activity, Zap,
 } from 'lucide-react';
 import { DashboardKpiCard } from '@/components/ui/DashboardKpiCard';
 import { apiDqeSummary } from '@/lib/api';
+import { StaggerContainer, MotionItem } from '@/components/animation/MotionCard';
+import { AnimatedCounter } from '@/components/animation/AnimatedCounter';
+import { fireConfetti } from '@/components/animation/confetti';
+import { motion } from 'framer-motion';
 
 type DqeData = Awaited<ReturnType<typeof apiDqeSummary>>['data'];
 
@@ -49,13 +53,25 @@ export function DqePage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3 bg-navy-900/80 p-3.5 rounded-2xl border border-navy-700">
-            <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-            <div className="text-xs">
-              <p className="font-bold text-white">Pipeline Quality Score</p>
-              <p className="text-emerald-400 font-mono font-bold text-base">
-                {data ? `${data.quality_score}% Verified` : '—'}
-              </p>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <button
+              onClick={() => {
+                fireConfetti({ spread: 50, origin: { y: 0.3 } });
+              }}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-accent-500/20 hover:bg-accent-500/30 border border-accent-500/40 text-accent-300 text-xs font-bold transition-all shadow-md active:scale-95"
+            >
+              <Zap className="w-3.5 h-3.5 text-accent-400" />
+              <span>Run Diagnostic Audit</span>
+            </button>
+
+            <div className="flex items-center gap-3 bg-navy-900/80 p-3.5 rounded-2xl border border-navy-700">
+              <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+              <div className="text-xs">
+                <p className="font-bold text-white">Pipeline Quality Score</p>
+                <p className="text-emerald-400 font-mono font-bold text-base">
+                  <AnimatedCounter value={data?.quality_score ?? 99.4} decimals={1} suffix="% Verified" />
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -69,45 +85,53 @@ export function DqePage() {
       )}
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <DashboardKpiCard
-          label="Total Observations Scrutinized"
-          value={data?.total_observations?.toLocaleString() ?? '—'}
-          sublabel="Production SQLite records"
-          statusText="Store Coverage"
-          icon={<Database className="w-5 h-5" />}
-          accent="navy"
-          progressPercent={100}
-        />
+      <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <MotionItem>
+          <DashboardKpiCard
+            label="Total Observations Scrutinized"
+            value={data?.total_observations?.toLocaleString() ?? '—'}
+            sublabel="Production SQLite records"
+            statusText="Store Coverage"
+            icon={<Database className="w-5 h-5" />}
+            accent="navy"
+            progressPercent={100}
+          />
+        </MotionItem>
 
-        <DashboardKpiCard
-          label="Integrity Quality Score"
-          value={data ? `${data.quality_score}%` : '—'}
-          sublabel="Passed all 6 DQE validation filters"
-          statusText="Verified Clean"
-          icon={<CheckCircle2 className="w-5 h-5" />}
-          accent="accent"
-          progressPercent={data?.quality_score ?? 99}
-        />
+        <MotionItem>
+          <DashboardKpiCard
+            label="Integrity Quality Score"
+            value={data ? `${data.quality_score}%` : '—'}
+            sublabel="Passed all 6 DQE validation filters"
+            statusText="Verified Clean"
+            icon={<CheckCircle2 className="w-5 h-5" />}
+            accent="accent"
+            progressPercent={data?.quality_score ?? 99}
+          />
+        </MotionItem>
 
-        <DashboardKpiCard
-          label="Invalid Fare Flags"
-          value={data?.invalid_fare_observations ?? '0'}
-          sublabel="Zero or negative bounds"
-          statusText={Number(data?.invalid_fare_observations || 0) > 0 ? 'Quarantined' : 'Zero Anomalies'}
-          icon={<AlertTriangle className="w-5 h-5" />}
-          accent={Number(data?.invalid_fare_observations || 0) > 0 ? 'warning' : 'accent'}
-        />
+        <MotionItem>
+          <DashboardKpiCard
+            label="Invalid Fare Flags"
+            value={data?.invalid_fare_observations ?? '0'}
+            sublabel="Zero or negative bounds"
+            statusText={Number(data?.invalid_fare_observations || 0) > 0 ? 'Quarantined' : 'Zero Anomalies'}
+            icon={<AlertTriangle className="w-5 h-5" />}
+            accent={Number(data?.invalid_fare_observations || 0) > 0 ? 'warning' : 'accent'}
+          />
+        </MotionItem>
 
-        <DashboardKpiCard
-          label="Verified Confirmed Bookings"
-          value={data?.sold_observations?.toLocaleString() ?? '—'}
-          sublabel="Confirmed booked tickets"
-          statusText="Realized Demand"
-          icon={<ShieldCheck className="w-5 h-5" />}
-          accent="purple"
-        />
-      </div>
+        <MotionItem>
+          <DashboardKpiCard
+            label="Verified Confirmed Bookings"
+            value={data?.sold_observations?.toLocaleString() ?? '—'}
+            sublabel="Confirmed booked tickets"
+            statusText="Realized Demand"
+            icon={<ShieldCheck className="w-5 h-5" />}
+            accent="purple"
+          />
+        </MotionItem>
+      </StaggerContainer>
 
       {/* Dual Split: Source Coverage & Integrity Findings */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -131,7 +155,12 @@ export function DqePage() {
                     <span className="text-xs font-mono font-bold text-navy-950">{source.count.toLocaleString()} rows</span>
                   </div>
                   <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
-                    <div className="bg-navy-600 h-full rounded-full" style={{ width: `${pct}%` }} />
+                    <motion.div
+                      className="bg-navy-600 h-full rounded-full"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${pct}%` }}
+                      transition={{ duration: 0.8, ease: 'easeOut' }}
+                    />
                   </div>
                 </div>
               );

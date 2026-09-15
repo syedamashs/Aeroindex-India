@@ -11,6 +11,9 @@ import { DashboardKpiCard } from '@/components/ui/DashboardKpiCard';
 import { FilterBar } from '@/components/FilterBar';
 import { genericFareTooltipFormatter } from '@/components/chartFormatters';
 import { apiAirlines, apiIndex, type ApiFilters } from '@/lib/api';
+import { StaggerContainer, MotionItem } from '@/components/animation/MotionCard';
+import { AnimatedCounter } from '@/components/animation/AnimatedCounter';
+import { motion } from 'framer-motion';
 
 type ComparisonMode = 'airline' | 'source';
 
@@ -123,44 +126,52 @@ export function AirlinesPage() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <DashboardKpiCard
-          label={`Active ${comparisonMode === 'airline' ? 'Airlines' : 'OTAs'} Monitored`}
-          value={`${stats.length} Entities`}
-          sublabel={`${selected.length} selected for comparison`}
-          statusText="Live Feeds"
-          icon={<Plane className="w-5 h-5" />}
-          accent="navy"
-          progressPercent={100}
-        />
+      <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <MotionItem>
+          <DashboardKpiCard
+            label={`Active ${comparisonMode === 'airline' ? 'Airlines' : 'OTAs'} Monitored`}
+            value={`${stats.length} Entities`}
+            sublabel={`${selected.length} selected for comparison`}
+            statusText="Live Feeds"
+            icon={<Plane className="w-5 h-5" />}
+            accent="navy"
+            progressPercent={100}
+          />
+        </MotionItem>
 
-        <DashboardKpiCard
-          label="Highest Average Fare"
-          value={highestFareEntity ? formatINR(highestFareEntity.averageFare) : '—'}
-          sublabel={highestFareEntity ? highestFareEntity.name : undefined}
-          statusText="Premium Tier"
-          icon={<TrendingUp className="w-5 h-5" />}
-          accent="danger"
-        />
+        <MotionItem>
+          <DashboardKpiCard
+            label="Highest Average Fare"
+            value={highestFareEntity ? formatINR(highestFareEntity.averageFare) : '—'}
+            sublabel={highestFareEntity ? highestFareEntity.name : undefined}
+            statusText="Premium Tier"
+            icon={<TrendingUp className="w-5 h-5" />}
+            accent="danger"
+          />
+        </MotionItem>
 
-        <DashboardKpiCard
-          label="Most Economical Channel"
-          value={lowestFareEntity ? formatINR(lowestFareEntity.averageFare) : '—'}
-          sublabel={lowestFareEntity ? lowestFareEntity.name : undefined}
-          statusText="Value Leader"
-          icon={<CheckCircle2 className="w-5 h-5" />}
-          accent="accent"
-        />
+        <MotionItem>
+          <DashboardKpiCard
+            label="Most Economical Channel"
+            value={lowestFareEntity ? formatINR(lowestFareEntity.averageFare) : '—'}
+            sublabel={lowestFareEntity ? lowestFareEntity.name : undefined}
+            statusText="Value Leader"
+            icon={<CheckCircle2 className="w-5 h-5" />}
+            accent="accent"
+          />
+        </MotionItem>
 
-        <DashboardKpiCard
-          label="Total Price Records"
-          value={formatNumber(totalObs)}
-          sublabel="Multi-source observations"
-          statusText="Verified Pipeline"
-          icon={<Globe className="w-5 h-5" />}
-          accent="purple"
-        />
-      </div>
+        <MotionItem>
+          <DashboardKpiCard
+            label="Total Price Records"
+            value={formatNumber(totalObs)}
+            sublabel="Multi-source observations"
+            statusText="Verified Pipeline"
+            icon={<Globe className="w-5 h-5" />}
+            accent="purple"
+          />
+        </MotionItem>
+      </StaggerContainer>
 
       <FilterBar />
 

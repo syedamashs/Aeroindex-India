@@ -4,9 +4,12 @@ import { useApp } from '@/context/AppContext';
 import { formatINR, formatPercent } from '@/data/random';
 import { apiMap, type ApiRouteStats } from '@/lib/api';
 import {
-  Map as MapIcon, Route as RouteIcon, ShieldCheck,
+  Map as MapIcon, Route as RouteIcon, ShieldCheck, Radio, Activity,
 } from 'lucide-react';
 import L from 'leaflet';
+import { RadarScanner } from '@/components/animation/RadarScanner';
+import { AnimatedCounter } from '@/components/animation/AnimatedCounter';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Fix Leaflet default icon issue
 delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl;
@@ -32,6 +35,7 @@ export function MapPage() {
   const [selectedRoute, setSelectedRoute] = useState<string | null>(null);
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [showVolatility, setShowVolatility] = useState(true);
+  const [showRadarHUD, setShowRadarHUD] = useState(false);
 
   const [airports, setAirports] = useState<Array<{ code: string; city: string; state: string; lat: number; lng: number; region: string }>>([]);
   const [routeStats, setRouteStats] = useState<Array<ApiRouteStats & { id: string; avgFare: number }>>([]);
@@ -144,21 +148,51 @@ export function MapPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3 bg-navy-900/80 p-3 rounded-2xl border border-navy-700">
-            <div className="flex items-center gap-2 text-xs text-slate-300">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block" />
-              <span>Stable / Low</span>
-            </div>
-            <div className="flex items-center gap-2 text-xs text-slate-300">
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block" />
-              <span>Moderate</span>
-            </div>
-            <div className="flex items-center gap-2 text-xs text-slate-300">
-              <span className="w-2.5 h-2.5 rounded-full bg-rose-400 inline-block" />
-              <span>Surge Spike</span>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <button
+              onClick={() => setShowRadarHUD(!showRadarHUD)}
+              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border text-xs font-semibold transition-all backdrop-blur-sm active:scale-95 ${
+                showRadarHUD
+                  ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300 ring-2 ring-emerald-500/20'
+                  : 'bg-white/10 hover:bg-white/20 border-white/15 text-white'
+              }`}
+            >
+              <Activity className="w-3.5 h-3.5 text-emerald-400" />
+              <span>{showRadarHUD ? 'Hide Radar HUD' : 'Launch ATC Radar HUD'}</span>
+            </button>
+
+            <div className="flex items-center gap-3 bg-navy-900/80 p-3 rounded-2xl border border-navy-700">
+              <div className="flex items-center gap-2 text-xs text-slate-300">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block" />
+                <span>Stable / Low</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-slate-300">
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block" />
+                <span>Moderate</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-slate-300">
+                <span className="w-2.5 h-2.5 rounded-full bg-rose-400 inline-block" />
+                <span>Surge Spike</span>
+              </div>
             </div>
           </div>
         </div>
+
+        {/* Expandable Radar HUD */}
+        {showRadarHUD && (
+          <div className="relative z-10 mt-6 p-6 rounded-2xl bg-navy-950/95 border border-emerald-500/30 flex flex-col md:flex-row items-center justify-around gap-6 shadow-2xl animate-fade-in">
+            <RadarScanner size={260} />
+            <div className="max-w-md space-y-2 text-xs">
+              <h4 className="font-display font-bold text-white text-sm flex items-center gap-2">
+                <Radio className="w-4 h-4 text-emerald-400 animate-pulse" />
+                <span>Live Indian Airspace Surveillance Vector</span>
+              </h4>
+              <p className="text-slate-300 leading-relaxed">
+                Visualizing active commercial flight vectors across India. Concentric range rings map major metro trunk nodes (DEL, BOM, BLR, CCU, HYD, MAA, GOI) with continuous 360° frequency radar tracking.
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Filter Toolbar */}
@@ -352,7 +386,9 @@ export function MapPage() {
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-slate-600 font-mono font-medium">Avg {formatINR(stats.avgFare)}</span>
+                      <span className="text-slate-600 font-mono font-medium">
+                        Avg <AnimatedCounter value={stats.avgFare} prefix="₹" />
+                      </span>
                       <span className={`font-mono font-bold ${isSurge ? 'text-rose-600' : 'text-emerald-600'}`}>
                         MoM {formatPercent(stats.avgChange)}
                       </span>

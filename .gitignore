@@ -52,6 +52,10 @@ backend/data/*.sqlite3
 **/run_*_analysis.py
 **/run_index_demo.py
 
+# Superseded standalone documentation
+index_calc.md
+index_engine_methodology.md
+
 # Local browser sessions used by the scrapers
 .airindia_playwright_profile/
 .spicejet_playwright_profile/
@@ -74,6 +78,7 @@ Thumbs.db
 # Build artifacts
 coverage/
 *.tsbuildinfo
+frontend/.bolt/
 
 # Local SQLite database
 backend/database/*.db

@@ -1,6 +1,8 @@
 import { useAuth } from '@/context/AuthContext';
 import { Shield, User, Clock, FileText, ShieldCheck } from 'lucide-react';
 import { DashboardKpiCard } from '@/components/ui/DashboardKpiCard';
+import { StaggerContainer, MotionItem } from '@/components/animation/MotionCard';
+import { AnimatedCounter } from '@/components/animation/AnimatedCounter';
 
 export function AuditLogPage() {
   const { auditLog, user } = useAuth();
@@ -43,44 +45,52 @@ export function AuditLogPage() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <DashboardKpiCard
-          label="Logged Session Events"
-          value={auditLog.length}
-          sublabel="Current session telemetry"
-          statusText="Recorded"
-          icon={<FileText className="w-5 h-5" />}
-          accent="navy"
-          progressPercent={100}
-        />
+      <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <MotionItem>
+          <DashboardKpiCard
+            label="Logged Session Events"
+            value={auditLog.length}
+            sublabel="Current session telemetry"
+            statusText="Recorded"
+            icon={<FileText className="w-5 h-5" />}
+            accent="navy"
+            progressPercent={100}
+          />
+        </MotionItem>
 
-        <DashboardKpiCard
-          label="Active Authority"
-          value={user?.role?.toUpperCase() || 'ADMIN'}
-          sublabel={user?.email}
-          statusText="Verified Identity"
-          icon={<User className="w-5 h-5" />}
-          accent="accent"
-        />
+        <MotionItem>
+          <DashboardKpiCard
+            label="Active Authority"
+            value={user?.role?.toUpperCase() || 'ADMIN'}
+            sublabel={user?.email}
+            statusText="Verified Identity"
+            icon={<User className="w-5 h-5" />}
+            accent="accent"
+          />
+        </MotionItem>
 
-        <DashboardKpiCard
-          label="Security Protocol"
-          value="RBAC Tier 1"
-          sublabel="Multi-persona permission gating"
-          statusText="Enforced"
-          icon={<ShieldCheck className="w-5 h-5" />}
-          accent="purple"
-        />
+        <MotionItem>
+          <DashboardKpiCard
+            label="Security Protocol"
+            value="RBAC Tier 1"
+            sublabel="Multi-persona permission gating"
+            statusText="Enforced"
+            icon={<ShieldCheck className="w-5 h-5" />}
+            accent="purple"
+          />
+        </MotionItem>
 
-        <DashboardKpiCard
-          label="Tamper Verification"
-          value="100% Sealed"
-          sublabel="Append-only audit integrity"
-          statusText="Audit Ready"
-          icon={<Clock className="w-5 h-5" />}
-          accent="warning"
-        />
-      </div>
+        <MotionItem>
+          <DashboardKpiCard
+            label="Tamper Verification"
+            value="100% Sealed"
+            sublabel="Append-only audit integrity"
+            statusText="Audit Ready"
+            icon={<Clock className="w-5 h-5" />}
+            accent="warning"
+          />
+        </MotionItem>
+      </StaggerContainer>
 
       {/* Role Authority Breakdown */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
