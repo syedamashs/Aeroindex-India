@@ -955,7 +955,7 @@ function computeStatistics(data, query = {}) {
 }
 
 app.get('/api/health', (req, res) => {
-  res.json({ ok: true, service: 'aeroindex-backend', timestamp: new Date().toISOString() });
+  res.json({ ok: true, service: 'aeroindex-backend' });
 });
 
 app.post('/api/scheduler/run', (req, res) => {
