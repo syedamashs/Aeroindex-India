@@ -1,5 +1,6 @@
 import json
 import csv
+import os
 import time
 import re
 from datetime import datetime, date, timedelta
@@ -1860,16 +1861,19 @@ def run(task):
         print(f"target lead: T+{target_lead_days}")
 
         with sync_playwright() as p:
-            context = p.chromium.launch_persistent_context(
-                user_data_dir=profile_dir,
-                channel="chrome",
-                headless=False,
-                args=[
+            browser_options = {
+                "user_data_dir": profile_dir,
+                "headless": str(os.getenv("APIX_HEADLESS", "false")).lower() == "true",
+                "args": [
                     "--disable-blink-features=AutomationControlled",
                     "--disable-web-security",
                 ],
-                viewport={"width": 1400, "height": 900},
-            )
+                "viewport": {"width": 1400, "height": 900},
+            }
+            browser_channel = os.getenv("APIX_BROWSER_CHANNEL")
+            if browser_channel:
+                browser_options["channel"] = browser_channel
+            context = p.chromium.launch_persistent_context(**browser_options)
 
             page = context.pages[0] if context.pages else context.new_page()
 

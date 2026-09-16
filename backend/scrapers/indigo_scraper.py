@@ -764,11 +764,16 @@ def run(task):
 
     try:
         with sync_playwright() as p:
-            context = p.chromium.launch_persistent_context(
-                user_data_dir=str(profile_dir), channel="chrome", headless=headless,
-                viewport={"width": 1400, "height": 900},
-                args=["--disable-blink-features=AutomationControlled"],
-            )
+            browser_options = {
+                "user_data_dir": str(profile_dir),
+                "headless": headless,
+                "viewport": {"width": 1400, "height": 900},
+                "args": ["--disable-blink-features=AutomationControlled"],
+            }
+            browser_channel = os.getenv("APIX_BROWSER_CHANNEL")
+            if browser_channel:
+                browser_options["channel"] = browser_channel
+            context = p.chromium.launch_persistent_context(**browser_options)
             try:
                 page = context.pages[0] if context.pages else context.new_page()
                 page.goto(source_url, wait_until="domcontentloaded", timeout=timeout_ms)

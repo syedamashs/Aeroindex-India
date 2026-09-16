@@ -182,7 +182,11 @@ def run(task):
 
     try:
         with sync_playwright() as playwright:
-            browser = playwright.chromium.launch(channel="chrome", headless=headless)
+            browser_options = {"headless": headless}
+            browser_channel = os.getenv("APIX_BROWSER_CHANNEL")
+            if browser_channel:
+                browser_options["channel"] = browser_channel
+            browser = playwright.chromium.launch(**browser_options)
             page = browser.new_page(viewport={"width": 1400, "height": 900})
             try:
                 page.goto(source_url, wait_until="domcontentloaded", timeout=timeout_ms)

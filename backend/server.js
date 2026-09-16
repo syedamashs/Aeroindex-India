@@ -7,12 +7,14 @@ import { DatabaseSync } from 'node:sqlite';
 import { spawn } from 'node:child_process';
 
 const app = express();
-const PORT = 4002;
+const PORT = process.env.PORT || 4002;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const datasetsPath = path.resolve(__dirname, 'database');
-const sqlitePath = path.resolve(__dirname, 'data', 'apix.db');
+const sqlitePath = process.env.APIX_DB_PATH
+  ? path.resolve(process.env.APIX_DB_PATH)
+  : path.resolve(__dirname, 'data', 'apix.db');
 const DATA_CACHE_TTL_MS = 5000;
 let dataCache = null;
 let dataCacheExpiresAt = 0;
@@ -945,7 +947,7 @@ app.get('/api/map', async (req, res) => {
 });
 
 loadData().then(() => {
-  app.listen(PORT, () => {
+  app.listen(PORT, '0.0.0.0', () => {
     console.log(`AeroIndex backend running on http://localhost:${PORT}`);
   });
 }).catch((error) => {

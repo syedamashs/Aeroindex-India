@@ -13,6 +13,7 @@ dist/
 !.env.example
 backend/.env
 backend/.env.*
+!backend/.env.example
 
 # Logs
 npm-debug.log*

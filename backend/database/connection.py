@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sqlite3
+import os
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Iterator
@@ -15,7 +16,9 @@ from typing import Iterator
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 DATA_DIR = PROJECT_ROOT / "data"
-DATABASE_PATH = DATA_DIR / "apix.db"
+DATABASE_PATH = Path(
+    os.getenv("APIX_DB_PATH", str(DATA_DIR / "apix.db"))
+).expanduser()
 BACKUP_DATABASE_PATH = DATA_DIR / "backup" / "apix_scheduler_replica.db"
 SCHEMA_PATH = Path(__file__).resolve().parent / "schema.sql"
 
