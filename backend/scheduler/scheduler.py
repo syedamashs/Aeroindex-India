@@ -50,6 +50,7 @@ from storage.observation_storage import (
     insert_observations,
 )
 from database.connection import sync_scheduler_run_to_backup
+from upload_db import upload_database
 
 
 # ============================================================
@@ -552,6 +553,11 @@ def run_stage_a():
         print(
             "🎉 STAGE A SCHEDULER COMPLETED SUCCESSFULLY"
         )
+        try:
+            upload_url = upload_database()
+            print(f"Updated database uploaded to Hugging Face: {upload_url}")
+        except Exception as exc:
+            print(f"Hugging Face database upload failed: {type(exc).__name__}: {exc}")
     else:
         print(
             "⚠ STAGE A COMPLETED WITH FAILURES"

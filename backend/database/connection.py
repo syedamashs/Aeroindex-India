@@ -16,9 +16,14 @@ from typing import Iterator
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 DATA_DIR = PROJECT_ROOT / "data"
-DATABASE_PATH = Path(
+configured_database_path = Path(
     os.getenv("APIX_DB_PATH", str(DATA_DIR / "apix.db"))
 ).expanduser()
+DATABASE_PATH = (
+    configured_database_path
+    if configured_database_path.is_absolute()
+    else PROJECT_ROOT / configured_database_path
+)
 BACKUP_DATABASE_PATH = DATA_DIR / "backup" / "apix_scheduler_replica.db"
 SCHEMA_PATH = Path(__file__).resolve().parent / "schema.sql"
 

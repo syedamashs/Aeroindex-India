@@ -4,12 +4,16 @@ The Render service should use `backend` as its root directory.
 
 Use Node.js 22.5.0 or newer. The API uses Node's built-in `node:sqlite` module.
 
+Render Free has no persistent disk, so the database is downloaded from the
+Hugging Face dataset during every build. The scheduler uploads a successful
+updated database back to the same dataset.
+
 ## Commands
 
 Build command:
 
 ```text
-pip install -r requirements.txt && python -m playwright install --with-deps chromium && npm install
+mkdir -p data && python download_db.py && pip install -r requirements.txt && python -m playwright install --with-deps chromium && npm install
 ```
 
 Start command:
@@ -27,25 +31,35 @@ Set these in Render when needed:
 ```text
 APIX_HEADLESS=true
 APIX_BROWSER_TIMEOUT_MS=120000
-APIX_DB_PATH=/var/data/apix.db
+APIX_DB_PATH=./data/apix.db
+HF_TOKEN=
 ```
 
 `APIX_BROWSER_CHANNEL` should normally be unset. When it is unset, the scrapers use the Chromium browser installed by the build command. `APIX_DB_PATH` may remain unset for local development, where it defaults to `backend/data/apix.db`.
 
-No secrets are required by the current backend configuration. Do not put credentials or API keys in `.env.example` or in the repository.
+`HF_TOKEN` must be a Hugging Face token with permission to write to the
+`amashtce/aeroindex-db` dataset. Configure it in Render's secret environment
+variables; never commit it to GitHub.
+
+Set `APIX_DB_REFRESH=true` only when a build must explicitly replace an
+existing local database download.
 
 ## SQLite requirement
 
-`backend/data/apix.db` is approximately 254 MB locally and is ignored by Git. It must not be assumed to be present in a fresh Render checkout. The database contains the application's runtime observations and must be supplied separately before the service starts.
+`backend/data/apix.db` is approximately 254 MB locally and is ignored by Git.
+`download_db.py` downloads it from:
 
-For a persistent SQLite deployment:
+`https://huggingface.co/datasets/amashtce/aeroindex-db/resolve/main/apix.db`
 
-1. Attach a Render persistent disk mounted at `/var/data`.
-2. Copy the approved `apix.db` file to `/var/data/apix.db`.
-3. Set `APIX_DB_PATH=/var/data/apix.db`.
-4. Confirm `/api/health` and the dashboard endpoints after deployment.
+The download uses a temporary file and replaces the local database only after
+the download completes. If the download fails, the build fails and the server
+does not start with a missing database.
 
-Without a persistent disk, scheduler writes and generated raw files can be lost when the service restarts or is redeployed. Review the database contents for sensitive data before transferring it to Render. The database is intentionally not added to GitHub.
+The Render filesystem is ephemeral. A successful scheduler run calls
+`upload_db.upload_database()`, which uploads `data/apix.db` to the dataset as
+`apix.db` with the commit message `Update airfare database`. If scraping fails,
+the upload is skipped. If the upload fails, the local SQLite file is retained
+and a clear error is logged.
 
 ## Local verification
 
@@ -54,6 +68,7 @@ From the repository root:
 ```powershell
 python -m pip install -r backend/requirements.txt
 Push-Location backend
+python download_db.py
 npm install
 npm run start
 Pop-Location
