@@ -5,9 +5,72 @@ Route/date values are supplied by the scheduler task.
 
 import json
 import os
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 from playwright.sync_api import sync_playwright
+
+def click_spicejet_next_month(page, calendar_days):
+    calendar_arrows = page.locator('svg[data-testid="svg-img"]')
+    right_arrow = None
+    rightmost_x = -1
+    for index in range(calendar_arrows.count()):
+        arrow = calendar_arrows.nth(index)
+        box = arrow.bounding_box() if arrow.is_visible() else None
+        if box and 450 <= box["y"] <= 750 and box["x"] > rightmost_x:
+            rightmost_x = box["x"]
+            right_arrow = arrow
+    if right_arrow is not None:
+        right_arrow.locator("xpath=..").click(force=True)
+        page.wait_for_timeout(500)
+        return True
+
+    selectors = (
+        'button[aria-label*="next month" i]',
+        'button[aria-label*="next" i][aria-label*="calendar" i]',
+        'button[title*="next" i]',
+        'button[data-testid*="next" i]',
+        '[data-testid*="next" i][data-testid*="month" i]',
+        '[class*="next" i]',
+        '[class*="right-arrow" i]',
+        '[class*="rightArrow" i]',
+        '[class*="chevron-right" i]',
+    )
+
+    candidates = page.locator(", ".join(selectors))
+    for index in range(candidates.count()):
+        candidate = candidates.nth(index)
+        if candidate.is_visible() and candidate.is_enabled():
+            candidate.click(force=True)
+            page.wait_for_timeout(500)
+            return True
+
+    day_boxes = [
+        calendar_days.nth(index).bounding_box()
+        for index in range(calendar_days.count())
+        if calendar_days.nth(index).is_visible()
+    ]
+    day_boxes = [box for box in day_boxes if box]
+    if not day_boxes:
+        return False
+
+    max_day_x = max(box["x"] + box["width"] for box in day_boxes)
+    min_day_y = min(box["y"] for box in day_boxes)
+    max_day_y = max(box["y"] + box["height"] for box in day_boxes)
+    controls = page.locator('button, [role="button"], [tabindex="0"]')
+    for index in range(controls.count()):
+        control = controls.nth(index)
+        if not control.is_visible() or not control.is_enabled():
+            continue
+        box = control.bounding_box()
+        if not box:
+            continue
+        center_y = box["y"] + box["height"] / 2
+        if box["x"] > max_day_x + 15 and min_day_y - 80 <= center_y <= max_day_y + 80:
+            control.click(force=True)
+            page.wait_for_timeout(500)
+            return True
+
+    return False
 
 def extract_availability_records(response_data, requested_origin, requested_destination, collection_timestamp):
     """
@@ -211,11 +274,25 @@ def run(task):
                 print(f"Target date: {departure_date}")
                 calendar_days = page.locator(f'[data-testid="undefined-calendar-day-{departure_day}"]')
                 selected_day = False
-                for index in range(calendar_days.count()):
-                    candidate = calendar_days.nth(index)
-                    if candidate.is_visible():
-                        candidate.click(force=True)
-                        selected_day = True
+                target = date.fromisoformat(departure_date)
+                today = date.today()
+                month_distance = (target.year - today.year) * 12 + target.month - today.month
+                clicks_needed = max(0, month_distance - 1)
+
+                for _ in range(clicks_needed + 1):
+                    for index in range(calendar_days.count()):
+                        candidate = calendar_days.nth(index)
+                        if candidate.is_visible() and candidate.is_enabled():
+                            candidate.click(force=True)
+                            selected_day = True
+                            break
+                    if selected_day:
+                        break
+
+                    if _ >= clicks_needed:
+                        break
+
+                    if not click_spicejet_next_month(page, calendar_days):
                         break
                 if not selected_day:
                     raise RuntimeError(f"Visible departure date was not found: {departure_date}")

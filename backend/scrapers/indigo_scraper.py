@@ -8,7 +8,7 @@ No route or departure date is embedded in the collector.
 import csv
 import json
 import os
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 
@@ -34,12 +34,9 @@ def select_airport(page, field_name, city_name):
     ).first
 
     if field.count() == 0:
-        raise Exception(
-            f"{field_name} field not found"
-        )
+        raise Exception(f"{field_name} field not found")
 
     field.click(force=True)
-
     page.wait_for_timeout(500)
 
     input_box = field.locator(
@@ -84,6 +81,43 @@ def select_airport(page, field_name, city_name):
 # FUNCTION: SELECT DEPARTURE DATE
 # ============================================================
 
+def advance_calendar_to_date(page, departure_date):
+    date_cell = page.locator(
+        f'[role="gridcell"][data-date="{departure_date}"]'
+    ).filter(
+        has=page.locator("span.date")
+    ).first
+
+    target = date.fromisoformat(str(departure_date))
+    today = date.today()
+    month_distance = (target.year - today.year) * 12 + target.month - today.month
+    clicks_needed = max(0, month_distance - 1)
+    if clicks_needed == 0:
+        return date_cell
+
+    for _ in range(clicks_needed):
+        next_buttons = page.locator(
+            'button[aria-label*="next month" i], '
+            'button[aria-label*="next" i][aria-label*="calendar" i], '
+            'button[title*="next" i], '
+            'button[data-testid*="next" i], '
+            '[data-testid*="next" i][data-testid*="month" i], '
+            'button:has-text(">"), '
+            'button:has-text("›")'
+        )
+        clicked = False
+        for index in range(next_buttons.count()):
+            button = next_buttons.nth(index)
+            if button.is_visible() and button.is_enabled():
+                button.click(force=True)
+                page.wait_for_timeout(300)
+                clicked = True
+                break
+        if not clicked:
+            break
+
+    return date_cell
+
 def select_departure_date(page, departure_date):
 
     print("\n========== SELECTING DEPARTURE DATE ==========")
@@ -111,15 +145,21 @@ def select_departure_date(page, departure_date):
         departure_field.get_attribute("aria-label")
     )
 
+    current_label = (departure_field.get_attribute("aria-label") or "").casefold()
+    try:
+        target_date = datetime.strptime(departure_date, "%Y-%m-%d")
+        target_label = f"{target_date.day} {target_date.strftime('%B %Y')}".casefold()
+    except ValueError:
+        target_label = ""
+    if target_label and target_label in current_label:
+        print("Departure date already selected:", departure_date)
+        return
+
     departure_field.click(force=True)
 
     page.wait_for_timeout(1000)
 
-    date_cell = page.locator(
-        f'[role="gridcell"][data-date="{departure_date}"]'
-    ).filter(
-        has=page.locator("span.date")
-    ).first
+    date_cell = advance_calendar_to_date(page, departure_date)
 
     print(
         "Target date:",
@@ -740,17 +780,22 @@ def run(task):
     destination = str(task["destination"]).upper()
     departure_date = str(task["departure_date"])
     target_lead_days = int(task["target_lead_days"])
+    headless = str(task.get("headless", os.getenv("APIX_HEADLESS", "false"))).lower() == "true"
 
     origin_query = str(task.get("origin_query") or origin)
     destination_query = str(task.get("destination_query") or destination)
-    profile_dir = Path(task.get("profile_dir") or (Path.home() / ".apix" / "profiles" / "indigo"))
+    default_profile_dir = (
+        Path(__file__).resolve().parents[1] / "data" / "indigo_profile_test"
+        if os.name == "nt" and not headless
+        else Path.home() / ".apix" / "profiles" / "indigo"
+    )
+    profile_dir = Path(task.get("profile_dir") or default_profile_dir)
     output_dir = Path(task.get("output_dir") or (Path(__file__).resolve().parents[1] / "data"))
     raw_dir = output_dir / "raw" / "indigo"
     raw_dir.mkdir(parents=True, exist_ok=True)
     profile_dir.parent.mkdir(parents=True, exist_ok=True)
 
     source_url = str(task.get("source_url") or os.getenv("APIX_INDIGO_URL", "https://www.goindigo.in/"))
-    headless = str(task.get("headless", os.getenv("APIX_HEADLESS", "false"))).lower() == "true"
     timeout_ms = int(task.get("timeout_ms") or os.getenv("APIX_BROWSER_TIMEOUT_MS", "120000"))
     collection_timestamp = datetime.now().isoformat(timespec="seconds")
 
@@ -768,16 +813,21 @@ def run(task):
                 "user_data_dir": str(profile_dir),
                 "headless": headless,
                 "viewport": {"width": 1400, "height": 900},
-                "args": ["--disable-blink-features=AutomationControlled"],
+                "args": [
+                    "--disable-blink-features=AutomationControlled",
+                    "--disable-features=IsolateOrigins,site-per-process",
+                ],
             }
             browser_channel = os.getenv("APIX_BROWSER_CHANNEL")
             if browser_channel:
                 browser_options["channel"] = browser_channel
+            elif os.name == "nt" and not headless:
+                browser_options["channel"] = "chrome"
             context = p.chromium.launch_persistent_context(**browser_options)
             try:
                 page = context.pages[0] if context.pages else context.new_page()
                 page.goto(source_url, wait_until="domcontentloaded", timeout=timeout_ms)
-                page.wait_for_timeout(5000)
+                page.wait_for_timeout(10000)
 
                 select_airport(page, "From", origin_query)
                 select_airport(page, "To", destination_query)

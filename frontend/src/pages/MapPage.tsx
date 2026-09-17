@@ -39,8 +39,10 @@ export function MapPage() {
 
   const [airports, setAirports] = useState<Array<{ code: string; city: string; state: string; lat: number; lng: number; region: string }>>([]);
   const [routeStats, setRouteStats] = useState<Array<ApiRouteStats & { id: string; avgFare: number }>>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     apiMap({
       origin: filters.origin !== 'all' ? filters.origin : undefined,
       destination: filters.destination !== 'all' ? filters.destination : undefined,
@@ -51,7 +53,8 @@ export function MapPage() {
     }).then((response) => {
       setAirports(response.data.airports);
       setRouteStats(response.data.routes);
-    }).catch((error) => console.error('Failed to fetch map data:', error));
+    }).catch((error) => console.error('Failed to fetch map data:', error))
+      .finally(() => setLoading(false));
   }, [filters, lastUpdate]);
 
   const airportMap = useMemo(() => new Map(airports.map((airport) => [airport.code, airport])), [airports]);
@@ -205,7 +208,7 @@ export function MapPage() {
                 onClick={() => setSelectedRegion(null)}
                 className={`pill-tab ${selectedRegion === null ? 'pill-tab-active' : 'pill-tab-inactive'}`}
               >
-                All Zones ({routeStats.length} Routes)
+                All Zones ({loading ? '…' : `${routeStats.length} Routes`})
               </button>
               {regions.map((region) => (
                 <button

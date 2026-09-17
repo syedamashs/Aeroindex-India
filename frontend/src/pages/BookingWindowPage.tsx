@@ -99,6 +99,7 @@ export function BookingWindowPage() {
             icon={<TrendingUp className="w-5 h-5" />}
             accent="danger"
             progressPercent={Math.min(100, priceDiff)}
+            loading={loading}
           />
         </MotionItem>
 
@@ -110,6 +111,7 @@ export function BookingWindowPage() {
             statusText="Peak Tariff"
             icon={<Clock className="w-5 h-5" />}
             accent="warning"
+            loading={loading}
           />
         </MotionItem>
 
@@ -121,6 +123,7 @@ export function BookingWindowPage() {
             statusText="Baseline Tier"
             icon={<CheckCircle2 className="w-5 h-5" />}
             accent="accent"
+            loading={loading}
           />
         </MotionItem>
 
@@ -132,6 +135,7 @@ export function BookingWindowPage() {
             statusText="Best Value"
             icon={<Info className="w-5 h-5" />}
             accent="navy"
+            loading={loading}
           />
         </MotionItem>
       </StaggerContainer>

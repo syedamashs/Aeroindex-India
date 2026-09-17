@@ -190,6 +190,7 @@ export function RoutesPage() {
             icon={<RouteIcon className="w-5 h-5" />}
             accent="navy"
             progressPercent={100}
+            loading={loading}
           />
         </MotionItem>
 
@@ -202,6 +203,7 @@ export function RoutesPage() {
             statusText="Max MoM Spike"
             icon={<AlertTriangle className="w-5 h-5" />}
             accent="danger"
+            loading={loading}
           />
         </MotionItem>
 
@@ -213,6 +215,7 @@ export function RoutesPage() {
             statusText="Dynamic Pricing"
             icon={<TrendingUp className="w-5 h-5" />}
             accent="warning"
+            loading={loading}
           />
         </MotionItem>
 
@@ -224,6 +227,7 @@ export function RoutesPage() {
             statusText="Economical Trunk"
             icon={<CheckCircle2 className="w-5 h-5" />}
             accent="accent"
+            loading={loading}
           />
         </MotionItem>
       </StaggerContainer>

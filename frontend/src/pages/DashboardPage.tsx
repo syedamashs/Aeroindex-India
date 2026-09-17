@@ -105,27 +105,32 @@ export function DashboardPage() {
         <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-navy-500/20 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-          <div className="space-y-2 max-w-2xl">
-            <div className="flex flex-wrap items-center gap-2.5">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                </span>
-                LIVE AIRFARE SURVEILLANCE GRID
-              </span>
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/10 text-navy-200 text-xs font-medium backdrop-blur-sm">
-                <ShieldCheck className="w-3.5 h-3.5 text-accent-400" />
-                DGCA & MoCA Compliance Spec
-              </span>
+          <div className="flex items-start sm:items-center gap-4 sm:gap-5 max-w-2xl">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/10 backdrop-blur-md p-2 border border-white/20 shadow-xl shrink-0 flex items-center justify-center">
+              <img src="/logo.png" alt="AeroIndex Logo" className="w-full h-full object-contain drop-shadow-md" />
             </div>
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-center gap-2.5">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </span>
+                  LIVE AIRFARE SURVEILLANCE GRID
+                </span>
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/10 text-navy-200 text-xs font-medium backdrop-blur-sm">
+                  <ShieldCheck className="w-3.5 h-3.5 text-accent-400" />
+                  DGCA & MoCA Compliance Spec
+                </span>
+              </div>
 
-            <h1 className="font-display font-extrabold text-2xl lg:text-3xl tracking-tight text-white">
-              National Airfare Price Intelligence
-            </h1>
-            <p className="text-sm text-navy-200 leading-relaxed">
-              Real-time econometric index modeling, high-frequency fare volatility tracking, and consumer tariff protection across Indian domestic corridors.
-            </p>
+              <h1 className="font-display font-extrabold text-2xl lg:text-3xl tracking-tight text-white">
+                National Airfare Price Intelligence
+              </h1>
+              <p className="text-sm text-navy-200 leading-relaxed">
+                Real-time econometric index modeling, high-frequency fare volatility tracking, and consumer tariff protection across Indian domestic corridors.
+              </p>
+            </div>
           </div>
 
           {/* Quick Action Hub */}
@@ -204,7 +209,11 @@ export function DashboardPage() {
             <div>
               <p className="text-navy-400 text-[11px] font-medium uppercase tracking-wider">Average Ticket</p>
               <p className="text-white font-mono font-bold text-sm">
-                <AnimatedCounter value={statistics?.averageFare ?? 12450} prefix="₹" />
+                {loading ? (
+                  <span className="inline-block w-16 h-4 bg-white/20 rounded animate-pulse" />
+                ) : (
+                  <AnimatedCounter value={statistics?.averageFare ?? 12450} prefix="₹" />
+                )}
               </p>
             </div>
           </div>
@@ -215,7 +224,11 @@ export function DashboardPage() {
             <div>
               <p className="text-navy-400 text-[11px] font-medium uppercase tracking-wider">Fare Range (Min / Max)</p>
               <p className="text-white font-mono font-bold text-sm">
-                {statistics?.minFare ? `${formatINR(statistics.minFare)} – ${formatINR(statistics.maxFare)}` : '₹3.1k – ₹45.7k'}
+                {loading ? (
+                  <span className="inline-block w-24 h-4 bg-white/20 rounded animate-pulse" />
+                ) : (
+                  statistics?.minFare ? `${formatINR(statistics.minFare)} – ${formatINR(statistics.maxFare)}` : '₹3.1k – ₹45.7k'
+                )}
               </p>
             </div>
           </div>
@@ -226,7 +239,11 @@ export function DashboardPage() {
             <div>
               <p className="text-navy-400 text-[11px] font-medium uppercase tracking-wider">Data Quality Score</p>
               <p className="text-white font-mono font-bold text-sm">
-                <AnimatedCounter value={statistics?.dataQuality ?? 99.4} decimals={1} suffix="% Verified" />
+                {loading ? (
+                  <span className="inline-block w-16 h-4 bg-white/20 rounded animate-pulse" />
+                ) : (
+                  <AnimatedCounter value={statistics?.dataQuality ?? 99.4} decimals={1} suffix="% Verified" />
+                )}
               </p>
             </div>
           </div>
@@ -247,69 +264,80 @@ export function DashboardPage() {
       {/* Global Filter Bar */}
       <FilterBar />
 
+      {error && (
+        <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700 flex items-center gap-3">
+          <AlertTriangle className="w-5 h-5 text-rose-600 flex-shrink-0" />
+          <span>{error}</span>
+        </div>
+      )}
+
+      {/* Primary High-Impact KPI Grid */}
+      <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <MotionItem>
+          <DashboardKpiCard
+            label="National Airfare Index"
+            value={latest?.indexValue?.toFixed(1) ?? '100.0'}
+            change={latest?.percentageChange}
+            sublabel="Baseline: Jan 2026 = 100.0"
+            statusText={latest?.indexValue > 100 ? 'Above Base' : 'Sub-Base'}
+            icon={<Activity className="w-5 h-5" />}
+            accent="navy"
+            progressPercent={Math.min(100, ((latest?.indexValue ?? 100) / 120) * 100)}
+            loading={loading}
+          />
+        </MotionItem>
+
+        <MotionItem>
+          <DashboardKpiCard
+            label="Monthly Velocity (MoM)"
+            value={formatPercent(latest?.percentageChange ?? 0)}
+            sublabel="vs preceding monthly cohort"
+            statusText={Math.abs(latest?.percentageChange || 0) > 4 ? 'High Volatility' : 'Normal Fluctuations'}
+            icon={<TrendingUp className="w-5 h-5" />}
+            accent={latest && latest.percentageChange > 0 ? 'danger' : 'accent'}
+            loading={loading}
+          />
+        </MotionItem>
+
+        <MotionItem>
+          <DashboardKpiCard
+            label="Active Observations"
+            value={formatNumber(statistics?.totalObservations ?? 0)}
+            sublabel={`${statistics?.routesMonitored ?? 0} corridors • ${statistics?.airlinesMonitored ?? 0} carriers`}
+            statusText="Verified Ingestion"
+            icon={<Database className="w-5 h-5" />}
+            accent="purple"
+            progressPercent={statistics?.dataQuality ?? 98}
+            loading={loading}
+          />
+        </MotionItem>
+
+        <MotionItem>
+          <DashboardKpiCard
+            label="High-Surge Corridors"
+            value={highPriceRoutes}
+            sublabel="Routes with >5% price jump"
+            statusText={highPriceRoutes > 4 ? 'Surveillance Alert' : 'Safe Threshold'}
+            icon={<AlertTriangle className="w-5 h-5" />}
+            accent={highPriceRoutes > 4 ? 'warning' : 'accent'}
+            loading={loading}
+          />
+        </MotionItem>
+      </StaggerContainer>
+
       {loading ? (
-        <div className="glass-card p-12 text-center space-y-3">
-          <div className="inline-block w-8 h-8 border-4 border-navy-600 border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm font-medium text-slate-600">Synthesizing national airfare intelligence...</p>
+        <div className="glass-card p-12 text-center space-y-3.5 border border-slate-200/80 shadow-sm animate-fade-in">
+          <div className="relative inline-flex items-center justify-center">
+            <div className="w-10 h-10 border-4 border-navy-200 border-t-navy-700 rounded-full animate-spin" />
+            <Database className="w-4 h-4 text-navy-700 absolute animate-pulse" />
+          </div>
+          <div className="space-y-1">
+            <p className="text-sm font-bold text-navy-950">Fetching from Backend DB...</p>
+            <p className="text-xs text-slate-500 font-mono">Synchronizing live observations from SQLite database</p>
+          </div>
         </div>
       ) : (
         <>
-          {error && (
-            <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700 flex items-center gap-3">
-              <AlertTriangle className="w-5 h-5 text-rose-600 flex-shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
-
-          {/* Primary High-Impact KPI Grid */}
-          <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <MotionItem>
-              <DashboardKpiCard
-                label="National Airfare Index"
-                value={latest?.indexValue?.toFixed(1) ?? '100.0'}
-                change={latest?.percentageChange}
-                sublabel="Baseline: Jan 2026 = 100.0"
-                statusText={latest?.indexValue > 100 ? 'Above Base' : 'Sub-Base'}
-                icon={<Activity className="w-5 h-5" />}
-                accent="navy"
-                progressPercent={Math.min(100, ((latest?.indexValue ?? 100) / 120) * 100)}
-              />
-            </MotionItem>
-
-            <MotionItem>
-              <DashboardKpiCard
-                label="Monthly Velocity (MoM)"
-                value={formatPercent(latest?.percentageChange ?? 0)}
-                sublabel="vs preceding monthly cohort"
-                statusText={Math.abs(latest?.percentageChange || 0) > 4 ? 'High Volatility' : 'Normal Fluctuations'}
-                icon={<TrendingUp className="w-5 h-5" />}
-                accent={latest && latest.percentageChange > 0 ? 'danger' : 'accent'}
-              />
-            </MotionItem>
-
-            <MotionItem>
-              <DashboardKpiCard
-                label="Active Observations"
-                value={formatNumber(statistics?.totalObservations ?? 0)}
-                sublabel={`${statistics?.routesMonitored ?? 0} corridors • ${statistics?.airlinesMonitored ?? 0} carriers`}
-                statusText="Verified Ingestion"
-                icon={<Database className="w-5 h-5" />}
-                accent="purple"
-                progressPercent={statistics?.dataQuality ?? 98}
-              />
-            </MotionItem>
-
-            <MotionItem>
-              <DashboardKpiCard
-                label="High-Surge Corridors"
-                value={highPriceRoutes}
-                sublabel="Routes with >5% price jump"
-                statusText={highPriceRoutes > 4 ? 'Surveillance Alert' : 'Safe Threshold'}
-                icon={<AlertTriangle className="w-5 h-5" />}
-                accent={highPriceRoutes > 4 ? 'warning' : 'accent'}
-              />
-            </MotionItem>
-          </StaggerContainer>
 
           {/* Main Airfare Index Command Center Chart */}
           <div className="glass-card p-6">

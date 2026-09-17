@@ -51,7 +51,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const triggerUpdate = useCallback(
     (count = 200) => {
       setLastUpdate(Date.now());
-      showToast(`Database refresh requested. Showing the latest SQLite observations.`, 'success');
+      showToast('Dashboard refreshed from the current SQLite database.', 'success');
     },
     [showToast],
   );

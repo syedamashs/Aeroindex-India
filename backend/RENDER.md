@@ -22,6 +22,11 @@ Start command:
 npm run start
 ```
 
+Both `npm run start` and `npm run dev` verify that `data/apix.db` exists before
+starting the API. Set `APIX_DB_REFRESH=true` for an explicit Hugging Face
+refresh before startup; this keeps normal local restarts fast while retaining
+the same database source as Render.
+
 The backend listens on Render's `PORT` and binds to `0.0.0.0`. Locally it falls back to port `4002`.
 
 ## Environment variables
@@ -62,6 +67,10 @@ the upload is skipped. If the upload fails, the local SQLite file is retained
 and a clear error is logged.
 
 ## Local verification
+
+Create `backend/.env` from `backend/.env.example` and set `HF_TOKEN` to a
+write-enabled Hugging Face token. This file is ignored by Git and must never be
+committed.
 
 From the repository root:
 

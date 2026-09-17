@@ -11,8 +11,8 @@ BACKEND_DIR = Path(__file__).resolve().parent
 DATABASE_PATH = BACKEND_DIR / "data" / "apix.db"
 
 
-def download_database() -> Path:
-    refresh = os.getenv("APIX_DB_REFRESH", "false").lower() == "true"
+def download_database(force_refresh: bool = False) -> Path:
+    refresh = force_refresh or os.getenv("APIX_DB_REFRESH", "false").lower() == "true"
     if DATABASE_PATH.exists() and not refresh:
         print(f"SQLite database already exists: {DATABASE_PATH}")
         return DATABASE_PATH
@@ -35,4 +35,4 @@ def download_database() -> Path:
 
 
 if __name__ == "__main__":
-    download_database()
+    download_database(force_refresh="--refresh" in os.sys.argv)

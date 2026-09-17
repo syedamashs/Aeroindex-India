@@ -69,7 +69,11 @@ export function DqePage() {
               <div className="text-xs">
                 <p className="font-bold text-white">Pipeline Quality Score</p>
                 <p className="text-emerald-400 font-mono font-bold text-base">
-                  <AnimatedCounter value={data?.quality_score ?? 99.4} decimals={1} suffix="% Verified" />
+                  {loading ? (
+                    <span className="inline-block w-20 h-4 bg-white/20 rounded animate-pulse" />
+                  ) : (
+                    <AnimatedCounter value={data?.quality_score ?? 99.4} decimals={1} suffix="% Verified" />
+                  )}
                 </p>
               </div>
             </div>
@@ -95,6 +99,7 @@ export function DqePage() {
             icon={<Database className="w-5 h-5" />}
             accent="navy"
             progressPercent={100}
+            loading={loading}
           />
         </MotionItem>
 
@@ -107,6 +112,7 @@ export function DqePage() {
             icon={<CheckCircle2 className="w-5 h-5" />}
             accent="accent"
             progressPercent={data?.quality_score ?? 99}
+            loading={loading}
           />
         </MotionItem>
 
@@ -118,6 +124,7 @@ export function DqePage() {
             statusText={Number(data?.invalid_fare_observations || 0) > 0 ? 'Quarantined' : 'Zero Anomalies'}
             icon={<AlertTriangle className="w-5 h-5" />}
             accent={Number(data?.invalid_fare_observations || 0) > 0 ? 'warning' : 'accent'}
+            loading={loading}
           />
         </MotionItem>
 
@@ -129,6 +136,7 @@ export function DqePage() {
             statusText="Realized Demand"
             icon={<ShieldCheck className="w-5 h-5" />}
             accent="purple"
+            loading={loading}
           />
         </MotionItem>
       </StaggerContainer>

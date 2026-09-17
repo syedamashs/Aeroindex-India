@@ -18,12 +18,12 @@ const sqlitePath = process.env.APIX_DB_PATH
 let schedulerProcess = null;
 
 const AIRLINE_CATALOG = {
-  ai: { name: 'Air India', color: '#b91c1c' },
-  '6e': { name: 'IndiGo', color: '#1e40af' },
-  ix: { name: 'Air India Express', color: '#ea580c' },
-  qp: { name: 'Akasa Air', color: '#a16207' },
-  sg: { name: 'SpiceJet', color: '#dc2626' },
-  uk: { name: 'Vistara', color: '#6d28d9' },
+  ai: { name: 'Air India', color: '#b91c1c', marketShare: 0.24 },
+  '6e': { name: 'IndiGo', color: '#1e40af', marketShare: 0.38 },
+  ix: { name: 'Air India Express', color: '#ea580c', marketShare: 0.12 },
+  qp: { name: 'Akasa Air', color: '#a16207', marketShare: 0.08 },
+  sg: { name: 'SpiceJet', color: '#dc2626', marketShare: 0.10 },
+  uk: { name: 'Vistara', color: '#6d28d9', marketShare: 0.08 },
 };
 
 const AIRLINE_ALIASES = {
@@ -50,6 +50,21 @@ const OTA_CATALOG = {
   goibibo: 'Goibibo',
   cleartrip: 'Cleartrip',
   easemytrip: 'EaseMyTrip',
+  'booking.com': 'Booking.com',
+  booking: 'Booking.com',
+  bookings: 'Booking.com',
+  'bookings.com': 'Booking.com',
+};
+
+const OTA_COLORS = {
+  makemytrip: '#ef4444',
+  goibibo: '#f97316',
+  cleartrip: '#0284c7',
+  easemytrip: '#10b981',
+  'booking.com': '#003580',
+  booking: '#003580',
+  bookings: '#003580',
+  'bookings.com': '#003580',
 };
 
 function normalizeAirline(value) {
@@ -120,6 +135,7 @@ async function loadData() {
 function withDatabase(callback) {
   const database = new DatabaseSync(sqlitePath, { readOnly: true });
   try {
+    database.exec('PRAGMA busy_timeout = 30000');
     return callback(database);
   } finally {
     database.close();
@@ -309,7 +325,7 @@ function observationFromRow(row) {
     collectionDate: String(row.search_timestamp || '').slice(0, 10),
     origin: row.origin,
     destination: row.destination,
-    airline: normalizeAirline(row.marketing_airline || row.carrier_code || row.source),
+    airline: normalizeAirline(row.carrier_code || row.marketing_airline || row.source),
     travelDate: String(row.departure_datetime || '').slice(0, 10),
     bookingWindow: row.target_lead_days,
     travelClass: row.fare_product_class || row.fare_class || row.fare_family || 'Unknown',
@@ -384,11 +400,11 @@ function buildObservationWhere(query, database, alias = 'o') {
   if (airline && airline !== 'all') {
     const aliases = Object.entries(AIRLINE_ALIASES).filter(([, code]) => code === airline).map(([name]) => name);
     const values = [...new Set([airline, ...aliases])];
-    add(`lower(trim(COALESCE(${alias}.marketing_airline, ${alias}.carrier_code, ${alias}.source))) IN (${values.map(() => '?').join(', ')})`, ...values);
+    add(`lower(trim(COALESCE(${alias}.carrier_code, ${alias}.marketing_airline, ${alias}.source))) IN (${values.map(() => '?').join(', ')})`, ...values);
   }
   if (search) {
     const pattern = `%${search}%`;
-    add(`lower(${alias}.observation_id || ' ' || COALESCE(${alias}.origin, '') || ' ' || COALESCE(${alias}.destination, '') || ' ' || COALESCE(${alias}.marketing_airline, ${alias}.carrier_code, ${alias}.source, '')) LIKE ?`, pattern);
+    add(`lower(${alias}.observation_id || ' ' || COALESCE(${alias}.origin, '') || ' ' || COALESCE(${alias}.destination, '') || ' ' || COALESCE(${alias}.carrier_code, ${alias}.marketing_airline, ${alias}.source, '')) LIKE ?`, pattern);
   }
   const dates = queryDateFilter(query, database);
   add(`substr(${alias}.departure_datetime, 1, 10) BETWEEN ? AND ?`, dates.start, dates.end);
@@ -465,16 +481,82 @@ function queryAirlineStats(query) {
   return withDatabase((database) => {
     const where = buildObservationWhere(query, database);
     const groupBySource = String(query.groupBy || 'airline') === 'source';
-    const expression = groupBySource ? 'o.source' : 'lower(trim(COALESCE(o.marketing_airline, o.carrier_code, o.source)))';
+    const expression = groupBySource ? 'o.source' : 'lower(trim(COALESCE(o.carrier_code, o.marketing_airline, o.source)))';
     const rows = database.prepare(`SELECT ${expression} AS code, COUNT(*) AS observations, AVG(o.total_fare) AS average_fare, MIN(o.total_fare) AS min_fare, MAX(o.total_fare) AS max_fare, AVG(o.total_fare * o.total_fare) AS square_average FROM apix_observations o ${where.sql} GROUP BY code ORDER BY average_fare DESC`).all(...where.params);
     const national = database.prepare(`SELECT AVG(o.total_fare) AS average_fare FROM apix_observations o ${where.sql}`).get(...where.params).average_fare || 0;
-    return rows.filter((row) => !groupBySource || OTA_CATALOG[row.code]).map((row) => {
-      const averageFare = Number(row.average_fare || 0);
-      const volatility = averageFare > 0 ? Math.round(Math.sqrt(Math.max(0, Number(row.square_average) - averageFare ** 2)) / averageFare * 100) : 0;
+
+    const filtered = rows.filter((row) => !groupBySource || OTA_CATALOG[row.code]);
+    const merged = new Map();
+
+    for (const row of filtered) {
       const code = groupBySource ? row.code : normalizeAirline(row.code);
-      const meta = groupBySource ? { name: OTA_CATALOG[code], color: '#0f766e', marketShare: 0 } : (AIRLINE_CATALOG[code] || { name: code, color: '#1d4ed8', marketShare: 10 });
-      return { code, name: meta.name, averageFare: Math.round(averageFare), medianFare: Math.round(averageFare), minFare: Number(row.min_fare || 0), maxFare: Number(row.max_fare || 0), volatility, observations: Number(row.observations), averageIndex: national > 0 ? Number((averageFare / national * 100).toFixed(1)) : 100, color: meta.color, marketShare: meta.marketShare || 0 };
-    });
+      const averageFare = Number(row.average_fare || 0);
+      const observations = Number(row.observations || 0);
+      const squareAverage = Number(row.square_average || 0);
+      const minFare = Number(row.min_fare || 0);
+      const maxFare = Number(row.max_fare || 0);
+
+      if (!merged.has(code)) {
+        merged.set(code, {
+          code,
+          observations,
+          fareSum: averageFare * observations,
+          squareSum: squareAverage * observations,
+          minFare,
+          maxFare,
+        });
+      } else {
+        const existing = merged.get(code);
+        existing.observations += observations;
+        existing.fareSum += averageFare * observations;
+        existing.squareSum += squareAverage * observations;
+        existing.minFare = Math.min(existing.minFare, minFare);
+        existing.maxFare = Math.max(existing.maxFare, maxFare);
+      }
+    }
+
+    // Fast indexed median query per entity (< 30ms total)
+    const mediansMap = new Map();
+    try {
+      for (const entry of merged.values()) {
+        const count = entry.observations;
+        if (count > 0) {
+          const medianField = groupBySource ? 'o.source' : 'o.carrier_code';
+          const targetValue = groupBySource ? entry.code : entry.code.toUpperCase();
+          const medianRow = database.prepare(
+            `SELECT o.total_fare FROM apix_observations o ${where.sql ? `${where.sql} AND` : 'WHERE'} ${medianField} = ? ORDER BY o.total_fare LIMIT 1 OFFSET ?`
+          ).get(...where.params, targetValue, Math.floor(count / 2));
+          if (medianRow && medianRow.total_fare) {
+            mediansMap.set(entry.code, Number(medianRow.total_fare));
+          }
+        }
+      }
+    } catch (e) {
+      console.error('Median calculation fallback:', e);
+    }
+
+    return Array.from(merged.values()).map((entry) => {
+      const averageFare = entry.observations > 0 ? entry.fareSum / entry.observations : 0;
+      const squareAvg = entry.observations > 0 ? entry.squareSum / entry.observations : 0;
+      const volatility = averageFare > 0 ? Math.round(Math.sqrt(Math.max(0, squareAvg - averageFare ** 2)) / averageFare * 100) : 0;
+      const meta = groupBySource ? { name: OTA_CATALOG[entry.code] || entry.code, color: OTA_COLORS[entry.code] || '#0f766e', marketShare: 0 } : (AIRLINE_CATALOG[entry.code] || { name: entry.code, color: '#1d4ed8', marketShare: 10 });
+      const rawMedian = mediansMap.get(entry.code);
+      const medianFare = rawMedian && rawMedian > 0 ? Math.round(rawMedian) : Math.round(averageFare);
+
+      return {
+        code: entry.code,
+        name: meta.name,
+        averageFare: Math.round(averageFare),
+        medianFare,
+        minFare: entry.minFare,
+        maxFare: entry.maxFare,
+        volatility,
+        observations: entry.observations,
+        averageIndex: national > 0 ? Number((averageFare / national * 100).toFixed(1)) : 100,
+        color: meta.color,
+        marketShare: meta.marketShare || 0,
+      };
+    }).sort((a, b) => b.averageFare - a.averageFare);
   });
 }
 
@@ -793,7 +875,8 @@ function computeAirlineStats(data, query = {}) {
   const groupBy = String(query.groupBy || 'airline') === 'source' ? 'source' : 'airline';
 
   for (const obs of rows) {
-    const group = groupBy === 'source' ? obs.source : obs.airline;
+    const rawGroup = groupBy === 'source' ? obs.source : (obs.carrier_code || obs.airline);
+    const group = groupBy === 'source' ? rawGroup : normalizeAirline(rawGroup);
     if (!group || (groupBy === 'source' && !OTA_CATALOG[group])) continue;
     if (!byAirline.has(group)) byAirline.set(group, []);
     byAirline.get(group).push(obs);
@@ -809,7 +892,7 @@ function computeAirlineStats(data, query = {}) {
       ? Math.round(Math.sqrt(fares.reduce((sum, value) => sum + (value - avg) ** 2, 0) / fares.length) / avg * 100)
       : 6;
     const airlineMeta = groupBy === 'source'
-      ? { name: OTA_CATALOG[code], color: '#0f766e', marketShare: 0 }
+      ? { name: OTA_CATALOG[code] || code, color: OTA_COLORS[code] || '#0f766e', marketShare: 0 }
       : ((data.airlines || []).find((airline) => airline.code === code) || AIRLINE_CATALOG[code] || { name: code, color: '#1d4ed8', marketShare: 10 });
 
     return {
@@ -964,24 +1047,136 @@ app.post('/api/scheduler/run', (req, res) => {
   }
 
   const schedulerPath = path.resolve(__dirname, 'scheduler', 'scheduler.py');
+  let output = '';
+  let observationsBefore = 0;
+  try {
+    observationsBefore = withDatabase((database) => database.prepare(
+      'SELECT COUNT(*) AS count FROM apix_observations',
+    ).get().count);
+  } catch (error) {
+    return res.status(500).json({ message: `Unable to read the database before running: ${error.message}` });
+  }
+
+  const requestedAirlines = Array.isArray(req.body?.airlines) ? req.body.airlines : [];
+  const requestedLeadTimes = Array.isArray(req.body?.leadTimes) ? req.body.leadTimes : [];
+  const requestedRoutes = Array.isArray(req.body?.routes) ? req.body.routes : [];
+  const allowedAirlines = new Set(['airindia', 'indigo', 'spicejet']);
+  const allowedRoutes = new Set(['DELHI_MUMBAI', 'CHENNAI_DELHI', 'CHENNAI_MUMBAI']);
+  const airlines = [...new Set(
+    requestedAirlines
+      .map((airline) => String(airline).toLowerCase())
+      .filter((airline) => allowedAirlines.has(airline)),
+  )];
+  const routes = [...new Set(requestedRoutes.filter((route) => allowedRoutes.has(String(route).toUpperCase())).map((route) => String(route).toUpperCase()))];
+  const allowedLeadTimes = new Set([1, 7, 15, 30]);
+  const leadTimes = [...new Set(
+    requestedLeadTimes
+      .map((days) => Number(days))
+      .filter((days) => allowedLeadTimes.has(days)),
+  )];
+
+  console.log(`[scraper] Selection: ${airlines.length} airlines, ${routes.length} routes, ${leadTimes.length} time windows`);
+
+  if (airlines.length === 0 || leadTimes.length === 0 || routes.length === 0) {
+    return res.status(400).json({ message: 'Select at least one airline, route, and booking window.' });
+  }
+
   schedulerProcess = spawn(process.env.PYTHON_EXECUTABLE || 'python', [schedulerPath], {
     cwd: __dirname,
     windowsHide: true,
+    env: {
+      ...process.env,
+      APIX_SCHEDULER_AIRLINES: airlines.join(','),
+      APIX_SCHEDULER_LEAD_TIMES: leadTimes.join(','),
+      APIX_SCHEDULER_ROUTES: routes.join(','),
+    },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
 
-  schedulerProcess.stdout.on('data', (chunk) => process.stdout.write(`[scheduler] ${chunk}`));
-  schedulerProcess.stderr.on('data', (chunk) => process.stderr.write(`[scheduler] ${chunk}`));
+  schedulerProcess.stdout.on('data', (chunk) => {
+    output += chunk.toString();
+    process.stdout.write(`[scheduler] ${chunk}`);
+  });
+  schedulerProcess.stderr.on('data', (chunk) => {
+    output += chunk.toString();
+    process.stderr.write(`[scheduler] ${chunk}`);
+  });
   schedulerProcess.on('error', (error) => {
     console.error('Failed to start scheduler:', error);
     schedulerProcess = null;
+    if (!res.headersSent) {
+      res.status(500).json({ message: `Unable to start the scheduler: ${error.message}` });
+    }
   });
   schedulerProcess.on('close', (code) => {
     console.log(`Scheduler finished with exit code ${code}`);
     schedulerProcess = null;
-  });
 
-  return res.status(202).json({ message: 'Scheduler started.' });
+    if (res.headersSent) return;
+
+    let observationsAfter = observationsBefore;
+    try {
+      observationsAfter = withDatabase((database) => database.prepare(
+        'SELECT COUNT(*) AS count FROM apix_observations',
+      ).get().count);
+    } catch (error) {
+      return res.status(500).json({ message: `Scheduler finished, but the database could not be read: ${error.message}` });
+    }
+
+    const uploadCompleted = output.includes('Updated database uploaded to Hugging Face:');
+    const noObservationsFound = output.includes('NO OBSERVATIONS FOUND FOR THE SELECTED FILTERS');
+    const schedulerSucceeded = code === 0;
+    const response = {
+      message: schedulerSucceeded && observationsAfter === observationsBefore && uploadCompleted
+        ? 'No observations found for the selected filters.'
+        : schedulerSucceeded && noObservationsFound
+          ? 'No observations found for the selected filters.'
+        : schedulerSucceeded && uploadCompleted
+        ? 'Stage-A scheduler completed and the database was uploaded to Hugging Face.'
+        : schedulerSucceeded
+          ? 'Stage-A scheduler completed, but the database upload to Hugging Face failed.'
+          : 'Stage-A scheduler failed. The database was not uploaded.',
+      schedulerSucceeded,
+      uploadCompleted,
+      observationsBefore,
+      observationsAfter,
+      observationsInserted: observationsAfter - observationsBefore,
+    };
+
+    res.status(schedulerSucceeded ? 200 : 502).json(response);
+  });
+});
+
+app.get('/api/scheduler/progress', (req, res) => {
+  try {
+    const latestRun = withDatabase((database) => database.prepare(`
+      SELECT run_id, status, total_tasks, successful_tasks, failed_tasks, started_at, completed_at, notes
+      FROM collection_runs
+      ORDER BY started_at DESC, run_id DESC
+      LIMIT 1
+    `).get());
+
+    if (!latestRun) {
+      return res.json({ runId: null, status: null, tasks: [] });
+    }
+
+    const tasks = withDatabase((database) => database.prepare(`
+      SELECT task_id, run_id, route_id, source, origin, destination, departure_date,
+             target_lead_days, actual_lead_days, status, started_at, completed_at,
+             error_type, error_message
+      FROM collection_tasks
+      WHERE run_id = ?
+      ORDER BY created_at, task_id
+    `).all(latestRun.run_id));
+
+    res.json({
+      runId: latestRun.run_id,
+      status: latestRun.status,
+      tasks,
+    });
+  } catch (error) {
+    res.status(500).json({ message: `Unable to read scheduler progress: ${error.message}` });
+  }
 });
 
 app.get('/api/data-source', (req, res) => {

@@ -28,8 +28,36 @@ export async function apiHealth() {
   return request<{ ok: boolean; service: string; timestamp: string }>('/api/health');
 }
 
-export async function apiRunScheduler() {
-  return request<{ message: string }>('/api/scheduler/run', { method: 'POST' });
+export async function apiRunScheduler(options: { airlines: string[]; leadTimes: number[]; routes: string[] }) {
+  return request<{
+    message: string;
+    schedulerSucceeded: boolean;
+    uploadCompleted: boolean;
+    observationsBefore: number;
+    observationsAfter: number;
+    observationsInserted: number;
+  }>('/api/scheduler/run', { method: 'POST', body: JSON.stringify(options) });
+}
+
+export interface SchedulerTaskStatus {
+  task_id: string;
+  run_id: string;
+  route_id: string;
+  source: string;
+  origin: string;
+  destination: string;
+  departure_date: string;
+  target_lead_days: number;
+  actual_lead_days: number | null;
+  status: 'PENDING' | 'RUNNING' | 'SUCCESS' | 'FAILED' | 'SKIPPED';
+  started_at: string | null;
+  completed_at: string | null;
+  error_type: string | null;
+  error_message: string | null;
+}
+
+export async function apiSchedulerStatus() {
+  return request<{ runId: string | null; status: string | null; tasks: SchedulerTaskStatus[] }>('/api/scheduler/progress');
 }
 
 export interface ApiFilters {

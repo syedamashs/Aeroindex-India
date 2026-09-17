@@ -7,8 +7,8 @@
     "node": ">=22.5.0"
   },
   "scripts": {
-    "dev": "node --watch server.js",
-    "start": "node server.js"
+    "dev": "python download_db.py && node --watch server.js",
+    "start": "python download_db.py && node server.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

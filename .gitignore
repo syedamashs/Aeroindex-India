@@ -53,6 +53,10 @@ backend/data/*.sqlite3
 **/run_*_dqe.py
 **/run_*_analysis.py
 **/run_index_demo.py
+backend/scripts/
+backend/scratch/
+*.bak
+*.download
 
 # Superseded standalone documentation
 index_calc.md

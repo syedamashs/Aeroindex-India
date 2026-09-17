@@ -30,8 +30,10 @@ export function MethodologyPage() {
   const [statistics, setStatistics] = useState({ routesMonitored: 0, totalObservations: 0 });
   const [quality, setQuality] = useState({ invalid: 0, duplicates: 0, valid: 0 });
   const [routeWeight, setRouteWeight] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     Promise.all([apiStatistics(), apiDqeSummary(), apiRoutes()])
       .then(([stats, dqe, routes]) => {
         setStatistics({ routesMonitored: stats.data.routesMonitored, totalObservations: stats.data.totalObservations });
@@ -39,7 +41,8 @@ export function MethodologyPage() {
         setQuality({ invalid, duplicates: dqe.data.duplicate_identity_groups, valid: Math.max(0, dqe.data.total_observations - invalid) });
         setRouteWeight(routes.data.reduce((sum, route) => sum + route.weight, 0));
       })
-      .catch((error) => console.error('Failed to fetch methodology statistics:', error));
+      .catch((error) => console.error('Failed to fetch methodology statistics:', error))
+      .finally(() => setLoading(false));
   }, []);
 
   return (
@@ -85,39 +88,63 @@ export function MethodologyPage() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 pt-2">
           <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
             <p className="text-[10px] uppercase font-bold text-slate-400">Routes Monitored</p>
-            <p className="text-base font-mono font-bold text-navy-950 mt-0.5">
-              <AnimatedCounter value={statistics.routesMonitored} />
-            </p>
+            <div className="text-base font-mono font-bold text-navy-950 mt-0.5 min-h-[24px] flex items-center">
+              {loading ? (
+                <div className="h-4 w-12 bg-slate-200 rounded animate-pulse" />
+              ) : (
+                <AnimatedCounter value={statistics.routesMonitored} />
+              )}
+            </div>
           </div>
           <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
             <p className="text-[10px] uppercase font-bold text-slate-400">Total Observations</p>
-            <p className="text-base font-mono font-bold text-navy-950 mt-0.5">
-              <AnimatedCounter value={statistics.totalObservations} />
-            </p>
+            <div className="text-base font-mono font-bold text-navy-950 mt-0.5 min-h-[24px] flex items-center">
+              {loading ? (
+                <div className="h-4 w-16 bg-slate-200 rounded animate-pulse" />
+              ) : (
+                <AnimatedCounter value={statistics.totalObservations} />
+              )}
+            </div>
           </div>
           <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
             <p className="text-[10px] uppercase font-bold text-slate-400">Valid Fare Rows</p>
-            <p className="text-base font-mono font-bold text-emerald-600 mt-0.5">
-              <AnimatedCounter value={quality.valid} />
-            </p>
+            <div className="text-base font-mono font-bold text-emerald-600 mt-0.5 min-h-[24px] flex items-center">
+              {loading ? (
+                <div className="h-4 w-16 bg-emerald-100 rounded animate-pulse" />
+              ) : (
+                <AnimatedCounter value={quality.valid} />
+              )}
+            </div>
           </div>
           <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
             <p className="text-[10px] uppercase font-bold text-slate-400">Invalid Records</p>
-            <p className="text-base font-mono font-bold text-rose-600 mt-0.5">
-              <AnimatedCounter value={quality.invalid} />
-            </p>
+            <div className="text-base font-mono font-bold text-rose-600 mt-0.5 min-h-[24px] flex items-center">
+              {loading ? (
+                <div className="h-4 w-10 bg-rose-100 rounded animate-pulse" />
+              ) : (
+                <AnimatedCounter value={quality.invalid} />
+              )}
+            </div>
           </div>
           <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
             <p className="text-[10px] uppercase font-bold text-slate-400">Duplicate Groups</p>
-            <p className="text-base font-mono font-bold text-amber-600 mt-0.5">
-              <AnimatedCounter value={quality.duplicates} />
-            </p>
+            <div className="text-base font-mono font-bold text-amber-600 mt-0.5 min-h-[24px] flex items-center">
+              {loading ? (
+                <div className="h-4 w-10 bg-amber-100 rounded animate-pulse" />
+              ) : (
+                <AnimatedCounter value={quality.duplicates} />
+              )}
+            </div>
           </div>
           <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
             <p className="text-[10px] uppercase font-bold text-slate-400">Route Weight Sum</p>
-            <p className="text-base font-mono font-bold text-navy-950 mt-0.5">
-              <AnimatedCounter value={routeWeight} />
-            </p>
+            <div className="text-base font-mono font-bold text-navy-950 mt-0.5 min-h-[24px] flex items-center">
+              {loading ? (
+                <div className="h-4 w-12 bg-slate-200 rounded animate-pulse" />
+              ) : (
+                <AnimatedCounter value={routeWeight} />
+              )}
+            </div>
           </div>
         </div>
       </MethodSection>

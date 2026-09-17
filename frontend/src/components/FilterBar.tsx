@@ -22,7 +22,10 @@ export function FilterBar() {
   useEffect(() => {
     Promise.all([apiMap(), apiAirlines()]).then(([map, airlineResponse]) => {
       setAirports(map.data.airports.map(({ code, city }) => ({ code, city })));
-      setAirlines(airlineResponse.data.map(({ code, name }) => ({ code, name })));
+      const uniqueAirlines = Array.from(
+        new Map(airlineResponse.data.map(({ code, name }) => [code, { code, name }])).values()
+      );
+      setAirlines(uniqueAirlines);
     }).catch(() => {
       setAirports([]);
       setAirlines([]);

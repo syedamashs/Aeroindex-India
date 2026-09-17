@@ -97,7 +97,11 @@ export function AlertsPage() {
               <div className="text-xs">
                 <p className="font-bold text-white">Active Queue</p>
                 <p className="text-accent-400 font-mono font-bold text-base">
-                  <AnimatedCounter value={alerts.length} /> Incidents
+                  {loading ? (
+                    <span className="inline-block w-20 h-4 bg-white/20 rounded animate-pulse" />
+                  ) : (
+                    <><AnimatedCounter value={alerts.length} /> Incidents</>
+                  )}
                 </p>
               </div>
             </div>
@@ -116,6 +120,7 @@ export function AlertsPage() {
             icon={<Bell className="w-5 h-5" />}
             accent="navy"
             progressPercent={100}
+            loading={loading}
           />
         </MotionItem>
 
@@ -127,6 +132,7 @@ export function AlertsPage() {
             statusText={counts.high > 0 ? 'Action Required' : 'Nominal'}
             icon={<AlertTriangle className="w-5 h-5" />}
             accent="danger"
+            loading={loading}
           />
         </MotionItem>
 
@@ -138,6 +144,7 @@ export function AlertsPage() {
             statusText="Watching"
             icon={<Activity className="w-5 h-5" />}
             accent="warning"
+            loading={loading}
           />
         </MotionItem>
 
@@ -149,6 +156,7 @@ export function AlertsPage() {
             statusText="Within Spec"
             icon={<ShieldCheck className="w-5 h-5" />}
             accent="accent"
+            loading={loading}
           />
         </MotionItem>
       </StaggerContainer>
@@ -167,7 +175,7 @@ export function AlertsPage() {
                     onClick={() => setSeverityFilter(s)}
                     className={`pill-tab capitalize ${isActive ? 'pill-tab-active' : 'pill-tab-inactive'}`}
                   >
-                    {s === 'all' ? `All (${counts.total})` : `${s} (${counts[s]})`}
+                    {s === 'all' ? `All (${loading ? '…' : counts.total})` : `${s} (${loading ? '…' : counts[s]})`}
                   </button>
                 );
               })}

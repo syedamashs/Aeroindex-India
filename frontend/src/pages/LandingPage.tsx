@@ -84,8 +84,8 @@ export function LandingPage() {
       <header className="sticky top-0 z-30 bg-navy-950/90 backdrop-blur-md border-b border-navy-800/80 text-white px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center ring-1 ring-white/20">
-              <Plane className="w-5 h-5 text-accent-400" />
+            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center ring-1 ring-white/20 overflow-hidden p-1">
+              <img src="/logo.png" alt="AeroIndex Logo" className="w-full h-full object-contain" />
             </div>
             <div>
               <span className="font-display font-extrabold text-lg tracking-tight text-white flex items-center gap-1.5">

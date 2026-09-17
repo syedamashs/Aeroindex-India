@@ -65,8 +65,8 @@ export function LoginPage() {
       <div className="relative z-10 w-full max-w-md mx-auto my-auto">
         {/* Logo & Headline */}
         <div className="login-brand text-center mb-8">
-          <div className="inline-flex w-14 h-14 rounded-2xl bg-gradient-to-tr from-navy-800 to-navy-600 items-center justify-center mb-4 shadow-xl ring-1 ring-white/20">
-            <Plane className="w-7 h-7 text-accent-400" />
+          <div className="inline-flex w-16 h-16 rounded-2xl bg-gradient-to-tr from-navy-800 to-navy-600 items-center justify-center mb-4 shadow-xl ring-1 ring-white/20 overflow-hidden p-1.5">
+            <img src="/logo.png" alt="AeroIndex Logo" className="w-full h-full object-contain" />
           </div>
           <h1 className="font-display font-extrabold text-2xl lg:text-3xl text-white tracking-tight">
             Vayuyaan India

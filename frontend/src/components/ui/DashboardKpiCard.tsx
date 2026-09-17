@@ -12,6 +12,7 @@ interface DashboardKpiCardProps {
   valueClassName?: string;
   statusText?: string;
   progressPercent?: number;
+  loading?: boolean;
 }
 
 export function DashboardKpiCard({
@@ -24,6 +25,7 @@ export function DashboardKpiCard({
   valueClassName = '',
   statusText,
   progressPercent,
+  loading = false,
 }: DashboardKpiCardProps) {
   const accentStyles = {
     navy: {
@@ -82,48 +84,62 @@ export function DashboardKpiCard({
         </div>
 
         <div className="flex items-baseline gap-2">
-          <div className={`text-3xl font-display font-extrabold text-navy-950 tracking-tight ${valueClassName}`}>
-            <AnimatedCounter value={value} />
-          </div>
-          {statusText && (
-            <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-md ${currentTheme.badge}`}>
-              {statusText}
-            </span>
+          {loading ? (
+            <div className="h-9 w-32 rounded-lg bg-slate-200/80 animate-pulse my-0.5" />
+          ) : (
+            <>
+              <div className={`text-3xl font-display font-extrabold text-navy-950 tracking-tight ${valueClassName}`}>
+                <AnimatedCounter value={value} />
+              </div>
+              {statusText && (
+                <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-md ${currentTheme.badge}`}>
+                  {statusText}
+                </span>
+              )}
+            </>
           )}
         </div>
       </div>
 
       <div className="mt-3 pt-3 border-t border-slate-100 flex flex-col gap-2">
-        <div className="flex items-center justify-between text-xs">
-          {change !== undefined && (
-            <span
-              className={`inline-flex items-center gap-1 font-semibold px-2 py-0.5 rounded-md ${
-                change > 0
-                  ? 'bg-rose-50 text-rose-600 border border-rose-200/60'
-                  : change < 0
-                  ? 'bg-emerald-50 text-emerald-600 border border-emerald-200/60'
-                  : 'bg-slate-100 text-slate-600'
-              }`}
-            >
-              {change > 0 ? (
-                <TrendingUp className="w-3.5 h-3.5" />
-              ) : change < 0 ? (
-                <TrendingDown className="w-3.5 h-3.5" />
-              ) : (
-                <Minus className="w-3.5 h-3.5" />
-              )}
-              {change > 0 ? `+${change.toFixed(1)}%` : `${change.toFixed(1)}%`}
-            </span>
-          )}
-          {sublabel && <span className="text-slate-500 font-medium text-[11px] truncate">{sublabel}</span>}
-        </div>
+        {loading ? (
+          <div className="h-4 w-36 rounded bg-slate-100 animate-pulse my-0.5" />
+        ) : (
+          <div className="flex items-center justify-between text-xs">
+            {change !== undefined && (
+              <span
+                className={`inline-flex items-center gap-1 font-semibold px-2 py-0.5 rounded-md ${
+                  change > 0
+                    ? 'bg-rose-50 text-rose-600 border border-rose-200/60'
+                    : change < 0
+                    ? 'bg-emerald-50 text-emerald-600 border border-emerald-200/60'
+                    : 'bg-slate-100 text-slate-600'
+                }`}
+              >
+                {change > 0 ? (
+                  <TrendingUp className="w-3.5 h-3.5" />
+                ) : change < 0 ? (
+                  <TrendingDown className="w-3.5 h-3.5" />
+                ) : (
+                  <Minus className="w-3.5 h-3.5" />
+                )}
+                {change > 0 ? `+${change.toFixed(1)}%` : `${change.toFixed(1)}%`}
+              </span>
+            )}
+            {sublabel && <span className="text-slate-500 font-medium text-[11px] truncate">{sublabel}</span>}
+          </div>
+        )}
 
         {progressPercent !== undefined && (
           <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-            <div
-              className={`h-full rounded-full transition-all duration-500 ${currentTheme.progress}`}
-              style={{ width: `${Math.min(100, Math.max(0, progressPercent))}%` }}
-            />
+            {loading ? (
+              <div className="h-full bg-slate-200 animate-pulse w-full rounded-full" />
+            ) : (
+              <div
+                className={`h-full rounded-full transition-all duration-500 ${currentTheme.progress}`}
+                style={{ width: `${Math.min(100, Math.max(0, progressPercent))}%` }}
+              />
+            )}
           </div>
         )}
       </div>

@@ -23,12 +23,10 @@ AIRLINES = (
     "spicejet",
 )
 
+# Default scheduler smoke-test lead time is T+7 while we validate the
+# database insert path before restoring the full matrix.
 LEAD_TIME_DAYS = (
-    1,
     7,
-    15,
-    30,
-    45,
 )
 
 

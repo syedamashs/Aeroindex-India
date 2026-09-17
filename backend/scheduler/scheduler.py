@@ -11,9 +11,30 @@ Stage A scope:
 """
 
 import json
+import os
 import sys
 from pathlib import Path
 from importlib import import_module
+
+
+def safe_print(*args, sep=' ', end='\n', file=None):
+    """Write text safely to stdout/stderr on Windows terminals that cannot encode Unicode."""
+    stream = file if file is not None else sys.stdout
+    encoding = getattr(stream, 'encoding', None) or 'utf-8'
+    text = sep.join(str(arg) for arg in args)
+
+    try:
+        stream.write(text)
+        if end is not None:
+            stream.write(end)
+        stream.flush()
+        return
+    except UnicodeEncodeError:
+        safe_text = text.encode(encoding, errors='replace').decode(encoding, errors='replace')
+        stream.write(safe_text)
+        if end is not None:
+            stream.write(end)
+        stream.flush()
 
 
 # ============================================================
@@ -57,7 +78,11 @@ from upload_db import upload_database
 # STAGE-A CONFIGURATION
 # ============================================================
 
-STAGE_A_ROUTE_ID = "DELHI_MUMBAI"
+STAGE_A_ROUTE_IDS = (
+    "DELHI_MUMBAI",
+    "CHENNAI_DELHI",
+    "CHENNAI_MUMBAI",
+)
 
 STAGE_A_AIRLINES = (
     "airindia",
@@ -65,13 +90,34 @@ STAGE_A_AIRLINES = (
     "spicejet",
 )
 
+# Smoke-test only for DB verification before expanding back to the
+# full production lead-time matrix.
 STAGE_A_LEAD_TIMES = (
-    1,
     7,
-    15,
-    30,
-    45,
 )
+
+
+def configured_scheduler_values():
+    airlines = tuple(dict.fromkeys(
+        value.strip().lower()
+        for value in os.getenv("APIX_SCHEDULER_AIRLINES", "airindia").split(",")
+        if value.strip() in STAGE_A_AIRLINES
+    ))
+    supported_lead_times = {1, 7, 15, 30}
+    lead_times = tuple(
+        days
+        for days in dict.fromkeys(
+            int(value.strip())
+            for value in os.getenv("APIX_SCHEDULER_LEAD_TIMES", "7").split(",")
+            if value.strip().isdigit() and int(value.strip()) in supported_lead_times
+        )
+    )
+    routes = tuple(dict.fromkeys(
+        value.strip().upper()
+        for value in os.getenv("APIX_SCHEDULER_ROUTES", ",".join(STAGE_A_ROUTE_IDS)).split(",")
+        if value.strip().upper() in STAGE_A_ROUTE_IDS
+    ))
+    return airlines, lead_times, routes
 
 
 # ============================================================
@@ -197,25 +243,25 @@ def execute_task(task):
     task_id = task["task_id"]
     source = task["source"]
 
-    print()
-    print("-" * 60)
-    print(
+    safe_print()
+    safe_print("-" * 60)
+    safe_print(
         f"Task      : {task_id}"
     )
-    print(
+    safe_print(
         f"Source    : {source.upper()}"
     )
-    print(
+    safe_print(
         f"Route     : "
         f"{task['origin']} -> {task['destination']}"
     )
-    print(
+    safe_print(
         f"Departure : {task['departure_date']}"
     )
-    print(
+    safe_print(
         f"Target    : T+{task['target_lead_days']}"
     )
-    print("-" * 60)
+    safe_print("-" * 60)
 
     # --------------------------------------------------------
     # PENDING -> RUNNING
@@ -229,7 +275,7 @@ def execute_task(task):
         # SCRAPE
         # ----------------------------------------------------
 
-        print("  [1/4] Scraping...")
+        safe_print("  [1/4] Scraping...")
 
         scraper_result = run_task(
             source,
@@ -240,13 +286,13 @@ def execute_task(task):
         # LOAD RAW JSON
         # ----------------------------------------------------
 
-        print("  [2/4] Loading raw JSON...")
+        safe_print("  [2/4] Loading raw JSON...")
 
         raw_json, raw_path = load_raw_response(
             scraper_result
         )
 
-        print(
+        safe_print(
             f"        Raw file: {raw_path}"
         )
 
@@ -254,7 +300,7 @@ def execute_task(task):
         # NORMALIZE
         # ----------------------------------------------------
 
-        print("  [3/4] Normalizing...")
+        safe_print("  [3/4] Normalizing...")
 
         normalizer = load_normalizer(source)
 
@@ -280,7 +326,7 @@ def execute_task(task):
                 actual_lead_days=task["target_lead_days"],
             )
 
-        print(
+        safe_print(
             f"        Normalized observations: "
             f"{len(observations)}"
         )
@@ -289,7 +335,7 @@ def execute_task(task):
         # SQLITE
         # ----------------------------------------------------
 
-        print("  [4/4] Writing SQLite...")
+        safe_print("  [4/4] Writing SQLite...")
 
         inserted = insert_observations(
             observations
@@ -322,8 +368,8 @@ def execute_task(task):
             actual_lead_days=actual_lead_days,
         )
 
-        print(
-            f"  ✓ SUCCESS — {inserted} observations inserted"
+        safe_print(
+            f"  SUCCESS — {inserted} observations inserted"
         )
 
         return inserted
@@ -339,12 +385,12 @@ def execute_task(task):
             error_message=error_message,
         )
 
-        print(
-            f"  ✗ FAILED — {error_type}: "
+        safe_print(
+            f"  FAILED — {error_type}: "
             f"{error_message}"
         )
 
-        return 0
+        return None
 
 
 # ============================================================
@@ -363,10 +409,15 @@ def run_stage_a():
         × one run
     """
 
-    print()
-    print("=" * 60)
-    print("APIx — STAGE A COLLECTION SCHEDULER")
-    print("=" * 60)
+    selected_airlines, selected_lead_times, selected_route_ids = configured_scheduler_values()
+
+    if not selected_airlines or not selected_lead_times or not selected_route_ids:
+        raise ValueError("No scheduler selections were provided. Select at least one airline, route, and booking window.")
+
+    safe_print()
+    safe_print("=" * 60)
+    safe_print("APIx — STAGE A COLLECTION SCHEDULER")
+    safe_print("=" * 60)
 
     # --------------------------------------------------------
     # LOAD THE DGCA ROUTE MASTER
@@ -377,40 +428,31 @@ def run_stage_a():
     selected_routes = [
         route
         for route in routes
-        if str(route["route_id"]).strip()
-        == STAGE_A_ROUTE_ID
+        if str(route["route_id"]).strip().upper() in selected_route_ids
     ]
 
-    if not selected_routes:
-        raise ValueError(
-            f"Route {STAGE_A_ROUTE_ID} "
-            f"not found in routes.csv"
-        )
-
-    if len(selected_routes) != 1:
-        raise ValueError(
-            f"Expected exactly one route for "
-            f"{STAGE_A_ROUTE_ID}, found "
-            f"{len(selected_routes)}"
-        )
-
-    route = selected_routes[0]
-
-    print()
-    print(
-        f"Route : {route['city1']} -> {route['city2']}"
+    selected_route_ids = tuple(
+        route_id
+        for route_id in selected_route_ids
+        if any(str(route["route_id"]).strip().upper() == route_id for route in selected_routes)
     )
-    print(
-        f"Route ID : {route['route_id']}"
+
+    safe_print()
+    safe_print(
+        "Routes: "
+        + ", ".join(f"{route['city1']} -> {route['city2']}" for route in selected_routes)
     )
-    print(
-        f"Airlines: {', '.join(STAGE_A_AIRLINES)}"
+    safe_print(
+        f"Route IDs: {', '.join(selected_route_ids)}"
     )
-    print(
+    safe_print(
+        f"Airlines: {', '.join(selected_airlines)}"
+    )
+    safe_print(
         "Lead times: "
         + ", ".join(
             f"T+{days}"
-            for days in STAGE_A_LEAD_TIMES
+            for days in selected_lead_times
         )
     )
 
@@ -420,8 +462,8 @@ def run_stage_a():
 
     tasks = build_tasks(
         routes=selected_routes,
-        airlines=STAGE_A_AIRLINES,
-        lead_times=STAGE_A_LEAD_TIMES,
+        airlines=selected_airlines,
+        lead_times=selected_lead_times,
     )
 
     if not tasks:
@@ -431,11 +473,11 @@ def run_stage_a():
 
     run_id = tasks[0]["run_id"]
 
-    print()
-    print(
+    safe_print()
+    safe_print(
         f"Run ID: {run_id}"
     )
-    print(
+    safe_print(
         f"Tasks : {len(tasks)}"
     )
 
@@ -471,8 +513,8 @@ def run_stage_a():
         start=1,
     ):
 
-        print()
-        print(
+        safe_print()
+        safe_print(
             f"[{index}/{len(tasks)}]"
         )
 
@@ -484,12 +526,12 @@ def run_stage_a():
         # run leaves both databases aligned without copying synthetic rows.
         sync_scheduler_run_to_backup(run_id)
 
-        total_inserted += inserted
-
-        if inserted > 0:
-            successful += 1
-        else:
+        if inserted is None:
             failed += 1
+            continue
+
+        total_inserted += inserted
+        successful += 1
 
     # --------------------------------------------------------
     # FINALIZE RUN
@@ -503,67 +545,69 @@ def run_stage_a():
     # FINAL REPORT
     # --------------------------------------------------------
 
-    print()
-    print("=" * 60)
-    print("STAGE A FINAL REPORT")
-    print("=" * 60)
+    safe_print()
+    safe_print("=" * 60)
+    safe_print("STAGE A FINAL REPORT")
+    safe_print("=" * 60)
 
-    print(
+    safe_print(
         f"Run ID              : {run_id}"
     )
 
-    print(
+    safe_print(
         f"Route               : "
-        f"{route['city1']} -> {route['city2']}"
+        ", ".join(f"{item['city1']} -> {item['city2']}" for item in selected_routes)
     )
 
-    print(
+    safe_print(
         "Lead times          : "
         + ", ".join(
             f"T+{days}"
-            for days in STAGE_A_LEAD_TIMES
+            for days in selected_lead_times
         )
     )
 
-    print(
+    safe_print(
         f"Tasks                : {len(tasks)}"
     )
 
-    print(
+    safe_print(
         f"Successful tasks     : {successful}"
     )
 
-    print(
+    safe_print(
         f"Failed tasks         : {failed}"
     )
 
-    print(
+    safe_print(
         f"Observations inserted: {total_inserted}"
     )
 
     if isinstance(run_summary, dict):
-        print(
+        safe_print(
             f"Run status           : "
             f"{run_summary.get('status', 'UNKNOWN')}"
         )
 
-    print("=" * 60)
+    safe_print("=" * 60)
 
-    if failed == 0:
-        print(
-            "🎉 STAGE A SCHEDULER COMPLETED SUCCESSFULLY"
+    if failed == 0 and total_inserted == 0:
+        safe_print("NO OBSERVATIONS FOUND FOR THE SELECTED FILTERS")
+    elif failed == 0:
+        safe_print(
+            "STAGE A SCHEDULER COMPLETED SUCCESSFULLY"
         )
         try:
             upload_url = upload_database()
-            print(f"Updated database uploaded to Hugging Face: {upload_url}")
+            safe_print(f"Updated database uploaded to Hugging Face: {upload_url}")
         except Exception as exc:
-            print(f"Hugging Face database upload failed: {type(exc).__name__}: {exc}")
+            safe_print(f"Hugging Face database upload failed: {type(exc).__name__}: {exc}")
     else:
-        print(
-            "⚠ STAGE A COMPLETED WITH FAILURES"
+        safe_print(
+            "STAGE A COMPLETED WITH FAILURES"
         )
 
-    print("=" * 60)
+    safe_print("=" * 60)
 
     return run_id
 

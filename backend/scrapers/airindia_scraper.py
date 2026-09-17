@@ -161,6 +161,36 @@ def close_popups(page):
 # EXTRACT CARRIER
 ######################################
 
+def advance_calendar_to_date(page, departure_date):
+    date_locator = page.locator(f'[data-date="{departure_date}"]')
+    target = date.fromisoformat(str(departure_date))
+    today = date.today()
+    month_distance = (target.year - today.year) * 12 + target.month - today.month
+    clicks_needed = max(0, month_distance - 1)
+    if clicks_needed == 0:
+        return
+
+    for _ in range(clicks_needed):
+        next_buttons = page.locator(
+            'button[aria-label*="next month" i], '
+            'button[aria-label*="next" i][aria-label*="calendar" i], '
+            'button[title*="next" i], '
+            'button[data-testid*="next" i], '
+            '[data-testid*="next" i][data-testid*="month" i], '
+            'button:has-text(">"), '
+            'button:has-text("›")'
+        )
+        clicked = False
+        for index in range(next_buttons.count()):
+            button = next_buttons.nth(index)
+            if button.is_visible() and button.is_enabled():
+                button.click(force=True)
+                page.wait_for_timeout(300)
+                clicked = True
+                break
+        if not clicked:
+            return
+
 def extract_carrier(flight_id):
 
     if not flight_id:
@@ -1927,6 +1957,7 @@ def run(task):
                     except Exception:
                         pass
 
+                advance_calendar_to_date(page, departure_date)
                 departure_day = str(int(departure_date.split("-")[2]))
                 dates = page.locator(f'[data-date="{departure_date}"]')
                 if dates.count() == 0:
@@ -1952,21 +1983,57 @@ def run(task):
                             pass
 
                 if not selected_date:
+                    visible_date_buttons = page.locator(
+                        'button[aria-label*="2026"], '
+                        'button[data-date*="2026"]'
+                    )
+                    for i in range(visible_date_buttons.count()):
+                        element = visible_date_buttons.nth(i)
+                        if not element.is_visible():
+                            continue
+                        if departure_date in (element.get_attribute("aria-label") or "") or departure_date == element.get_attribute("data-date"):
+                            element.click(timeout=3000)
+                            selected_date = True
+                            break
+
+                if not selected_date:
                     raise RuntimeError(f"Departure date not selected: {departure_date}")
 
                 page.wait_for_timeout(1000)
 
-                search_button = page.get_by_role(
-                    "button", name=re.compile(r"Search", re.IGNORECASE)
-                ).first
-                if search_button.count() == 0:
+                search_button = None
+                search_candidates = (
+                    page.get_by_role("button", name=re.compile(r"Search", re.IGNORECASE)),
+                    page.get_by_text(re.compile(r"^Search(?: Flight| Flights)?$", re.IGNORECASE)),
+                    page.locator('[data-testid*="search" i]'),
+                    page.locator('button:has-text("Search")'),
+                    page.locator('[role="button"]:has-text("Search")'),
+                    page.locator('.ai-button__label'),
+                )
+                for candidates in search_candidates:
+                    for index in range(candidates.count()):
+                        candidate = candidates.nth(index)
+                        if candidate.is_visible() and candidate.is_enabled():
+                            parent_button = candidate.locator(
+                                "xpath=ancestor::*[self::button or @role='button'][1]"
+                            )
+                            search_button = (
+                                parent_button.first
+                                if parent_button.count() > 0 and parent_button.first.is_visible()
+                                else candidate
+                            )
+                            break
+                    if search_button is not None:
+                        break
+
+                if search_button is None:
                     raise RuntimeError("Air India Search button not found")
 
                 with page.expect_response(
                     lambda response: "air-bounds" in response.url,
                     timeout=120000,
                 ) as response_info:
-                    search_button.click()
+                    search_button.click(force=True)
 
                 air_bounds_response = response_info.value
                 if air_bounds_response.status != 200:

@@ -145,6 +145,7 @@ export function IndexPage() {
             icon={<TrendingUp className="w-5 h-5" />}
             accent="navy"
             progressPercent={Math.min(100, ((latest?.indexValue ?? 100) / 120) * 100)}
+            loading={loading}
           />
         </MotionItem>
 
@@ -156,6 +157,7 @@ export function IndexPage() {
             statusText={Math.abs(latest?.percentageChange || 0) > 3 ? 'Elevated Drift' : 'Within Band'}
             icon={<TrendingUp className="w-5 h-5" />}
             accent={latest && latest.percentageChange > 0 ? 'danger' : 'accent'}
+            loading={loading}
           />
         </MotionItem>
 
@@ -167,6 +169,7 @@ export function IndexPage() {
             statusText="Standard Reference"
             icon={<Layers className="w-5 h-5" />}
             accent="purple"
+            loading={loading}
           />
         </MotionItem>
 
@@ -179,6 +182,7 @@ export function IndexPage() {
             icon={<CheckCircle2 className="w-5 h-5" />}
             accent="accent"
             progressPercent={100}
+            loading={loading}
           />
         </MotionItem>
       </StaggerContainer>

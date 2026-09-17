@@ -52,7 +52,10 @@ export function DataExplorerPage() {
 
         const [mapRes, airlineRes] = await Promise.all([apiMap(), apiAirlines()]);
         setAirports(mapRes.data.airports);
-        setAirlines(airlineRes.data);
+        const uniqueAirlines = Array.from(
+          new Map(airlineRes.data.map((item) => [item.code, { code: item.code, name: item.name }])).values()
+        );
+        setAirlines(uniqueAirlines);
       } catch (error) {
         console.error('Failed to fetch observations:', error);
       } finally {
@@ -134,7 +137,11 @@ export function DataExplorerPage() {
             <div className="px-3.5 py-2 rounded-xl bg-navy-900/80 border border-navy-700 text-xs text-white">
               <span className="text-slate-400">Total Ingest: </span>
               <span className="font-mono font-bold text-accent-400">
-                <AnimatedCounter value={data.total} /> rows
+                {loading && data.total === 0 ? (
+                  <span className="inline-block w-16 h-3.5 bg-white/20 rounded animate-pulse align-middle" />
+                ) : (
+                  <><AnimatedCounter value={data.total} /> rows</>
+                )}
               </span>
             </div>
 

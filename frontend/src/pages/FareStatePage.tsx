@@ -235,6 +235,7 @@ export function FareStatePage() {
             icon={<TrendingUp className="w-5 h-5" />}
             accent="warning"
             progressPercent={Number(data?.fep.percentage || 0)}
+            loading={loading}
           />
         </MotionItem>
 
@@ -246,6 +247,7 @@ export function FareStatePage() {
             statusText="Upward Pressure"
             icon={<ArrowUpRight className="w-5 h-5" />}
             accent="danger"
+            loading={loading}
           />
         </MotionItem>
 
@@ -257,6 +259,7 @@ export function FareStatePage() {
             statusText="Cooling Trend"
             icon={<ArrowDownRight className="w-5 h-5" />}
             accent="accent"
+            loading={loading}
           />
         </MotionItem>
 
@@ -268,6 +271,7 @@ export function FareStatePage() {
             statusText="Sticky Pricing"
             icon={<CircleDot className="w-5 h-5" />}
             accent="navy"
+            loading={loading}
           />
         </MotionItem>
       </StaggerContainer>

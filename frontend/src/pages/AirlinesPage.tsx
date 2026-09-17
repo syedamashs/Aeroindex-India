@@ -24,6 +24,12 @@ export function AirlinesPage() {
   const [stats, setStats] = useState<Array<{ code: string; name: string; averageFare: number; medianFare: number; minFare: number; maxFare: number; volatility: number; observations: number; averageIndex: number; color: string }>>([]);
   const [loading, setLoading] = useState(true);
 
+  const handleModeChange = (mode: ComparisonMode) => {
+    if (mode === comparisonMode) return;
+    setSelected([]);
+    setComparisonMode(mode);
+  };
+
   useEffect(() => {
     setLoading(true);
     const apiFilters: ApiFilters = {
@@ -38,19 +44,32 @@ export function AirlinesPage() {
     };
     Promise.all([apiAirlines(apiFilters), apiIndex(apiFilters)])
       .then(([airlineResponse]) => {
-        setStats(airlineResponse.data);
-        setSelected((previous) => previous.length ? previous.filter((code) => airlineResponse.data.some((airline) => airline.code === code)) : airlineResponse.data.map((airline) => airline.code));
+        const uniqueStats = Array.from(
+          new Map(airlineResponse.data.map((item) => [item.code, item])).values()
+        );
+        setStats(uniqueStats);
+        setSelected(uniqueStats.map((item) => item.code));
       })
       .catch((error) => console.error('Failed to fetch airline data:', error))
       .finally(() => setLoading(false));
   }, [filters, lastUpdate, comparisonMode]);
 
-  const filtered = stats.filter((s) => selected.includes(s.code));
+  const filtered = useMemo(() => {
+    if (!stats.length) return [];
+    if (!selected.length) return stats;
+    const matches = stats.filter((s) => selected.includes(s.code));
+    return matches.length ? matches : stats;
+  }, [stats, selected]);
 
   const toggleAirline = (code: string) => {
-    setSelected((prev) =>
-      prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code],
-    );
+    setSelected((prev) => {
+      const current = prev.length ? prev : stats.map((s) => s.code);
+      if (current.includes(code)) {
+        const next = current.filter((c) => c !== code);
+        return next.length ? next : stats.map((s) => s.code);
+      }
+      return [...current, code];
+    });
   };
 
   const highestFareEntity = useMemo(() => {
@@ -67,12 +86,14 @@ export function AirlinesPage() {
     return stats.reduce((sum, s) => sum + s.observations, 0);
   }, [stats]);
 
-  const barData = filtered.map((s) => ({
-    name: s.name,
-    averageFare: s.averageFare,
-    medianFare: s.medianFare,
-    color: s.color,
-  }));
+  const barData = useMemo(() => {
+    return filtered.map((s) => ({
+      name: s.name,
+      averageFare: s.averageFare,
+      medianFare: s.medianFare,
+      color: s.color,
+    }));
+  }, [filtered]);
 
   return (
     <div className="animate-fade-in space-y-6">
@@ -104,7 +125,7 @@ export function AirlinesPage() {
           {/* Grouping Switcher Pill */}
           <div className="flex items-center bg-navy-900/80 p-1 rounded-xl border border-navy-700">
             <button
-              onClick={() => { setSelected([]); setComparisonMode('airline'); }}
+              onClick={() => handleModeChange('airline')}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all ${
                 comparisonMode === 'airline' ? 'bg-accent-500 text-navy-950 shadow-md' : 'text-slate-300 hover:text-white'
               }`}
@@ -113,7 +134,7 @@ export function AirlinesPage() {
               <span>Airlines</span>
             </button>
             <button
-              onClick={() => { setSelected([]); setComparisonMode('source'); }}
+              onClick={() => handleModeChange('source')}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all ${
                 comparisonMode === 'source' ? 'bg-accent-500 text-navy-950 shadow-md' : 'text-slate-300 hover:text-white'
               }`}
@@ -136,6 +157,7 @@ export function AirlinesPage() {
             icon={<Plane className="w-5 h-5" />}
             accent="navy"
             progressPercent={100}
+            loading={loading}
           />
         </MotionItem>
 
@@ -147,6 +169,7 @@ export function AirlinesPage() {
             statusText="Premium Tier"
             icon={<TrendingUp className="w-5 h-5" />}
             accent="danger"
+            loading={loading}
           />
         </MotionItem>
 
@@ -158,6 +181,7 @@ export function AirlinesPage() {
             statusText="Value Leader"
             icon={<CheckCircle2 className="w-5 h-5" />}
             accent="accent"
+            loading={loading}
           />
         </MotionItem>
 
@@ -169,6 +193,7 @@ export function AirlinesPage() {
             statusText="Verified Pipeline"
             icon={<Globe className="w-5 h-5" />}
             accent="purple"
+            loading={loading}
           />
         </MotionItem>
       </StaggerContainer>

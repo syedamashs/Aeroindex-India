@@ -54,15 +54,18 @@ export function SystemPage() {
   const [allObs, setAllObs] = useState(0);
   const [qualityScore, setQualityScore] = useState(99.4);
   const [avgFare, setAvgFare] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     Promise.all([apiStatistics(), apiDqeSummary(), apiDataSource()]).then(([statistics, quality, source]) => {
       const stats = statistics.data;
       setAllObs(quality.data.total_observations);
       setQualityScore(quality.data.quality_score || 99.4);
       setAvgFare(Number(stats.averageFare ?? 0));
       setDs(source.data);
-    }).catch((error) => console.error('Failed to fetch system statistics:', error));
+    }).catch((error) => console.error('Failed to fetch system statistics:', error))
+      .finally(() => setLoading(false));
   }, [lastUpdate]);
 
   return (
@@ -128,6 +131,7 @@ export function SystemPage() {
             icon={<Database className="w-5 h-5" />}
             accent="navy"
             progressPercent={100}
+            loading={loading}
           />
         </MotionItem>
 
@@ -140,6 +144,7 @@ export function SystemPage() {
             icon={<CheckCircle2 className="w-5 h-5" />}
             accent="accent"
             progressPercent={qualityScore}
+            loading={loading}
           />
         </MotionItem>
 
@@ -151,6 +156,7 @@ export function SystemPage() {
             statusText="Mean Yield"
             icon={<BarChart3 className="w-5 h-5" />}
             accent="purple"
+            loading={loading}
           />
         </MotionItem>
 
@@ -162,6 +168,7 @@ export function SystemPage() {
             statusText="100% Online"
             icon={<Server className="w-5 h-5" />}
             accent="warning"
+            loading={loading}
           />
         </MotionItem>
       </StaggerContainer>

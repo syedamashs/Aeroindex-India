@@ -20,8 +20,10 @@ export function InsightsPage() {
   const [airlineStats, setAirlineStats] = useState<Array<{ name: string; averageFare: number }>>([]);
   const [insights, setInsights] = useState<Array<{ id: string; text: string; category: string }>>([]);
   const [bwStats, setBwStats] = useState<Array<{ window: number; averageFare: number }>>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     const apiFilters: ApiFilters = {
       origin: filters.origin !== 'all' ? filters.origin : undefined,
       destination: filters.destination !== 'all' ? filters.destination : undefined,
@@ -38,7 +40,8 @@ export function InsightsPage() {
       setAirlineStats(airlines.data);
       setInsights(insightResponse.data);
       setBwStats(booking.data);
-    }).catch((error) => console.error('Failed to fetch insights:', error));
+    }).catch((error) => console.error('Failed to fetch insights:', error))
+      .finally(() => setLoading(false));
   }, [filters, lastUpdate]);
 
   const latest = indexPoints[indexPoints.length - 1];
@@ -114,6 +117,7 @@ export function InsightsPage() {
             icon={<Activity className="w-5 h-5" />}
             accent="navy"
             progressPercent={Math.min(100, ((latest?.indexValue ?? 100) / 120) * 100)}
+            loading={loading}
           />
         </MotionItem>
 
@@ -126,6 +130,7 @@ export function InsightsPage() {
             statusText="Surge Alert"
             icon={<ArrowUpRight className="w-5 h-5" />}
             accent="danger"
+            loading={loading}
           />
         </MotionItem>
 
@@ -138,6 +143,7 @@ export function InsightsPage() {
             statusText="Price Relief"
             icon={<ArrowDownRight className="w-5 h-5" />}
             accent="accent"
+            loading={loading}
           />
         </MotionItem>
 
@@ -149,6 +155,7 @@ export function InsightsPage() {
             statusText="Erratic Quotes"
             icon={<Gauge className="w-5 h-5" />}
             accent="warning"
+            loading={loading}
           />
         </MotionItem>
       </StaggerContainer>
