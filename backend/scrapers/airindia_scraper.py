@@ -1907,6 +1907,9 @@ def run(task):
                     "--disable-dev-shm-usage",
                     "--disable-gpu",
                     "--no-first-run",
+                    "--disable-http2",
+                    "--ignore-certificate-errors",
+                    "--disable-features=NetworkService",
                 ],
                 "viewport": {"width": 1400, "height": 900},
             }

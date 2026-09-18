@@ -254,6 +254,8 @@ def run(task):
                     "--disable-dev-shm-usage",
                     "--disable-gpu",
                     "--no-first-run",
+                    "--disable-http2",
+                    "--ignore-certificate-errors",
                 ],
             }
             browser_channel = os.getenv("APIX_BROWSER_CHANNEL")
