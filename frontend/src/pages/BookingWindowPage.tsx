@@ -7,6 +7,7 @@ import { useApp } from '@/context/AppContext';
 import { formatINR, formatPercent } from '@/data/random';
 import { fareTooltipFormatter } from '@/components/chartFormatters';
 import { apiBookingWindow, type ApiFilters } from '@/lib/api';
+import { InsightBot, BOOKING_WINDOW_INSIGHTS } from '@/components/InsightBot';
 
 export function BookingWindowPage() {
   const { filters, lastUpdate } = useApp();
@@ -66,12 +67,19 @@ export function BookingWindowPage() {
           </p>
         </div>
 
-        {t1 && t45 && (
-          <div className="text-right font-mono text-xs">
-            <span className="text-slate-500 block text-[11px] font-sans">Close-in Surge Premium (T+1 vs T+45)</span>
-            <span className="text-lg font-bold text-rose-600">+{surgeMultiplier}%</span>
-          </div>
-        )}
+        <div className="flex items-center gap-3">
+          <InsightBot
+            title="Advance-Purchase Curve"
+            subtitle="Booking window price dynamics"
+            insights={BOOKING_WINDOW_INSIGHTS}
+          />
+          {t1 && t45 && (
+            <div className="text-right font-mono text-xs">
+              <span className="text-slate-500 block text-[11px] font-sans">Close-in Surge Premium (T+1 vs T+45)</span>
+              <span className="text-lg font-bold text-rose-600">+{surgeMultiplier}%</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Global Compact Filter Bar */}

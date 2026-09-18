@@ -11,6 +11,7 @@ import {
   apiIndex, apiRoutes, apiAlerts, apiStatistics, apiAirlines, type ApiFilters,
 } from '@/lib/api';
 import { ArrowUpRight, ArrowDownRight, Minus, Loader2 } from 'lucide-react';
+import { InsightBot, DASHBOARD_OVERVIEW_INSIGHTS } from '@/components/InsightBot';
 
 export function DashboardPage() {
   const { filters, lastUpdate, setIsUiLoading } = useApp();
@@ -101,6 +102,13 @@ export function DashboardPage() {
               </span>
             )}
           </div>
+
+          <InsightBot
+            title="National Airfare Index"
+            subtitle="Composite dashboard overview"
+            insights={DASHBOARD_OVERVIEW_INSIGHTS}
+            triggerLabel="What is this?"
+          />
         </div>
       </section>
 

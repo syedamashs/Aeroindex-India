@@ -7,6 +7,7 @@ import { formatINR, formatPercent } from '@/data/random';
 import { indexTooltipFormatter } from '@/components/chartFormatters';
 import { apiIndex, apiRoutes, type ApiRouteStats } from '@/lib/api';
 import { ArrowUpRight, ArrowDownRight, RotateCcw, Sliders, Info } from 'lucide-react';
+import { InsightBot, INDEX_TRAJECTORY_INSIGHTS, ROUTE_CONTRIBUTION_INSIGHTS } from '@/components/InsightBot';
 
 export function IndexPage() {
   const { lastUpdate, showToast } = useApp();
@@ -16,6 +17,14 @@ export function IndexPage() {
   const [showWeights, setShowWeights] = useState(false);
   const [showFormula, setShowFormula] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  const yDomain = useMemo(() => {
+    const vals = indexPoints.map((p) => p.indexValue).filter(Boolean);
+    if (!vals.length) return [90, 115];
+    const min = Math.min(...vals);
+    const max = Math.max(...vals);
+    return [Math.floor(min - 3), Math.ceil(max + 3)] as [number, number];
+  }, [indexPoints]);
 
   useEffect(() => {
     setLoading(true);
@@ -186,7 +195,14 @@ export function IndexPage() {
               Time-series progression of Laspeyres index relative to January 2026 benchmark
             </p>
           </div>
-          <span className="text-[11px] font-mono text-slate-500">Fixed-Basket Model</span>
+          <div className="flex items-center gap-2">
+            <InsightBot
+              title="National Airfare Index Trajectory"
+              subtitle="Jan 2026 – present"
+              insights={INDEX_TRAJECTORY_INSIGHTS}
+            />
+            <span className="text-[11px] font-mono text-slate-500">Fixed-Basket Model</span>
+          </div>
         </div>
 
         <div className="h-72 w-full">
@@ -200,7 +216,7 @@ export function IndexPage() {
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
               <XAxis dataKey="monthLabel" stroke="#a8a29e" fontSize={11} tickLine={false} axisLine={{ stroke: '#e7e5e4' }} />
-              <YAxis domain={[85, 125]} stroke="#a8a29e" fontSize={11} tickLine={false} axisLine={{ stroke: '#e7e5e4' }} />
+              <YAxis domain={yDomain} stroke="#a8a29e" fontSize={11} tickLine={false} axisLine={{ stroke: '#e7e5e4' }} />
               <Tooltip formatter={indexTooltipFormatter} />
               <ReferenceLine y={100} stroke="#a8a29e" strokeDasharray="3 3" label={{ value: 'Benchmark Base (100.0)', fill: '#78716c', fontSize: 10, position: 'insideTopRight' }} />
               <Area type="monotone" dataKey="indexValue" stroke="#c2410c" strokeWidth={2} fillOpacity={1} fill="url(#indexFill)" />
@@ -218,7 +234,14 @@ export function IndexPage() {
             </h2>
             <p className="text-[11px] text-slate-400">Weighted points contributed to the current monthly change</p>
           </div>
-          <span className="text-[11px] text-slate-400">Δ = (MoM Shift × Basket Weight)</span>
+          <div className="flex items-center gap-2">
+            <InsightBot
+              title="Route Contribution Analysis"
+              subtitle="MoM Weighted Shifts"
+              insights={ROUTE_CONTRIBUTION_INSIGHTS}
+            />
+            <span className="text-[11px] text-slate-400">Δ = (MoM Shift × Basket Weight)</span>
+          </div>
         </div>
 
         <div className="bg-white border border-slate-200 rounded-lg p-4 space-y-3">
