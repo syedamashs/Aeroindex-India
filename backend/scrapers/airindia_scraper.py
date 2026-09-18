@@ -1953,8 +1953,20 @@ def run(task):
                     wait_until="domcontentloaded",
                     timeout=120000,
                 )
-                page.wait_for_timeout(5000)
+                # Wait longer for JS-heavy booking widget to fully render
+                page.wait_for_timeout(8000)
                 close_popups(page)
+
+                # Wait explicitly for airport input to appear (up to 30s)
+                try:
+                    page.wait_for_selector(
+                        'input[aria-label="Select origin airport"]',
+                        timeout=30000,
+                    )
+                except Exception:
+                    raise RuntimeError(
+                        "Air India booking widget did not load (airport input not found after 30s)"
+                    )
 
                 airports = page.locator('input[aria-label="Select origin airport"]')
                 if airports.count() < 2:
