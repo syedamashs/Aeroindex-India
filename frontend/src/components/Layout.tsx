@@ -9,10 +9,12 @@ import {
   Loader2,
   ChevronDown,
   ArrowUpRight,
+  Compass,
 } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { apiRunScheduler, apiSchedulerStatus, apiStatistics, type SchedulerTaskStatus } from '@/lib/api';
 import { AviationTickerTape } from '@/components/animation/AviationTickerTape';
+import { PlatformGuideModal } from '@/components/PlatformGuideModal';
 
 interface NavItem {
   to: string;
@@ -97,6 +99,7 @@ export function Layout({ children }: { children: ReactNode }) {
   const [schedulerTasks, setSchedulerTasks] = useState<SchedulerTaskStatus[]>([]);
   const [backendReady, setBackendReady] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
 
   const canScrape = !isUiLoading && backendReady && !schedulerRunning && !isRefreshing;
   const [selectedSchedulerAirlines, setSelectedSchedulerAirlines] = useState<string[]>(SCHEDULER_AIRLINES.map((a) => a.value));
@@ -297,6 +300,19 @@ export function Layout({ children }: { children: ReactNode }) {
               </span>
             </div>
 
+            {/* SIH Interactive Platform Guide / App Tour Button */}
+            <button
+              onClick={() => setGuideOpen(true)}
+              className="relative group flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-500/25 via-orange-500/20 to-amber-500/25 hover:from-amber-500/35 hover:to-orange-500/35 text-amber-300 hover:text-white border border-amber-500/60 hover:border-amber-400 text-xs font-semibold shadow-xs transition-all cursor-pointer overflow-hidden ring-1 ring-amber-500/30"
+              title="SIH Interactive Platform Walkthrough & Evaluation Guide"
+            >
+              <Compass className="w-3.5 h-3.5 text-amber-400 animate-spin-slow" />
+              <span className="font-sans font-bold tracking-wide">Platform Guide</span>
+              <span className="hidden sm:inline-block px-1.5 py-0.2 text-[9px] font-mono font-extrabold uppercase rounded bg-amber-400 text-slate-950">
+                Tour
+              </span>
+            </button>
+
             {/* Live Scraping Trigger Button - Only enabled after backend DB fetched and UI ready */}
             <button
               onClick={openSchedulerModal}
@@ -485,7 +501,18 @@ export function Layout({ children }: { children: ReactNode }) {
             ))}
           </div>
 
-          <div className="pt-4 border-t border-[#292524]">
+          <div className="pt-4 border-t border-[#292524] space-y-2">
+            <button
+              onClick={() => {
+                setGuideOpen(true);
+                setMobileOpen(false);
+              }}
+              className="w-full flex items-center justify-center gap-2 py-2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/50 text-xs font-bold"
+            >
+              <Compass className="w-3.5 h-3.5 text-amber-400" />
+              <span>Launch SIH Platform Tour</span>
+            </button>
+
             <button
               onClick={() => {
                 if (canScrape) {
@@ -726,6 +753,13 @@ export function Layout({ children }: { children: ReactNode }) {
           </div>
         </div>
       )}
+      {/* =========================================================================
+          SIH INTERACTIVE PLATFORM WALKTHROUGH GUIDE MODAL
+          ========================================================================= */}
+      <PlatformGuideModal
+        isOpen={guideOpen}
+        onClose={() => setGuideOpen(false)}
+      />
     </div>
   );
 }

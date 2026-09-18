@@ -8,6 +8,7 @@ import { indexTooltipFormatter } from '@/components/chartFormatters';
 import { apiIndex, apiRoutes, type ApiRouteStats } from '@/lib/api';
 import { ArrowUpRight, ArrowDownRight, RotateCcw, Sliders, Info } from 'lucide-react';
 import { InsightBot, INDEX_TRAJECTORY_INSIGHTS, ROUTE_CONTRIBUTION_INSIGHTS } from '@/components/InsightBot';
+import { FlightTrajectoryChart } from '@/components/FlightTrajectoryChart';
 
 export function IndexPage() {
   const { lastUpdate, showToast } = useApp();
@@ -184,46 +185,18 @@ export function IndexPage() {
         </div>
       </section>
 
-      {/* 3. PRIMARY TIME-SERIES CHART */}
-      <section className="bg-white border border-slate-200 rounded-lg p-5">
-        <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
-          <div>
-            <h2 className="text-sm font-semibold text-slate-900">
-              National Airfare Price Index (Base = 100)
-            </h2>
-            <p className="text-[11px] text-slate-400 mt-0.5">
-              Time-series progression of Laspeyres index relative to January 2026 benchmark
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <InsightBot
-              title="National Airfare Index Trajectory"
-              subtitle="Jan 2026 – present"
-              insights={INDEX_TRAJECTORY_INSIGHTS}
-            />
-            <span className="text-[11px] font-mono text-slate-500">Fixed-Basket Model</span>
-          </div>
-        </div>
+      {/* 3. PRIMARY TIME-SERIES CHART WITH FLIGHT SIMULATION */}
+      <FlightTrajectoryChart
+        data={indexPoints}
+        loading={loading}
+        title="National Airfare Price Index (Base = 100)"
+        subtitle="Time-series progression of Laspeyres index relative to January 2026 benchmark"
+        showModeSwitcher={false}
+        defaultMode="index"
+        showInsightBot={true}
+        botInsights={INDEX_TRAJECTORY_INSIGHTS}
+      />
 
-        <div className="h-72 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={indexPoints} margin={{ top: 10, right: 12, left: -10, bottom: 0 }}>
-              <defs>
-                <linearGradient id="indexFill" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#c2410c" stopOpacity={0.12} />
-                  <stop offset="95%" stopColor="#c2410c" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-              <XAxis dataKey="monthLabel" stroke="#a8a29e" fontSize={11} tickLine={false} axisLine={{ stroke: '#e7e5e4' }} />
-              <YAxis domain={yDomain} stroke="#a8a29e" fontSize={11} tickLine={false} axisLine={{ stroke: '#e7e5e4' }} />
-              <Tooltip formatter={indexTooltipFormatter} />
-              <ReferenceLine y={100} stroke="#a8a29e" strokeDasharray="3 3" label={{ value: 'Benchmark Base (100.0)', fill: '#78716c', fontSize: 10, position: 'insideTopRight' }} />
-              <Area type="monotone" dataKey="indexValue" stroke="#c2410c" strokeWidth={2} fillOpacity={1} fill="url(#indexFill)" />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-      </section>
 
       {/* 4. ROUTE CONTRIBUTION TO INDEX MOVEMENT */}
       <section className="space-y-3">

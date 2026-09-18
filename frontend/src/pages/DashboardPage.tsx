@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Area, AreaChart,
 } from 'recharts';
@@ -11,7 +11,8 @@ import {
   apiIndex, apiRoutes, apiAlerts, apiStatistics, apiAirlines, type ApiFilters,
 } from '@/lib/api';
 import { ArrowUpRight, ArrowDownRight, Minus, Loader2 } from 'lucide-react';
-import { InsightBot, DASHBOARD_OVERVIEW_INSIGHTS } from '@/components/InsightBot';
+import { InsightBot, DASHBOARD_OVERVIEW_INSIGHTS, INDEX_TRAJECTORY_INSIGHTS } from '@/components/InsightBot';
+import { FlightTrajectoryChart } from '@/components/FlightTrajectoryChart';
 
 export function DashboardPage() {
   const { filters, lastUpdate, setIsUiLoading } = useApp();
@@ -26,6 +27,14 @@ export function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [chartMode, setChartMode] = useState<'index' | 'fare'>('index');
   const [routePage, setRoutePage] = useState(1);
+
+  const indexYDomain = useMemo(() => {
+    const vals = indexPoints.map((p: any) => p.indexValue).filter(Boolean);
+    if (!vals.length) return [90, 115] as [number, number];
+    const min = Math.min(...vals);
+    const max = Math.max(...vals);
+    return [Math.floor(min - 3), Math.ceil(max + 3)] as [number, number];
+  }, [indexPoints]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -180,85 +189,17 @@ export function DashboardPage() {
         </div>
       </section>
 
-      {/* 3. PRIMARY TIME-SERIES CHART */}
-      <section className="bg-white border border-slate-200 rounded-lg p-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-slate-100 gap-2">
-          <div>
-            <h2 className="text-sm font-semibold text-slate-900">
-              {chartMode === 'index' ? 'National Airfare Index Trajectory' : 'Average Market Ticket Fare (INR)'}
-            </h2>
-            <p className="text-[11px] text-slate-400 mt-0.5">
-              Monthly weighted cohort aggregation across monitored domestic city-pairs
-            </p>
-          </div>
+      {/* 3. PRIMARY TIME-SERIES CHART WITH FLIGHT SIMULATION */}
+      <FlightTrajectoryChart
+        data={indexPoints}
+        loading={loading}
+        title="National Airfare Index Trajectory"
+        subtitle="Monthly weighted cohort aggregation across monitored domestic city-pairs"
+        showModeSwitcher={true}
+        showInsightBot={true}
+        botInsights={INDEX_TRAJECTORY_INSIGHTS}
+      />
 
-          <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded border border-slate-200 self-start sm:self-auto">
-            <button
-              onClick={() => setChartMode('index')}
-              className={`px-2.5 py-1 text-xs font-medium rounded ${chartMode === 'index' ? 'bg-white text-slate-900 shadow-xs font-semibold' : 'text-slate-600 hover:text-slate-900'
-                }`}
-            >
-              Composite Index
-            </button>
-            <button
-              onClick={() => setChartMode('fare')}
-              className={`px-2.5 py-1 text-xs font-medium rounded ${chartMode === 'fare' ? 'bg-white text-slate-900 shadow-xs font-semibold' : 'text-slate-600 hover:text-slate-900'
-                }`}
-            >
-              Average Fare (₹)
-            </button>
-          </div>
-        </div>
-
-        {loading ? (
-          <div className="h-64 flex items-center justify-center text-xs text-slate-400 font-mono">
-            Loading time series...
-          </div>
-        ) : (
-          <div className="h-64 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={indexPoints} margin={{ top: 10, right: 12, left: -10, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#c2410c" stopOpacity={0.12} />
-                    <stop offset="95%" stopColor="#c2410c" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                <XAxis
-                  dataKey="monthLabel"
-                  stroke="#a8a29e"
-                  fontSize={11}
-                  tickLine={false}
-                  axisLine={{ stroke: '#e7e5e4' }}
-                />
-                <YAxis
-                  domain={chartMode === 'index' ? [80, 130] : ['auto', 'auto']}
-                  stroke="#a8a29e"
-                  fontSize={11}
-                  tickLine={false}
-                  axisLine={{ stroke: '#e7e5e4' }}
-                  tickFormatter={chartMode === 'fare' ? (v) => `₹${(v / 1000).toFixed(0)}k` : (v) => v.toFixed(0)}
-                />
-                <Tooltip
-                  formatter={chartMode === 'index' ? indexTooltipFormatter : genericFareTooltipFormatter}
-                />
-                {chartMode === 'index' && (
-                  <ReferenceLine y={100} stroke="#a8a29e" strokeDasharray="4 4" label={{ value: 'Base 100.0', fill: '#78716c', fontSize: 10, position: 'right' }} />
-                )}
-                <Area
-                  type="monotone"
-                  dataKey={chartMode === 'index' ? 'indexValue' : 'averageFare'}
-                  stroke="#c2410c"
-                  strokeWidth={2}
-                  fillOpacity={1}
-                  fill="url(#chartGradient)"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        )}
-      </section>
 
       {/* 4. ROUTE ACTIVITY TABLE (PAGINATED 10 PER PAGE) */}
       {(() => {
