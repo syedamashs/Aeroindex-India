@@ -105,6 +105,7 @@ export function Layout({ children }: { children: ReactNode }) {
   const [schedulerResult, setSchedulerResult] = useState<{
     kind: 'success' | 'warning' | 'error';
     message: string;
+    errorDetail?: string | null;
     observationsBefore?: number;
     observationsAfter?: number;
     observationsInserted?: number;
@@ -118,22 +119,18 @@ export function Layout({ children }: { children: ReactNode }) {
         if (isMounted) setBackendReady(true);
       })
       .catch(() => {
-        const retryTimer = setTimeout(() => {
-          apiStatistics()
-            .then(() => {
-              if (isMounted) setBackendReady(true);
-            })
-            .catch(() => {
-              if (isMounted) setBackendReady(false);
-            });
-        }, 1500);
-        return () => clearTimeout(retryTimer);
+        if (isMounted) setBackendReady(false);
       });
 
     return () => {
       isMounted = false;
     };
-  }, [lastUpdate]);
+  }, []);
+
+  // Sync canScrape state to AppContext so pages can disable their triggers
+  useEffect(() => {
+    setIsScrapingActive(schedulerRunning || isRefreshing);
+  }, [schedulerRunning, isRefreshing, setIsScrapingActive]);
 
   const dropdownContainerRef = useRef<HTMLDivElement>(null);
 
@@ -156,9 +153,9 @@ export function Layout({ children }: { children: ReactNode }) {
 
   const openSchedulerModal = () => {
     setSchedulerResult(null);
-    setSelectedSchedulerAirlines(SCHEDULER_AIRLINES.map((airline) => airline.value));
-    setSelectedSchedulerLeadTimes([...SCHEDULER_LEAD_TIMES]);
-    setSelectedSchedulerRoutes(SCHEDULER_ROUTES.map((route) => route.value));
+    setSelectedSchedulerAirlines(['indigo']);
+    setSelectedSchedulerLeadTimes([7]);
+    setSelectedSchedulerRoutes(['DELHI_MUMBAI']);
     setSchedulerModalOpen(true);
   };
 
@@ -207,8 +204,9 @@ export function Layout({ children }: { children: ReactNode }) {
       const result = await apiRunScheduler(selection);
       await pollProgress();
       setSchedulerResult({
-        kind: result.observationsInserted === 0 ? 'warning' : result.uploadCompleted ? 'success' : 'warning',
+        kind: !result.schedulerSucceeded ? 'error' : result.observationsInserted === 0 ? 'warning' : result.uploadCompleted ? 'success' : 'warning',
         message: result.message,
+        errorDetail: result.errorDetail,
         observationsBefore: result.observationsBefore,
         observationsAfter: result.observationsAfter,
         observationsInserted: result.observationsInserted,
@@ -220,6 +218,7 @@ export function Layout({ children }: { children: ReactNode }) {
         setIsRefreshing(false);
       }, 1200);
     } catch (error) {
+      await pollProgress();
       setSchedulerResult({
         kind: 'error',
         message: error instanceof Error ? error.message : 'Unable to run the scheduler.',
@@ -642,26 +641,33 @@ export function Layout({ children }: { children: ReactNode }) {
                       <div className="p-3 text-stone-400 text-center font-mono">Initializing Playwright worker...</div>
                     ) : (
                       schedulerTasks.map((task) => (
-                        <div key={task.task_id} className="p-2 flex items-center justify-between text-[11px]">
-                          <div>
-                            <span className="font-semibold text-stone-800">{task.source.toUpperCase()}</span>
-                            <span className="text-stone-400 ml-1.5 font-mono">
-                              T+{task.target_lead_days} · {task.departure_date}
+                        <div key={task.task_id} className="p-2 text-[11px]">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <span className="font-semibold text-stone-800">{task.source.toUpperCase()}</span>
+                              <span className="text-stone-400 ml-1.5 font-mono">
+                                T+{task.target_lead_days} · {task.departure_date}
+                              </span>
+                            </div>
+                            <span
+                              className={`px-1.5 py-0.5 rounded text-[10px] font-mono ${
+                                task.status === 'SUCCESS'
+                                  ? 'bg-emerald-100 text-emerald-800'
+                                  : task.status === 'FAILED'
+                                  ? 'bg-rose-100 text-rose-800'
+                                  : task.status === 'RUNNING'
+                                  ? 'bg-amber-100 text-amber-800'
+                                  : 'bg-stone-200 text-stone-700'
+                              }`}
+                            >
+                              {task.status}
                             </span>
                           </div>
-                          <span
-                            className={`px-1.5 py-0.5 rounded text-[10px] font-mono ${
-                              task.status === 'SUCCESS'
-                                ? 'bg-emerald-100 text-emerald-800'
-                                : task.status === 'FAILED'
-                                ? 'bg-rose-100 text-rose-800'
-                                : task.status === 'RUNNING'
-                                ? 'bg-amber-100 text-amber-800'
-                                : 'bg-stone-200 text-stone-700'
-                            }`}
-                          >
-                            {task.status}
-                          </span>
+                          {task.status === 'FAILED' && (task.error_message || task.error_type) && (
+                            <p className="mt-1 text-[10px] font-mono text-rose-700 break-words bg-rose-50 p-1 rounded">
+                              {task.error_type ? `${task.error_type}: ` : ''}{task.error_message}
+                            </p>
+                          )}
                         </div>
                       ))
                     )}
@@ -685,8 +691,13 @@ export function Layout({ children }: { children: ReactNode }) {
                     ) : (
                       <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />
                     )}
-                    <div>
+                    <div className="min-w-0 flex-1">
                       <p className="font-medium">{schedulerResult.message}</p>
+                      {schedulerResult.errorDetail && (
+                        <p className="mt-1.5 p-2 rounded bg-rose-100/80 border border-rose-300 text-[11px] font-mono text-rose-900 break-words">
+                          {schedulerResult.errorDetail}
+                        </p>
+                      )}
                       {schedulerResult.observationsAfter !== undefined && (
                         <p className="mt-1 text-[11px] text-stone-600 font-mono">
                           Records: {schedulerResult.observationsBefore?.toLocaleString()} →{' '}

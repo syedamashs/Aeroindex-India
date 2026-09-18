@@ -1861,7 +1861,8 @@ def run(task):
     raw_dir = output_dir / "raw" / "airindia"
     raw_dir.mkdir(parents=True, exist_ok=True)
 
-    profile_dir = str(task.get("profile_dir") or (Path.home() / ".apix" / "profiles" / "airindia"))
+    profile_dir = Path(task.get("profile_dir") or (Path.home() / ".apix" / "profiles" / "airindia"))
+    profile_dir.mkdir(parents=True, exist_ok=True)
 
     collection_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     result = {
@@ -1891,12 +1892,21 @@ def run(task):
         print(f"target lead: T+{target_lead_days}")
 
         with sync_playwright() as p:
+            is_headless = (
+                str(os.getenv("APIX_HEADLESS", "true" if os.name != "nt" else "false")).lower()
+                == "true"
+            )
             browser_options = {
-                "user_data_dir": profile_dir,
-                "headless": str(os.getenv("APIX_HEADLESS", "false")).lower() == "true",
+                "user_data_dir": str(profile_dir),
+                "headless": is_headless,
                 "args": [
                     "--disable-blink-features=AutomationControlled",
                     "--disable-web-security",
+                    "--no-sandbox",
+                    "--disable-setuid-sandbox",
+                    "--disable-dev-shm-usage",
+                    "--disable-gpu",
+                    "--no-first-run",
                 ],
                 "viewport": {"width": 1400, "height": 900},
             }

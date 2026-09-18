@@ -55,7 +55,7 @@ DEFAULT_CURRENCY = "INR"
 
 BROWSER_HEADLESS = os.getenv(
     "APIX_HEADLESS",
-    "false",
+    "true" if os.name != "nt" else "false",
 ).lower() == "true"
 
 BROWSER_TIMEOUT_MS = int(

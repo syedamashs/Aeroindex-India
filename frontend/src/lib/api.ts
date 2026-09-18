@@ -31,6 +31,7 @@ export async function apiHealth() {
 export async function apiRunScheduler(options: { airlines: string[]; leadTimes: number[]; routes: string[] }) {
   return request<{
     message: string;
+    errorDetail?: string | null;
     schedulerSucceeded: boolean;
     uploadCompleted: boolean;
     observationsBefore: number;

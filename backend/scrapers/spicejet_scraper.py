@@ -231,8 +231,8 @@ def run(task):
     profile_dir = Path(task.get("profile_dir") or (Path.home() / ".apix" / "profiles" / "spicejet"))
     profile_dir.parent.mkdir(parents=True, exist_ok=True)
 
-    source_url = str(task.get("source_url") or os.getenv("APIX_SPICEJET_URL", "https://www.spicejet.com/"))
-    headless = str(task.get("headless", os.getenv("APIX_HEADLESS", "false"))).lower() == "true"
+    default_headless = "true" if os.name != "nt" else "false"
+    headless = str(task.get("headless", os.getenv("APIX_HEADLESS", default_headless))).lower() == "true"
     timeout_ms = int(task.get("timeout_ms") or os.getenv("APIX_BROWSER_TIMEOUT_MS", "120000"))
     collection_timestamp = datetime.now().isoformat(timespec="seconds")
     result = {
@@ -245,7 +245,17 @@ def run(task):
 
     try:
         with sync_playwright() as playwright:
-            browser_options = {"headless": headless}
+            browser_options = {
+                "headless": headless,
+                "args": [
+                    "--disable-blink-features=AutomationControlled",
+                    "--no-sandbox",
+                    "--disable-setuid-sandbox",
+                    "--disable-dev-shm-usage",
+                    "--disable-gpu",
+                    "--no-first-run",
+                ],
+            }
             browser_channel = os.getenv("APIX_BROWSER_CHANNEL")
             if browser_channel:
                 browser_options["channel"] = browser_channel

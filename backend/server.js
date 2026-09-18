@@ -1082,11 +1082,13 @@ app.post('/api/scheduler/run', (req, res) => {
     return res.status(400).json({ message: 'Select at least one airline, route, and booking window.' });
   }
 
+  const isHeadless = process.env.APIX_HEADLESS || (process.platform === 'win32' ? 'false' : 'true');
   schedulerProcess = spawn(process.env.PYTHON_EXECUTABLE || 'python', [schedulerPath], {
     cwd: __dirname,
     windowsHide: true,
     env: {
       ...process.env,
+      APIX_HEADLESS: isHeadless,
       APIX_SCHEDULER_AIRLINES: airlines.join(','),
       APIX_SCHEDULER_LEAD_TIMES: leadTimes.join(','),
       APIX_SCHEDULER_ROUTES: routes.join(','),
@@ -1124,27 +1126,55 @@ app.post('/api/scheduler/run', (req, res) => {
       return res.status(500).json({ message: `Scheduler finished, but the database could not be read: ${error.message}` });
     }
 
+    const observationsInserted = observationsAfter - observationsBefore;
+    const hasFailures = output.includes('STAGE A COMPLETED WITH FAILURES') || code !== 0;
     const uploadCompleted = output.includes('Updated database uploaded to Hugging Face:');
+    const uploadFailedMatch = output.match(/Hugging Face database upload failed:\s*([^\r\n]+)/);
+    const uploadFailedReason = uploadFailedMatch ? uploadFailedMatch[1].trim() : null;
+    const taskFailureMatch = output.match(/FAILED\s*—\s*([^\r\n]+)/);
+    const taskFailureReason = taskFailureMatch ? taskFailureMatch[1].trim() : null;
     const noObservationsFound = output.includes('NO OBSERVATIONS FOUND FOR THE SELECTED FILTERS');
-    const schedulerSucceeded = code === 0;
+
+    let message = '';
+    let schedulerSucceeded = false;
+
+    if (hasFailures) {
+      schedulerSucceeded = false;
+      if (observationsInserted > 0) {
+        message = `Partial scrape: ${observationsInserted} new observations saved, but some tasks failed. (${taskFailureReason || 'Check worker logs'})`;
+      } else {
+        message = `Scraper failed: ${taskFailureReason || 'Unable to collect tariff observations. Check carrier distribution engine or network.'}`;
+      }
+    } else if (observationsInserted > 0) {
+      schedulerSucceeded = true;
+      if (uploadCompleted) {
+        message = `Live scraping completed successfully! Added ${observationsInserted} new records and uploaded database to Hugging Face.`;
+      } else if (uploadFailedReason) {
+        message = `Live scraping added ${observationsInserted} new records locally, but Hugging Face upload failed: ${uploadFailedReason}`;
+      } else {
+        message = `Live scraping added ${observationsInserted} new records locally.`;
+      }
+    } else if (noObservationsFound) {
+      schedulerSucceeded = true;
+      message = 'Scraper completed, but no flights were found for the selected corridor and booking window.';
+    } else {
+      schedulerSucceeded = code === 0;
+      message = schedulerSucceeded
+        ? 'Scraper finished with 0 new records.'
+        : `Scheduler failed with exit code ${code}.`;
+    }
+
     const response = {
-      message: schedulerSucceeded && observationsAfter === observationsBefore && uploadCompleted
-        ? 'No observations found for the selected filters.'
-        : schedulerSucceeded && noObservationsFound
-          ? 'No observations found for the selected filters.'
-        : schedulerSucceeded && uploadCompleted
-        ? 'Stage-A scheduler completed and the database was uploaded to Hugging Face.'
-        : schedulerSucceeded
-          ? 'Stage-A scheduler completed, but the database upload to Hugging Face failed.'
-          : 'Stage-A scheduler failed. The database was not uploaded.',
+      message,
+      errorDetail: taskFailureReason || uploadFailedReason || null,
       schedulerSucceeded,
       uploadCompleted,
       observationsBefore,
       observationsAfter,
-      observationsInserted: observationsAfter - observationsBefore,
+      observationsInserted,
     };
 
-    res.status(schedulerSucceeded ? 200 : 502).json(response);
+    res.status(schedulerSucceeded ? 200 : (hasFailures ? 502 : 200)).json(response);
   });
 });
 

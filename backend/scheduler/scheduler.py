@@ -606,6 +606,9 @@ def run_stage_a():
         safe_print(
             "STAGE A COMPLETED WITH FAILURES"
         )
+        if failed >= len(tasks):
+            safe_print("=" * 60)
+            sys.exit(1)
 
     safe_print("=" * 60)
 

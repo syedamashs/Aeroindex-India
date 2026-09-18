@@ -780,7 +780,8 @@ def run(task):
     destination = str(task["destination"]).upper()
     departure_date = str(task["departure_date"])
     target_lead_days = int(task["target_lead_days"])
-    headless = str(task.get("headless", os.getenv("APIX_HEADLESS", "false"))).lower() == "true"
+    default_headless = "true" if os.name != "nt" else "false"
+    headless = str(task.get("headless", os.getenv("APIX_HEADLESS", default_headless))).lower() == "true"
 
     origin_query = str(task.get("origin_query") or origin)
     destination_query = str(task.get("destination_query") or destination)
@@ -816,6 +817,11 @@ def run(task):
                 "args": [
                     "--disable-blink-features=AutomationControlled",
                     "--disable-features=IsolateOrigins,site-per-process",
+                    "--no-sandbox",
+                    "--disable-setuid-sandbox",
+                    "--disable-dev-shm-usage",
+                    "--disable-gpu",
+                    "--no-first-run",
                 ],
             }
             browser_channel = os.getenv("APIX_BROWSER_CHANNEL")
