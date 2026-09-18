@@ -169,7 +169,7 @@ export async function apiInsights(filters?: ApiFilters) {
 
 export async function apiStatistics(filters?: ApiFilters) {
   const qs = buildQueryString(filters || {});
-  return request<{ data: { index: number; momChange: number; routesMonitored: number; airlinesMonitored: number; totalObservations: number; highPriceRoutes: number; dataFreshness: string; dataQuality: number; minFare: number; maxFare: number; averageFare: number } }>(`/api/statistics${qs}`);
+  return request<{ data: { index: number; momChange: number; routesMonitored: number; airlinesMonitored: number; otasActive?: number; totalObservations: number; highPriceRoutes: number; dataFreshness: string; dataQuality: number; minFare: number; maxFare: number; averageFare: number } }>(`/api/statistics${qs}`);
 }
 
 export async function apiDataSource() {

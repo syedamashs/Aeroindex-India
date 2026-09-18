@@ -1,0 +1,32 @@
+# Node dependencies
+node_modules/
+
+# Local env secrets
+.env
+.env.*
+!.env.example
+
+# Database files (downloaded from Hugging Face at deployment build time)
+data/
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+
+# Python caches and virtual environments
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Logs
+logs/
+*.log
+
+# Scraper browser sessions
+.airindia_playwright_profile/
+.spicejet_playwright_profile/
+.indigo_chrome_profile/
+.makemytrip_playwright_profile/
+.apix/

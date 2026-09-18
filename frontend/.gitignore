@@ -10,6 +10,9 @@ node_modules
 dist
 dist-ssr
 *.local
+.vite
+*.tsbuildinfo
+.bolt
 
 .vscode/*
 !.vscode/extensions.json

@@ -117,11 +117,11 @@ export function TelemetryFeed({ maxLogs = 12 }: { maxLogs?: number }) {
           {filteredLogs.map((log) => {
             const badgeColor =
               log.channel === 'SCRAPER'
-                ? 'text-cyan-400 bg-cyan-950/60 border-cyan-800/60'
+                ? 'text-amber-300 bg-amber-950/60 border-amber-800/60'
                 : log.channel === 'DQE'
                 ? 'text-emerald-400 bg-emerald-950/60 border-emerald-800/60'
                 : log.channel === 'INDEX'
-                ? 'text-indigo-400 bg-indigo-950/60 border-indigo-800/60'
+                ? 'text-stone-300 bg-stone-900 border-stone-700'
                 : 'text-amber-400 bg-amber-950/60 border-amber-800/60';
 
             return (

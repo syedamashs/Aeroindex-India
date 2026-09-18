@@ -16,6 +16,8 @@ interface AppContextValue {
   triggerUpdate: (count?: number) => void;
   toast: ToastMsg | null;
   showToast: (message: string, type?: 'success' | 'info' | 'warning') => void;
+  isUiLoading: boolean;
+  setIsUiLoading: (loading: boolean) => void;
 }
 
 const DEFAULT_FILTERS: Filters = {
@@ -36,6 +38,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [demoMode, setDemoMode] = useState(true);
   const [lastUpdate, setLastUpdate] = useState(Date.now());
   const [toast, setToast] = useState<ToastMsg | null>(null);
+  const [isUiLoading, setIsUiLoading] = useState(true);
 
   const setFilters = useCallback((f: Partial<Filters>) => {
     setFiltersState((prev) => ({ ...prev, ...f }));
@@ -50,6 +53,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const triggerUpdate = useCallback(
     (count = 200) => {
+      setIsUiLoading(true);
       setLastUpdate(Date.now());
       showToast('Dashboard refreshed from the current SQLite database.', 'success');
     },
@@ -68,6 +72,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         triggerUpdate,
         toast,
         showToast,
+        isUiLoading,
+        setIsUiLoading,
       }}
     >
       {children}

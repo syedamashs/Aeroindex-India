@@ -49,7 +49,7 @@ export function LandingPage() {
       icon: PlaneIcon,
       title: 'Carrier Benchmark Intelligence',
       desc: 'Live comparison of average, median, and dynamic pricing spread across scheduled carriers including IndiGo, Air India, and Akasa.',
-      color: 'text-blue-600 bg-blue-50 ring-blue-200/50',
+      color: 'text-amber-800 bg-amber-50 ring-amber-200/50',
     },
     {
       icon: Clock,
@@ -222,7 +222,7 @@ export function LandingPage() {
             ['FEP', '88.9%', 'T+45 → T+1', 'text-amber-600'],
             ['ROUTE WATCH', 'DEL → BOM', '+13.7%', 'text-rose-600'],
             ['COVERAGE', '152 ROUTES', 'DGCA BASKET', 'text-emerald-600'],
-            ['ESTIMATOR', 'JEVONS', 'LOG-STABLE', 'text-blue-600'],
+            ['ESTIMATOR', 'JEVONS', 'LOG-STABLE', 'text-stone-700'],
           ].map(([label, value, detail, color], index) => <span key={`${copy}-${label}`} className="flex items-center gap-2"><span>{label}</span><strong className={color}>{value}</strong><span className="text-slate-300">{detail}</span><span className="text-slate-200">/</span></span>))}
         </div>
       </div>
@@ -239,9 +239,9 @@ export function LandingPage() {
           </div>
 
           <div className="relative grid gap-4 md:grid-cols-3">
-            <div className="landing-pipeline-line absolute left-[16%] right-[16%] top-14 hidden h-px bg-gradient-to-r from-blue-200 via-emerald-300 to-amber-200 md:block" />
+            <div className="landing-pipeline-line absolute left-[16%] right-[16%] top-14 hidden h-px bg-gradient-to-r from-stone-200 via-emerald-300 to-amber-200 md:block" />
             {[
-              { icon: ScanLine, step: '01', title: 'Observe', text: 'Collect fares across routes, carriers, OTAs, travel dates, and exact booking windows.', accent: 'bg-blue-50 text-blue-600 ring-blue-200', tag: '164,160 records' },
+              { icon: ScanLine, step: '01', title: 'Observe', text: 'Collect fares across routes, carriers, OTAs, travel dates, and exact booking windows.', accent: 'bg-stone-100 text-stone-800 ring-stone-200', tag: '164,160 records' },
               { icon: Layers3, step: '02', title: 'Compare', text: 'Validate identities, match comparable fare states, and estimate proportional movement with Jevons.', accent: 'bg-emerald-50 text-emerald-600 ring-emerald-200', tag: '152-route basket' },
               { icon: BellRing, step: '03', title: 'Act', text: 'Turn route pressure and booking premiums into prioritized alerts and policy-ready insight.', accent: 'bg-amber-50 text-amber-600 ring-amber-200', tag: '12 priority alerts' },
             ].map((item, index) => {

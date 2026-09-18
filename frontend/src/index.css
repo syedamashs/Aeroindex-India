@@ -6,447 +6,176 @@
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   }
   body {
-    @apply bg-slate-50 text-navy-900 font-sans antialiased;
+    @apply bg-[#faf8f5] text-stone-900 font-sans antialiased selection:bg-amber-200/60 selection:text-stone-900;
   }
   * {
-    @apply border-slate-200;
+    @apply border-stone-200;
   }
 }
 
 @layer components {
+  /* Editorial Canvas & Containers */
+  .editorial-card {
+    @apply bg-white border border-stone-200/90 rounded-lg shadow-xs;
+  }
+
+  .editorial-panel {
+    @apply bg-white border border-stone-200 rounded-md;
+  }
+
   .card {
-    @apply bg-white rounded-xl border border-slate-200 shadow-card;
+    @apply bg-white rounded-lg border border-stone-200 shadow-xs transition-colors;
   }
   .card-hover {
-    @apply transition-shadow duration-200 hover:shadow-card-hover;
+    @apply hover:border-stone-300;
   }
+
+  /* Analyst Buttons */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
   }
   .btn-primary {
-    @apply btn bg-navy-800 text-white hover:bg-navy-700 active:bg-navy-900;
+    @apply btn bg-stone-900 text-stone-50 hover:bg-stone-800 active:bg-stone-950;
   }
   .btn-secondary {
-    @apply btn bg-white text-navy-800 border border-slate-300 hover:bg-slate-50;
+    @apply btn bg-white text-stone-700 border border-stone-300 hover:bg-stone-50 active:bg-stone-100;
   }
   .btn-ghost {
-    @apply btn text-navy-600 hover:bg-navy-50;
+    @apply btn text-stone-600 hover:bg-stone-100 hover:text-stone-900;
   }
+  .btn-ochre {
+    @apply btn bg-amber-700 text-white hover:bg-amber-800 active:bg-amber-900;
+  }
+
+  /* Subtle Analyst Inputs */
   .input {
-    @apply w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-sm text-navy-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-navy-500/30 focus:border-navy-500 transition;
+    @apply w-full px-2.5 py-1.5 rounded-md border border-stone-300 bg-white text-xs text-stone-900 placeholder-stone-400 focus:outline-none focus:ring-1 focus:ring-amber-700 focus:border-amber-700 transition;
   }
   .select {
-    @apply input pr-8 appearance-none cursor-pointer;
+    @apply input pr-7 appearance-none cursor-pointer;
   }
+
+  /* Minimalist Semantic Badges - Warm Ochre & Terracotta Editorial */
   .badge {
-    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium;
+    @apply inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-medium leading-none;
   }
-  .badge-success { @apply badge bg-success-500/10 text-success-600; }
-  .badge-warning { @apply badge bg-warning-500/10 text-warning-600; }
-  .badge-danger  { @apply badge bg-danger-500/10 text-danger-600; }
-  .badge-navy    { @apply badge bg-navy-100 text-navy-700; }
-  .badge-slate   { @apply badge bg-slate-100 text-slate-600; }
+  .badge-success { @apply badge bg-emerald-50 text-emerald-800 border border-emerald-200; }
+  .badge-warning { @apply badge bg-amber-50 text-amber-800 border border-amber-200; }
+  .badge-danger  { @apply badge bg-rose-50 text-rose-800 border border-rose-200; }
+  .badge-ochre   { @apply badge bg-amber-50 text-amber-900 border border-amber-300; }
+  .badge-navy    { @apply badge bg-stone-100 text-stone-700 border border-stone-200; }
+  .badge-slate   { @apply badge bg-stone-100 text-stone-600 border border-stone-200; }
+
+  /* Typography Roles */
+  .page-title {
+    @apply text-xl lg:text-2xl font-semibold text-stone-900 tracking-tight;
+  }
+  .page-subtitle {
+    @apply text-xs text-stone-500 mt-1 max-w-3xl leading-relaxed;
+  }
   .section-title {
-    @apply text-lg font-display font-semibold text-navy-900;
+    @apply text-xs font-semibold uppercase tracking-wider text-stone-500;
   }
-  .section-subtitle {
-    @apply text-sm text-slate-500;
+  .section-heading {
+    @apply text-sm font-semibold text-stone-900;
   }
   .kpi-label {
-    @apply text-xs font-medium uppercase tracking-wider text-slate-500;
+    @apply text-[11px] font-medium uppercase tracking-wider text-stone-500;
   }
   .kpi-value {
-    @apply text-3xl font-display font-bold text-navy-900;
+    @apply text-2xl font-mono font-bold text-stone-900 tracking-tight;
   }
+
+  /* High-Density Data Tables */
   .table-th {
-    @apply px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap;
+    @apply px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-stone-500 bg-[#f7f5f0] border-b border-stone-200 whitespace-nowrap;
   }
   .table-td {
-    @apply px-4 py-3 text-sm text-navy-800 whitespace-nowrap;
+    @apply px-3 py-2 text-xs text-stone-800 border-b border-stone-100 whitespace-nowrap;
   }
   .table-row {
-    @apply border-t border-slate-100 hover:bg-slate-50 transition-colors;
+    @apply hover:bg-[#f7f5f0]/80 transition-colors;
   }
 
-  /* SIH Modern UI System */
-  .glass-card {
-    @apply bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200/80 shadow-sm transition-all duration-300;
-  }
-  .glass-card:hover {
-    @apply shadow-lg border-slate-300 -translate-y-0.5;
-  }
-  .glow-navy {
-    box-shadow: 0 0 25px -5px rgba(36, 70, 128, 0.25);
-  }
-  .glow-accent {
-    box-shadow: 0 0 25px -5px rgba(34, 197, 94, 0.25);
-  }
-  .glow-warning {
-    box-shadow: 0 0 25px -5px rgba(245, 158, 11, 0.25);
-  }
+  /* Neutral tabs */
   .pill-tab {
-    @apply px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-200;
+    @apply px-3 py-1 rounded text-xs font-medium transition-colors;
   }
   .pill-tab-active {
-    @apply bg-navy-900 text-white shadow-sm;
+    @apply bg-stone-900 text-white;
   }
   .pill-tab-inactive {
-    @apply bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-navy-900;
+    @apply text-stone-600 hover:bg-stone-100 hover:text-stone-900;
+  }
+
+  /* Legacy alias */
+  .glass-card {
+    @apply bg-white rounded-lg border border-stone-200 shadow-xs transition-colors;
   }
 }
 
-/* Leaflet overrides for professional look */
+/* Leaflet Overrides */
 .leaflet-container {
   font-family: 'Inter', system-ui, sans-serif;
-  font-size: 12px;
+  font-size: 11px;
 }
-
 .leaflet-popup-content-wrapper {
-  border-radius: 10px;
-  box-shadow: 0 4px 16px rgba(15, 29, 56, 0.15);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(28, 25, 23, 0.12);
+  border: 1px solid #e7e5e4;
+  background: #ffffff;
 }
-
 .leaflet-popup-content {
-  margin: 12px 14px;
+  margin: 10px 12px;
 }
-
 .leaflet-bar a {
-  border-radius: 6px !important;
+  border-radius: 4px !important;
+  border-color: #d6d3d1 !important;
 }
 
-/* Scrollbar */
+/* Subtle Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
-
 ::-webkit-scrollbar-track {
   background: transparent;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
+  background: #d6d3d1;
+  border-radius: 3px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #a8a29e;
 }
 
-html:has(.data-explorer-page),
-body:has(.data-explorer-page) {
-  scrollbar-width: none;
-  overflow-x: hidden;
-}
-body:has(.data-explorer-page)::-webkit-scrollbar { width: 0; height: 0; }
-
-/* Recharts tooltip */
+/* Recharts Tooltip Styling */
 .recharts-default-tooltip {
-  border-radius: 12px !important;
-  border: 1px solid #e2e8f0 !important;
-  box-shadow: 0 8px 24px rgba(15, 29, 56, 0.12) !important;
-  backdrop-filter: blur(8px);
+  border-radius: 6px !important;
+  border: 1px solid #d6d3d1 !important;
+  box-shadow: 0 4px 12px rgba(28, 25, 23, 0.08) !important;
+  background: #ffffff !important;
+  font-size: 12px !important;
+  padding: 8px 12px !important;
 }
 
+/* Calm animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
+  from { opacity: 0; transform: translateY(2px); }
   to { opacity: 1; transform: translateY(0); }
-}
-@keyframes pageTransition {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes appGridDrift {
-  from { background-position: 0 0, 0 0; }
-  to { background-position: 72px 72px, 72px 72px; }
-}
-@keyframes navSignal {
-  from { transform: translateX(0); }
-  to { transform: translateX(420%); }
-}
-@keyframes syncPulse {
-  0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.6); }
-  70% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
 }
 .animate-fade-in {
-  animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes pulse-soft {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}
-.animate-pulse-soft {
-  animation: pulse-soft 2s ease-in-out infinite;
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-.animate-shimmer {
-  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 100%);
-  background-size: 200% 100%;
-  animation: shimmer 2s infinite;
+  animation: fadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .app-main-shell {
   position: relative;
-  isolation: isolate;
-}
-.app-main-shell::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  opacity: 0.28;
-  background-image: linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
-  background-size: 72px 72px;
-  mask-image: linear-gradient(to bottom, black, transparent 70%);
-  animation: appGridDrift 28s linear infinite;
-}
-.page-transition {
-  animation: pageTransition 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-.app-nav-item {
-  position: relative;
-  overflow: hidden;
-}
-.app-nav-item::after {
-  content: '';
-  position: absolute;
-  left: -40%;
-  bottom: 0;
-  width: 34%;
-  height: 1px;
-  background: #4ade80;
-  box-shadow: 0 0 10px #4ade80;
-  opacity: 0;
-  transition: opacity 180ms ease;
-}
-.app-nav-item:hover::after,
-.app-nav-item[aria-current='page']::after {
-  opacity: 1;
-  animation: navSignal 1.8s linear infinite;
-}
-.app-sync-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-.app-sync-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 999px;
-  background: #22c55e;
-  box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.6);
-  animation: syncPulse 1.8s ease-out infinite;
-}
-.card {
-  transition: transform 260ms ease, box-shadow 260ms ease, border-color 260ms ease;
-}
-.card:hover {
-  border-color: rgba(148, 163, 184, 0.75);
-  box-shadow: 0 12px 30px rgba(15, 29, 56, 0.09), 0 2px 6px rgba(15, 29, 56, 0.04);
-}
-
-.landing-hero {
-  isolation: isolate;
-}
-.landing-grid {
-  opacity: 0.22;
-  background-image: linear-gradient(rgba(148, 163, 184, 0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(148, 163, 184, 0.12) 1px, transparent 1px);
-  background-size: 54px 54px;
-  mask-image: linear-gradient(to bottom, black, transparent 85%);
-}
-.landing-scanline {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(74, 222, 128, 0.65), transparent);
-  box-shadow: 0 0 22px rgba(74, 222, 128, 0.5);
-  animation: landingScan 7s ease-in-out infinite;
-}
-.landing-reveal {
-  animation: landingReveal 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-.landing-delay-1 { animation-delay: 120ms; }
-.landing-delay-2 { animation-delay: 220ms; }
-.landing-delay-3 { animation-delay: 320ms; }
-.landing-delay-4 { animation-delay: 430ms; }
-.landing-orbit {
-  position: absolute;
-  border: 1px solid rgba(74, 222, 128, 0.18);
-  border-radius: 999px;
-  pointer-events: none;
-}
-.landing-orbit-one {
-  width: 27rem;
-  height: 27rem;
-  right: -8rem;
-  top: -8rem;
-  animation: landingOrbit 18s linear infinite;
-}
-.landing-orbit-two {
-  width: 19rem;
-  height: 19rem;
-  right: -4rem;
-  top: -4rem;
-  border-color: rgba(56, 189, 248, 0.16);
-  animation: landingOrbit 12s linear infinite reverse;
-}
-.landing-bar {
-  transform-origin: bottom;
-  animation: landingBar 2.4s ease-in-out infinite alternate;
-}
-.landing-ticker {
-  animation: landingTicker 34s linear infinite;
-}
-.landing-pipeline-card {
-  animation: landingPipeline 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-.landing-pipeline-line {
-  background-size: 200% 100%;
-  animation: landingLine 4s ease-in-out infinite;
-}
-@keyframes landingReveal {
-  from { opacity: 0; transform: translateY(18px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes landingScan {
-  0%, 100% { transform: translateY(0); opacity: 0.25; }
-  50% { transform: translateY(38rem); opacity: 0.8; }
-}
-@keyframes landingOrbit {
-  from { transform: rotate(0deg) translateX(4px); }
-  to { transform: rotate(360deg) translateX(4px); }
-}
-@keyframes landingBar {
-  from { transform: scaleY(0.82); opacity: 0.55; }
-  to { transform: scaleY(1); opacity: 1; }
-}
-@keyframes landingTicker {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-@keyframes landingPipeline {
-  from { opacity: 0; transform: translateY(14px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes landingLine {
-  0%, 100% { background-position: 0% 50%; opacity: 0.55; }
-  50% { background-position: 100% 50%; opacity: 1; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .landing-reveal,
-  .landing-scanline,
-  .landing-orbit,
-  .landing-bar {
-    animation: none;
-  }
-  .landing-ticker,
-  .landing-pipeline-card,
-  .landing-pipeline-line {
-    animation: none;
-  }
-}
-
-.login-page::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  opacity: 0.14;
-  pointer-events: none;
-  background-image: linear-gradient(rgba(148, 163, 184, 0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(148, 163, 184, 0.12) 1px, transparent 1px);
-  background-size: 46px 46px;
-  mask-image: linear-gradient(to bottom, black, transparent 82%);
-  animation: loginGridDrift 18s linear infinite;
-}
-.login-brand {
-  animation: landingReveal 0.7s 80ms cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-.login-card {
-  position: relative;
-  overflow: hidden;
-  animation: loginCardReveal 0.75s 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-.login-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -28%;
-  width: 24%;
-  height: 2px;
-  background: #4ade80;
-  box-shadow: 0 0 18px 3px rgba(74, 222, 128, 0.7);
-  animation: loginCardScan 3.8s ease-in-out infinite;
-  pointer-events: none;
-}
-.login-submit {
-  position: relative;
-  overflow: hidden;
-}
-.login-submit::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  width: 30%;
-  background: rgba(255, 255, 255, 0.3);
-  transform: translateX(-180%) skewX(-18deg);
-  animation: loginButtonSweep 4s ease-in-out infinite;
-  pointer-events: none;
-}
-.login-role {
-  transition: transform 180ms ease, border-color 180ms ease, background-color 180ms ease;
-}
-.login-role:hover {
-  transform: translateX(4px);
-}
-@keyframes loginGridDrift {
-  from { background-position: 0 0, 0 0; }
-  to { background-position: 46px 46px, 46px 46px; }
-}
-@keyframes loginCardReveal {
-  from { opacity: 0; transform: translateY(16px) scale(0.985); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-@keyframes loginCardScan {
-  0%, 12% { transform: translateX(0); opacity: 0; }
-  22% { opacity: 1; }
-  78%, 100% { transform: translateX(535%); opacity: 0; }
-}
-@keyframes loginButtonSweep {
-  0%, 58% { transform: translateX(-180%) skewX(-18deg); }
-  78%, 100% { transform: translateX(430%) skewX(-18deg); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .login-page::before,
-  .login-brand,
-  .login-card,
-  .login-card::before,
-  .login-submit::after {
-    animation: none;
-  }
-  .login-role { transition: none; }
 }
 
 @media print {
   .no-print { display: none !important; }
   .print-full { width: 100% !important; max-width: none !important; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .app-main-shell::before,
-  .page-transition,
-  .app-nav-item::after,
-  .app-sync-dot {
-    animation: none;
-  }
-  .card,
-  .app-nav-item,
-  .login-role {
-    transition: none;
-  }
 }

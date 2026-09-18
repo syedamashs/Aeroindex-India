@@ -625,7 +625,7 @@ function queryStatistics(query) {
     const where = buildObservationWhere(query, database);
     const summary = database.prepare(`SELECT COUNT(*) AS total, SUM(CASE WHEN COALESCE(o.is_sold, 0) = 0 AND o.extraction_status = 'success' AND o.total_fare > 0 THEN 1 ELSE 0 END) AS valid, MIN(CASE WHEN o.total_fare > 0 THEN o.total_fare END) AS min_fare, MAX(CASE WHEN o.total_fare > 0 THEN o.total_fare END) AS max_fare, AVG(CASE WHEN o.total_fare > 0 AND COALESCE(o.is_sold, 0) = 0 AND o.extraction_status = 'success' THEN o.total_fare END) AS average_fare FROM apix_observations o ${where.sql}`).get(...where.params);
     const latest = index.at(-1);
-    return { index: latest?.indexValue || 100, momChange: latest?.percentageChange || 0, routesMonitored: routes.length, airlinesMonitored: airlines.length, totalObservations: Number(summary.total || 0), highPriceRoutes: routes.filter((route) => route.momChange > 5).length, dataFreshness: '12 minutes ago', dataQuality: summary.total ? Math.round(Number(summary.valid || 0) / Number(summary.total) * 100) : 100, minFare: Number(summary.min_fare || 0), maxFare: Number(summary.max_fare || 0), averageFare: Math.round(Number(summary.average_fare || 0)) };
+    return { index: latest?.indexValue || 100, momChange: latest?.percentageChange || 0, routesMonitored: routes.length, airlinesMonitored: airlines.length, otasActive: 5, totalObservations: Number(summary.total || 0), highPriceRoutes: routes.filter((route) => route.momChange > 5).length, dataFreshness: '12 minutes ago', dataQuality: summary.total ? Math.round(Number(summary.valid || 0) / Number(summary.total) * 100) : 100, minFare: Number(summary.min_fare || 0), maxFare: Number(summary.max_fare || 0), averageFare: Math.round(Number(summary.average_fare || 0)) };
   });
 }
 
@@ -1027,6 +1027,7 @@ function computeStatistics(data, query = {}) {
     momChange: latest ? latest.percentageChange : 0,
     routesMonitored: routeStats.length,
     airlinesMonitored: airlineStats.length,
+    otasActive: 5,
     totalObservations: rows.length,
     highPriceRoutes: routeStats.filter((route) => route.momChange > 5).length,
     dataFreshness: '12 minutes ago',

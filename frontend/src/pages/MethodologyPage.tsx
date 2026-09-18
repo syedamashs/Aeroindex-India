@@ -1,32 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { ArrowRight, Database, ShieldCheck, BookOpen, Code2 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { apiDqeSummary, apiRoutes, apiStatistics } from '@/lib/api';
-import { AnimatedCounter } from '@/components/animation/AnimatedCounter';
-
-function MethodSection({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <div className="glass-card p-6 space-y-4">
-      <h3 className="text-base font-display font-bold text-navy-950 border-b border-slate-100 pb-3">
-        {title}
-      </h3>
-      <div className="space-y-3 text-xs leading-relaxed text-slate-600">
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function Formula({ children }: { children: ReactNode }) {
-  return (
-    <div className="overflow-x-auto rounded-xl border border-navy-800 bg-navy-950 p-4 shadow-inner">
-      <p className="whitespace-nowrap font-mono text-xs font-bold text-accent-400">{children}</p>
-    </div>
-  );
-}
 
 export function MethodologyPage() {
-  const navigate = useNavigate();
   const [statistics, setStatistics] = useState({ routesMonitored: 0, totalObservations: 0 });
   const [quality, setQuality] = useState({ invalid: 0, duplicates: 0, valid: 0 });
   const [routeWeight, setRouteWeight] = useState(0);
@@ -46,148 +21,115 @@ export function MethodologyPage() {
   }, []);
 
   return (
-    <div className="animate-fade-in max-w-5xl mx-auto space-y-6">
-      {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-navy-950 via-navy-900 to-navy-800 text-white p-6 lg:p-8 shadow-xl border border-navy-700/60">
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-accent-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-navy-500/20 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-          <div className="space-y-2 max-w-2xl">
-            <div className="flex flex-wrap items-center gap-2.5">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                ECONOMETRIC METHODOLOGY SPECIFICATION
-              </span>
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/10 text-navy-200 text-xs font-medium backdrop-blur-sm">
-                Base Standard: January 2026 = 100.0
-              </span>
-            </div>
-
-            <h1 className="font-display font-extrabold text-3xl lg:text-4xl tracking-tight text-white">
-              Vayuyaan Mathematical Methodology
-            </h1>
-            <p className="text-sm text-navy-200 leading-relaxed">
-              Formal mathematical specification detailing how raw multi-source flight observations are cleaned, matched into identity cohorts, and aggregated into national price indices.
-            </p>
-          </div>
-
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-navy-900 hover:bg-slate-100 text-xs font-bold transition-all shadow-md active:scale-95 whitespace-nowrap self-start lg:self-center"
-          >
-            <span>Return to Dashboard</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+    <div className="max-w-5xl mx-auto space-y-8 animate-fade-in text-slate-800">
+      {/* 1. DOCUMENT MASTHEAD */}
+      <div className="border-b border-slate-300 pb-5">
+        <div className="flex items-center gap-2 text-xs font-mono text-slate-500 uppercase tracking-widest">
+          <span>Technical White Paper</span>
+          <span className="text-slate-300">/</span>
+          <span>DGCA-VAYU-SPEC-2026.01</span>
         </div>
+        <h1 className="text-2xl font-serif font-bold text-slate-900 tracking-tight mt-1.5">
+          Methodological Specification for the National Airfare Price Index (AeroIndex)
+        </h1>
+        <p className="text-xs text-slate-600 mt-1 max-w-2xl leading-relaxed">
+          Mathematical formulation, Laspeyres weighting framework, sampling protocol, and quality engine architecture for domestic scheduled passenger aviation.
+        </p>
       </div>
 
-      {/* Scope Metric Grid */}
-      <MethodSection title="1. Observation Unit & Population Bounds">
-        <p>A price observation is a validated canonical record in <code className="font-mono font-semibold text-navy-900 bg-slate-100 px-1.5 py-0.5 rounded">apix_observations</code> with verified total fare, route, departure timestamp, and origin provenance.</p>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 pt-2">
-          <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-            <p className="text-[10px] uppercase font-bold text-slate-400">Routes Monitored</p>
-            <div className="text-base font-mono font-bold text-navy-950 mt-0.5 min-h-[24px] flex items-center">
-              {loading ? (
-                <div className="h-4 w-12 bg-slate-200 rounded animate-pulse" />
-              ) : (
-                <AnimatedCounter value={statistics.routesMonitored} />
-              )}
-            </div>
-          </div>
-          <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-            <p className="text-[10px] uppercase font-bold text-slate-400">Total Observations</p>
-            <div className="text-base font-mono font-bold text-navy-950 mt-0.5 min-h-[24px] flex items-center">
-              {loading ? (
-                <div className="h-4 w-16 bg-slate-200 rounded animate-pulse" />
-              ) : (
-                <AnimatedCounter value={statistics.totalObservations} />
-              )}
-            </div>
-          </div>
-          <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-            <p className="text-[10px] uppercase font-bold text-slate-400">Valid Fare Rows</p>
-            <div className="text-base font-mono font-bold text-emerald-600 mt-0.5 min-h-[24px] flex items-center">
-              {loading ? (
-                <div className="h-4 w-16 bg-emerald-100 rounded animate-pulse" />
-              ) : (
-                <AnimatedCounter value={quality.valid} />
-              )}
-            </div>
-          </div>
-          <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-            <p className="text-[10px] uppercase font-bold text-slate-400">Invalid Records</p>
-            <div className="text-base font-mono font-bold text-rose-600 mt-0.5 min-h-[24px] flex items-center">
-              {loading ? (
-                <div className="h-4 w-10 bg-rose-100 rounded animate-pulse" />
-              ) : (
-                <AnimatedCounter value={quality.invalid} />
-              )}
-            </div>
-          </div>
-          <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-            <p className="text-[10px] uppercase font-bold text-slate-400">Duplicate Groups</p>
-            <div className="text-base font-mono font-bold text-amber-600 mt-0.5 min-h-[24px] flex items-center">
-              {loading ? (
-                <div className="h-4 w-10 bg-amber-100 rounded animate-pulse" />
-              ) : (
-                <AnimatedCounter value={quality.duplicates} />
-              )}
-            </div>
-          </div>
-          <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-            <p className="text-[10px] uppercase font-bold text-slate-400">Route Weight Sum</p>
-            <div className="text-base font-mono font-bold text-navy-950 mt-0.5 min-h-[24px] flex items-center">
-              {loading ? (
-                <div className="h-4 w-12 bg-slate-200 rounded animate-pulse" />
-              ) : (
-                <AnimatedCounter value={routeWeight} />
-              )}
-            </div>
+      {/* 2. TWO-COLUMN RESEARCH LAYOUT (Table of Contents + Document Body) */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        {/* Sticky Table of Contents */}
+        <div className="hidden md:block col-span-1">
+          <div className="sticky top-20 space-y-2 text-xs border-l border-slate-200 pl-3 font-sans">
+            <span className="text-[11px] font-mono uppercase text-slate-400 font-semibold block mb-2">Sections</span>
+            <a href="#sec-1" className="block text-slate-600 hover:text-slate-900">1. Executive Overview</a>
+            <a href="#sec-2" className="block text-slate-600 hover:text-slate-900">2. Laspeyres Formulation</a>
+            <a href="#sec-3" className="block text-slate-600 hover:text-slate-900">3. Corridor Weight Basket</a>
+            <a href="#sec-4" className="block text-slate-600 hover:text-slate-900">4. Booking Window Stratification</a>
+            <a href="#sec-5" className="block text-slate-600 hover:text-slate-900">5. DQE Ingestion Rules</a>
+            <a href="#sec-6" className="block text-slate-600 hover:text-slate-900">6. Legal &amp; Regulatory Basis</a>
           </div>
         </div>
-      </MethodSection>
 
-      <MethodSection title="2. Elementary Price Relative Equation">
-        <p>For one comparable flight identity <em>i</em> between base period <em>0</em> and observation period <em>t</em>, the elementary price relative measures proportional movement:</p>
-        <Formula>r(i, t) = p(i, t) / p(i, 0)</Formula>
-        <p>Only positive, finite total fares are eligible. If either base or period price is unavailable, the relative is quarantined in DQE integrity logs.</p>
-      </MethodSection>
+        {/* Document Body */}
+        <div className="col-span-1 md:col-span-3 space-y-8 text-xs leading-relaxed text-slate-700">
+          {/* Section 1 */}
+          <section id="sec-1" className="space-y-3">
+            <h2 className="text-base font-serif font-bold text-slate-900 border-b border-slate-200 pb-1.5">
+              1. Executive Overview
+            </h2>
+            <p>
+              The Vayuyaan National Airfare Price Index (AeroIndex India) is a statistical benchmark created to monitor and quantify macroeconomic price dynamics across Indian domestic scheduled commercial flight corridors. Modeled after official price indices published by central economic statistical organizations, Vayuyaan establishes an empirical standard for airline passenger tariffs.
+            </p>
+            <div className="bg-slate-50 border border-slate-200 p-3 rounded font-mono text-[11px] space-y-1">
+              <div><strong>Benchmark Base:</strong> January 2026 = 100.0</div>
+              <div><strong>Network Sampling:</strong> 27 Domestic Trunk City-Pairs</div>
+              <div><strong>Target Class:</strong> Economy Scheduled Passenger Service</div>
+            </div>
+          </section>
 
-      <MethodSection title="3. Laspeyres & Jevons Estimator Formulations">
-        <p>Vayuyaan implements weighted Laspeyres aggregation across representative high-density passenger trunk corridors:</p>
-        <Formula>Vayuyaan(t) = [ ∑ ( w_r × I(r, t) ) / ∑ w_r ] × 100</Formula>
-        <p>Where <em>w_r</em> represents the official DGCA passenger volume weight for route <em>r</em>, and <em>I(r, t)</em> is the route-level elementary relative.</p>
-      </MethodSection>
+          {/* Section 2 */}
+          <section id="sec-2" className="space-y-3">
+            <h2 className="text-base font-serif font-bold text-slate-900 border-b border-slate-200 pb-1.5">
+              2. Laspeyres Mathematical Formulation
+            </h2>
+            <p>
+              The composite index employs a Laspeyres price relative aggregator with fixed base-period passenger volume weights. Under this formulation, current period average fares for each corridor are normalized against the fixed January 2026 base fare:
+            </p>
+            <div className="bg-slate-900 text-white p-4 rounded font-mono text-center text-sm font-semibold tracking-wide">
+              I_t = [ ∑ ( w_i × ( P_i,t / P_i,0 ) ) / ∑ w_i ] × 100
+            </div>
+            <p className="text-[11px] text-slate-600">
+              Where <em>I_t</em> denotes the composite index at observation period <em>t</em>, <em>w_i</em> is the predetermined passenger traffic weight allocated to corridor <em>i</em>, <em>P_i,t</em> is the volume-weighted mean fare observed in period <em>t</em>, and <em>P_i,0</em> is the baseline January 2026 tariff.
+            </p>
+          </section>
 
-      <MethodSection title="4. Advance Departure Lead-Time Horizon (T+45 to T+1)">
-        <p>Booking windows are modeled as separate analytical cohorts to decompose dynamic seat yield curves:</p>
-        <Formula>Late Booking Urgency Premium = [ ( AvgFare(T+1) - AvgFare(T+45) ) / AvgFare(T+45) ] × 100</Formula>
-        <p>Fares exhibit steep quadratic inflection starting at <strong>T-7 days</strong>, culminating in last-minute urgency tariffs.</p>
-      </MethodSection>
+          {/* Section 3 */}
+          <section id="sec-3" className="space-y-3">
+            <h2 className="text-base font-serif font-bold text-slate-900 border-b border-slate-200 pb-1.5">
+              3. Corridor Weight Basket Allocation
+            </h2>
+            <p>
+              Individual route weights are calibrated directly from Directorate General of Civil Aviation (DGCA) annual domestic passenger traffic statistics. Monitored trunk sectors (including Delhi—Mumbai, Bengaluru—Delhi, and Chennai—Mumbai) receive proportional representation matching real consumer expenditure volume.
+            </p>
+          </section>
 
-      <MethodSection title="5. Surveillance Alert Rules & Gouging Thresholds">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
-          <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-            <p className="font-bold text-rose-700">Price Spike Flag</p>
-            <p className="text-slate-600 mt-0.5">Route MoM escalation ≥ 4% (Medium) or ≥ 8% (High Alert)</p>
-          </div>
-          <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-            <p className="font-bold text-amber-700">Volatility Threshold</p>
-            <p className="text-slate-600 mt-0.5">Route fare standard deviation σ ≥ 14% of route mean</p>
-          </div>
-        </div>
-      </MethodSection>
+          {/* Section 4 */}
+          <section id="sec-4" className="space-y-3">
+            <h2 className="text-base font-serif font-bold text-slate-900 border-b border-slate-200 pb-1.5">
+              4. Booking Window Stratification
+            </h2>
+            <p>
+              Airfare pricing is intrinsically multi-dimensional due to airline revenue management systems. To eliminate temporal bias, observations are stratified across four advance-purchase horizons:
+            </p>
+            <ul className="list-disc list-inside space-y-1 pl-2 text-slate-700">
+              <li><strong>T+1 Day:</strong> Close-in / emergency personal and business travel.</li>
+              <li><strong>T+7 Days:</strong> Standard 1-week domestic business planning.</li>
+              <li><strong>T+15 Days:</strong> Mid-horizon advance leisure and corporate travel.</li>
+              <li><strong>T+30 Days:</strong> 1-month planning baseline.</li>
+            </ul>
+          </section>
 
-      {/* Backend Architecture Note */}
-      <div className="p-4 rounded-xl bg-navy-900 text-white border border-navy-700 flex items-start gap-3 text-xs">
-        <Code2 className="w-5 h-5 text-accent-400 flex-shrink-0 mt-0.5" />
-        <div>
-          <p className="font-bold">Source Implementation Reference</p>
-          <p className="text-slate-300 mt-0.5 leading-relaxed">
-            Index computation algorithms live in <code>backend/index_engine/</code>; Markov state transitions in <code>backend/fare_state/</code>; live REST gateway in <code>backend/server.js</code>.
-          </p>
+          {/* Section 5 */}
+          <section id="sec-5" className="space-y-3">
+            <h2 className="text-base font-serif font-bold text-slate-900 border-b border-slate-200 pb-1.5">
+              5. Data Quality Engine (DQE) Protocol
+            </h2>
+            <p>
+              Raw tariff observations collected via Playwright headless scrapers undergo mandatory pre-index sanitization. Any record violating schema bounds (e.g. fare quotes below ₹1,500 or above ₹1,50,000, missing carrier identifiers, or identical flight key hashes within the same sweep) is isolated and excluded from index calculation.
+            </p>
+          </section>
+
+          {/* Section 6 */}
+          <section id="sec-6" className="space-y-3">
+            <h2 className="text-base font-serif font-bold text-slate-900 border-b border-slate-200 pb-1.5">
+              6. Legal &amp; Regulatory Basis
+            </h2>
+            <p>
+              This methodology aligns with consumer tariff protection principles set forth under Rule 135 of the Indian Aircraft Rules, 1937, requiring carriers to establish reasonable tariff structures considering operating costs and prevailing market conditions without predatory gouging.
+            </p>
+          </section>
         </div>
       </div>
     </div>

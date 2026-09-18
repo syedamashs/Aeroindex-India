@@ -57,11 +57,11 @@ export function DashboardKpiCard({
       glow: 'group-hover:shadow-[0_8px_30px_rgb(244,63,94,0.14)]',
     },
     purple: {
-      border: 'border-t-indigo-500',
-      iconBg: 'bg-indigo-50 text-indigo-600 ring-1 ring-indigo-200/50',
-      badge: 'bg-indigo-50 text-indigo-700',
-      progress: 'bg-indigo-500',
-      glow: 'group-hover:shadow-[0_8px_30px_rgb(99,102,241,0.14)]',
+      border: 'border-t-stone-600',
+      iconBg: 'bg-stone-100 text-stone-700 ring-1 ring-stone-200/50',
+      badge: 'bg-stone-100 text-stone-700',
+      progress: 'bg-stone-600',
+      glow: 'group-hover:shadow-[0_8px_30px_rgb(68,64,60,0.14)]',
     },
   };
 

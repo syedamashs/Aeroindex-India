@@ -20,19 +20,25 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 const STORAGE_KEY = 'aeroindex-auth';
 const AUDIT_KEY = 'aeroindex-audit';
 
+const DEFAULT_USER: UserRole = {
+  role: 'Analyst',
+  name: 'Analyst User',
+  email: 'analyst@aeroindex.gov.in',
+};
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<UserRole | null>(null);
+  const [user, setUser] = useState<UserRole | null>(() => {
+    try {
+      const saved = sessionStorage.getItem(STORAGE_KEY);
+      if (saved) return JSON.parse(saved);
+    } catch {
+      // ignore
+    }
+    return DEFAULT_USER;
+  });
   const [auditLog, setAuditLog] = useState<AuditEntry[]>([]);
 
   useEffect(() => {
-    const saved = sessionStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        setUser(JSON.parse(saved));
-      } catch {
-        // ignore
-      }
-    }
     const savedAudit = sessionStorage.getItem(AUDIT_KEY);
     if (savedAudit) {
       try {

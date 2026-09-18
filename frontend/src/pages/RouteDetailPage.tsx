@@ -3,16 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
   AreaChart, Area, BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
-import { formatINR, formatPercent, formatNumber } from '@/data/random';
-import {
-  ArrowLeft, TrendingUp, Activity, Gauge, BarChart2, Clock,
-  Route as RouteIcon, ShieldCheck,
-} from 'lucide-react';
-import { DashboardKpiCard } from '@/components/ui/DashboardKpiCard';
+import { formatINR, formatPercent } from '@/data/random';
+import { ArrowLeft, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { fareTooltipFormatter } from '@/components/chartFormatters';
 import { apiRouteDetail, apiRoutes, type ApiObservation, type ApiRouteStats } from '@/lib/api';
-import { FlightPathTrajectory } from '@/components/animation/FlightPathTrajectory';
-import { StaggerContainer, MotionItem } from '@/components/animation/MotionCard';
 
 export function RouteDetailPage() {
   const { routeId } = useParams();
@@ -53,258 +47,250 @@ export function RouteDetailPage() {
 
   const monthlyTrend = useMemo(() => {
     const groups = new Map<string, number[]>();
-    observations.forEach((observation) => {
-      const month = observation.travelDate.slice(0, 7);
-      groups.set(month, [...(groups.get(month) || []), observation.totalFare]);
+    observations.forEach((obs) => {
+      const month = obs.travelDate.slice(0, 7);
+      groups.set(month, [...(groups.get(month) || []), obs.totalFare]);
     });
     return [...groups.entries()]
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([month, fares]) => ({
         label: month,
-        fare: fares.reduce((sum, fare) => sum + fare, 0) / fares.length,
+        fare: Math.round(fares.reduce((sum, f) => sum + f, 0) / fares.length),
       }));
   }, [observations]);
 
   const airlineComp = useMemo(() => {
     const groups = new Map<string, number[]>();
-    observations.forEach((observation) =>
-      groups.set(observation.airline, [...(groups.get(observation.airline) || []), observation.totalFare])
+    observations.forEach((obs) =>
+      groups.set(obs.airline, [...(groups.get(obs.airline) || []), obs.totalFare])
     );
-    const colors = ['#244680', '#10b981', '#f43f5e', '#f59e0b', '#6366f1', '#06b6d4'];
-    return [...groups.entries()].map(([name, fares], index) => ({
+    return [...groups.entries()].map(([name, fares]) => ({
       name,
-      avgFare: fares.reduce((sum, fare) => sum + fare, 0) / fares.length,
-      color: colors[index % colors.length],
+      avgFare: Math.round(fares.reduce((sum, f) => sum + f, 0) / fares.length),
+      minFare: Math.min(...fares),
+      maxFare: Math.max(...fares),
+      count: fares.length,
     }));
   }, [observations]);
 
   const bwStats = useMemo(() => {
     const groups = new Map<number, number[]>();
-    observations.forEach((observation) =>
-      groups.set(observation.bookingWindow, [...(groups.get(observation.bookingWindow) || []), observation.totalFare])
+    observations.forEach((obs) =>
+      groups.set(obs.bookingWindow, [...(groups.get(obs.bookingWindow) || []), obs.totalFare])
     );
     return [...groups.entries()]
       .sort(([a], [b]) => a - b)
       .map(([window, fares]) => ({
         window,
         label: `T+${window}`,
-        averageFare: fares.reduce((sum, fare) => sum + fare, 0) / fares.length,
+        averageFare: Math.round(fares.reduce((sum, f) => sum + f, 0) / fares.length),
+        count: fares.length,
       }));
   }, [observations]);
 
   if (loading) {
     return (
-      <div className="glass-card p-12 text-center space-y-3">
-        <div className="inline-block w-8 h-8 border-4 border-navy-600 border-t-transparent rounded-full animate-spin" />
-        <p className="text-xs font-semibold text-slate-600">Loading corridor deep-dive...</p>
+      <div className="p-12 text-center text-xs text-slate-500 font-mono">
+        Loading corridor dossier...
       </div>
     );
   }
 
   if (!route) {
     return (
-      <div className="glass-card p-12 text-center space-y-4">
-        <p className="text-sm font-semibold text-slate-600">Flight corridor not found or unmonitored.</p>
-        <button onClick={() => navigate('/routes')} className="btn-primary">
-          Back to Route Analysis
+      <div className="p-8 text-center space-y-3">
+        <p className="text-xs text-slate-500">Corridor data not available.</p>
+        <button onClick={() => navigate('/routes')} className="btn btn-secondary">
+          Return to Corridor Table
         </button>
       </div>
     );
   }
 
-  const routeLabel = `${route.origin} → ${route.destination}`;
+  const isUp = (route.momChange || 0) > 0;
+  const isDown = (route.momChange || 0) < 0;
 
   return (
-    <div className="animate-fade-in space-y-6">
-      {/* Back Button */}
-      <button
-        onClick={() => navigate('/routes')}
-        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-navy-800 hover:bg-slate-50 transition-all shadow-sm"
-      >
-        <ArrowLeft className="w-3.5 h-3.5" />
-        <span>Back to All Corridors</span>
-      </button>
-
-      {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-navy-950 via-navy-900 to-navy-800 text-white p-6 lg:p-8 shadow-xl border border-navy-700/60">
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-accent-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-navy-500/20 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-          <div className="space-y-2 max-w-2xl">
-            <div className="flex flex-wrap items-center gap-2.5">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                CORRIDOR COCKPIT DEEP DIVE
-              </span>
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/10 text-navy-200 text-xs font-medium backdrop-blur-sm uppercase">
-                {route.category} Corridor • {route.distanceKm || 1150} KM
-              </span>
-            </div>
-
-            <h1 className="font-display font-extrabold text-3xl lg:text-4xl tracking-tight text-white flex items-center gap-3">
-              <RouteIcon className="w-7 h-7 text-accent-400" />
-              <span>{routeLabel}</span>
-            </h1>
-            <p className="text-sm text-navy-200 leading-relaxed">
-              Historical price relative evolution, carrier price yield benchmark, and advance booking elasticity curve for this flight corridor.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3 bg-navy-900/80 p-3.5 rounded-2xl border border-navy-700">
-            <div className="text-right">
-              <p className="text-[11px] text-slate-400 uppercase font-semibold">Route Index</p>
-              <p className="text-2xl font-display font-black text-white font-mono">{route.index.toFixed(1)}</p>
-            </div>
-          </div>
-        </div>
+    <div className="space-y-8 animate-fade-in max-w-[1440px]">
+      {/* Back link */}
+      <div>
+        <button
+          onClick={() => navigate('/routes')}
+          className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-900 transition-colors"
+        >
+          <ArrowLeft className="w-3 h-3" />
+          <span>Back to All Corridors</span>
+        </button>
       </div>
 
-      {/* Interactive Great Circle Flight Trajectory Animation */}
-      <FlightPathTrajectory
-        origin={route.origin}
-        destination={route.destination}
-        distanceKm={route.distanceKm || 1150}
-        fare={route.averageFare}
-        duration={route.distanceKm && route.distanceKm > 1500 ? '2h 45m' : '1h 55m'}
-        altitude="FL340 (34,000 ft)"
-      />
-
-      {/* KPI Cards */}
-      <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <MotionItem>
-          <DashboardKpiCard
-            label="Corridor Average Fare"
-            value={formatINR(route.averageFare)}
-            change={route.momChange}
-            sublabel="Current monitored cohort"
-            statusText="Weighted Mean"
-            icon={<TrendingUp className="w-5 h-5" />}
-            accent="navy"
-            progressPercent={100}
-          />
-        </MotionItem>
-
-        <MotionItem>
-          <DashboardKpiCard
-            label="Corridor Index Score"
-            value={route.index.toFixed(1)}
-            sublabel="Base Jan 2026 = 100.0"
-            statusText={route.index > 100 ? 'Surge Trend' : 'Below Base'}
-            icon={<Activity className="w-5 h-5" />}
-            accent="purple"
-          />
-        </MotionItem>
-
-        <MotionItem>
-          <DashboardKpiCard
-            label="Price Spread (Min – Max)"
-            value={`${formatINR(route.minFare)} – ${formatINR(route.maxFare)}`}
-            sublabel="Dynamic tariff range"
-            statusText="Spread Bounds"
-            icon={<BarChart2 className="w-5 h-5" />}
-            accent="accent"
-          />
-        </MotionItem>
-
-        <MotionItem>
-          <DashboardKpiCard
-            label="Volatility Index (σ)"
-            value={formatINR(route.volatility)}
-            sublabel="Observed standard deviation"
-            statusText={route.volatility > 2000 ? 'High Dispersion' : 'Stable Band'}
-            icon={<Gauge className="w-5 h-5" />}
-            accent={route.volatility > 2000 ? 'warning' : 'accent'}
-          />
-        </MotionItem>
-      </StaggerContainer>
-
-      {/* Monthly Price Curve Chart */}
-      <div className="glass-card p-6">
-        <div className="pb-5 mb-5 border-b border-slate-100">
-          <h3 className="text-base font-display font-bold text-navy-950">
-            Historical Corridor Fare Trajectory
-          </h3>
+      {/* 1. CORRIDOR REPORT HEADER */}
+      <div className="border-b border-slate-200 pb-4 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-mono uppercase text-slate-400">Corridor Dossier</span>
+            <span className="text-slate-300">/</span>
+            <span className="text-xs font-mono text-slate-500">{route.origin} — {route.destination}</span>
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 mt-1">
+            {route.origin} to {route.destination}
+          </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            Mean airfare progression for {routeLabel} across collection periods
+            Scheduled Domestic Trunk Airway · Direct passenger market telemetry
           </p>
         </div>
 
-        <div className="w-full h-80">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={monthlyTrend} margin={{ top: 15, right: 30, left: 10, bottom: 5 }}>
-              <defs>
-                <linearGradient id="routeAreaGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#244680" stopOpacity={0.25} />
-                  <stop offset="95%" stopColor="#244680" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-              <XAxis dataKey="label" tick={{ fontSize: 12, fill: '#64748b' }} />
-              <YAxis tick={{ fontSize: 12, fill: '#64748b' }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} />
-              <Tooltip formatter={fareTooltipFormatter} />
-              <Area
-                type="monotone"
-                dataKey="fare"
-                stroke="#244680"
-                strokeWidth={3}
-                fill="url(#routeAreaGrad)"
-                dot={{ r: 4, fill: '#244680', strokeWidth: 2, stroke: '#fff' }}
-                activeDot={{ r: 7, strokeWidth: 2, stroke: '#fff' }}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
+        <span className="text-xs font-mono text-slate-400">
+          Last sampled: {new Date().toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}
+        </span>
       </div>
 
-      {/* Dual Split: Carrier Comparison & Corridor Booking Curve */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div className="lg:col-span-6 glass-card p-6">
-          <div className="pb-4 mb-4 border-b border-slate-100">
-            <h3 className="text-base font-display font-bold text-navy-950">
-              Carrier Pricing on this Corridor
-            </h3>
-            <p className="text-xs text-slate-500">Average ticket pricing by operating airline</p>
-          </div>
-
-          <div className="w-full h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={airlineComp} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-                <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748b' }} />
-                <YAxis tick={{ fontSize: 12, fill: '#64748b' }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} />
-                <Tooltip formatter={fareTooltipFormatter} />
-                <Bar dataKey="avgFare" radius={[6, 6, 0, 0]}>
-                  {airlineComp.map((entry) => (
-                    <Cell key={entry.name} fill={entry.color} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+      {/* 2. CORE CORRIDOR METRICS STRIP */}
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-6 border-b border-slate-200 pb-6 text-xs font-mono">
+        <div>
+          <span className="text-[11px] font-sans text-slate-500 uppercase tracking-wider block">Average Fare</span>
+          <span className="text-2xl font-bold text-slate-900">{formatINR(route.averageFare)}</span>
+          <span className="text-[10px] font-sans text-slate-400 block">Weighted across horizons</span>
         </div>
 
-        <div className="lg:col-span-6 glass-card p-6">
-          <div className="pb-4 mb-4 border-b border-slate-100">
-            <h3 className="text-base font-display font-bold text-navy-950">
-              Corridor Booking Window Curve
-            </h3>
-            <p className="text-xs text-slate-500">Advance departure lead-day yield curve for {routeLabel}</p>
-          </div>
+        <div>
+          <span className="text-[11px] font-sans text-slate-500 uppercase tracking-wider block">Corridor Index</span>
+          <span className="text-2xl font-bold text-slate-900">{route.index ? route.index.toFixed(1) : '100.0'}</span>
+          <span className="text-[10px] font-sans text-slate-400 block">Base 100.0</span>
+        </div>
 
-          <div className="w-full h-64">
+        <div>
+          <span className="text-[11px] font-sans text-slate-500 uppercase tracking-wider block">Monthly Shift (MoM)</span>
+          <span className={`text-2xl font-bold inline-flex items-center ${
+            isUp ? 'text-rose-600' : isDown ? 'text-emerald-700' : 'text-slate-700'
+          }`}>
+            {isUp && <ArrowUpRight className="w-5 h-5 mr-0.5" />}
+            {isDown && <ArrowDownRight className="w-5 h-5 mr-0.5" />}
+            {formatPercent(route.momChange || 0)}
+          </span>
+          <span className="text-[10px] font-sans text-slate-400 block">Relative delta</span>
+        </div>
+
+        <div>
+          <span className="text-[11px] font-sans text-slate-500 uppercase tracking-wider block">Observations Monitored</span>
+          <span className="text-2xl font-bold text-slate-900">{route.observations?.toLocaleString('en-IN') ?? observations.length}</span>
+          <span className="text-[10px] font-sans text-slate-400 block">Verified fare points</span>
+        </div>
+      </section>
+
+      {/* 3. CHARTS GRID: FARE TREND & BOOKING WINDOW CURVE */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Monthly Fare Trend */}
+        <section className="bg-white border border-slate-200 rounded-lg p-5">
+          <div className="pb-3 mb-3 border-b border-slate-100">
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-700">
+              Monthly Average Fare Trend
+            </h2>
+            <p className="text-[11px] text-slate-400 mt-0.5">Historical trajectory over collection periods</p>
+          </div>
+          <div className="h-56 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={bwStats} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-                <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#64748b' }} />
-                <YAxis tick={{ fontSize: 12, fill: '#64748b' }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} />
+              <AreaChart data={monthlyTrend} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                <XAxis dataKey="label" stroke="#94a3b8" fontSize={11} tickLine={false} />
+                <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} />
                 <Tooltip formatter={fareTooltipFormatter} />
-                <Bar dataKey="averageFare" fill="#10b981" radius={[6, 6, 0, 0]} />
-              </BarChart>
+                <Area type="monotone" dataKey="fare" stroke="#c2410c" fill="#c2410c" fillOpacity={0.08} strokeWidth={2} />
+              </AreaChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </section>
+
+        {/* Booking Window Curve */}
+        <section className="bg-white border border-slate-200 rounded-lg p-5">
+          <div className="pb-3 mb-3 border-b border-slate-100">
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-700">
+              Advance Booking Horizon Curve
+            </h2>
+            <p className="text-[11px] text-slate-400 mt-0.5">Fare pricing behavior by days prior to departure</p>
+          </div>
+          <div className="h-56 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={bwStats} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                <XAxis dataKey="label" stroke="#94a3b8" fontSize={11} tickLine={false} />
+                <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} />
+                <Tooltip formatter={fareTooltipFormatter} />
+                <Area type="monotone" dataKey="averageFare" stroke="#d97706" fill="#d97706" fillOpacity={0.08} strokeWidth={2} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </section>
       </div>
+
+      {/* 4. AIRLINE PRICING COMPARISON TABLE */}
+      <section className="space-y-3">
+        <div>
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+            Carrier Pricing Breakdown on Corridor
+          </h2>
+          <p className="text-[11px] text-slate-400">Scheduled carriers operating on {route.origin} — {route.destination}</p>
+        </div>
+
+        <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr>
+                <th className="table-th">Carrier</th>
+                <th className="table-th text-right">Average Fare</th>
+                <th className="table-th text-right">Fare Range (Min – Max)</th>
+                <th className="table-th text-right">Obs Count</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 font-mono text-xs">
+              {airlineComp.map((a) => (
+                <tr key={a.name} className="table-row">
+                  <td className="table-td font-sans font-semibold text-slate-900">{a.name}</td>
+                  <td className="table-td text-right font-bold text-slate-900">{formatINR(a.avgFare)}</td>
+                  <td className="table-td text-right text-slate-600">{formatINR(a.minFare)} – {formatINR(a.maxFare)}</td>
+                  <td className="table-td text-right text-slate-500">{a.count}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* 5. RECENT OBSERVATION SAMPLES */}
+      <section className="space-y-3">
+        <div>
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+            Recent Monitored Tariff Observations
+          </h2>
+          <p className="text-[11px] text-slate-400">Sample flight queries recorded by scraper</p>
+        </div>
+
+        <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr>
+                <th className="table-th">Observation ID</th>
+                <th className="table-th">Travel Date</th>
+                <th className="table-th">Airline</th>
+                <th className="table-th">Window</th>
+                <th className="table-th">Class</th>
+                <th className="table-th text-right">Fare</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 font-mono text-xs">
+              {observations.slice(0, 8).map((obs) => (
+                <tr key={obs.id} className="table-row">
+                  <td className="table-td text-slate-500">{obs.id}</td>
+                  <td className="table-td text-slate-800">{obs.travelDate}</td>
+                  <td className="table-td font-sans font-medium text-slate-900">{obs.airline}</td>
+                  <td className="table-td text-slate-600">T+{obs.bookingWindow}</td>
+                  <td className="table-td font-sans text-slate-600">{obs.travelClass}</td>
+                  <td className="table-td text-right font-bold text-slate-900">{formatINR(obs.totalFare)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
     </div>
   );
 }
