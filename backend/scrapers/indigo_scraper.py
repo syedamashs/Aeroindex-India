@@ -810,28 +810,37 @@ def run(task):
 
     try:
         with sync_playwright() as p:
-            browser_options = {
-                "user_data_dir": str(profile_dir),
-                "headless": headless,
-                "viewport": {"width": 1400, "height": 900},
-                "args": [
-                    "--disable-blink-features=AutomationControlled",
-                    "--disable-features=IsolateOrigins,site-per-process",
-                    "--no-sandbox",
-                    "--disable-setuid-sandbox",
-                    "--disable-dev-shm-usage",
-                    "--disable-gpu",
-                    "--no-first-run",
-                    "--disable-http2",
-                    "--ignore-certificate-errors",
-                ],
-            }
-            browser_channel = os.getenv("APIX_BROWSER_CHANNEL")
-            if browser_channel:
-                browser_options["channel"] = browser_channel
-            elif os.name == "nt" and not headless:
-                browser_options["channel"] = "chrome"
-            context = p.chromium.launch_persistent_context(**browser_options)
+            browserless_token = os.getenv("BROWSERLESS_TOKEN")
+            if browserless_token:
+                print("[indigo] Using Browserless cloud browser")
+                _browser = p.chromium.connect_over_cdp(
+                    f"wss://chrome.browserless.io?token={browserless_token}"
+                )
+                context = _browser.new_context(
+                    viewport={"width": 1400, "height": 900},
+                    user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                )
+            else:
+                browser_options = {
+                    "user_data_dir": str(profile_dir),
+                    "headless": headless,
+                    "viewport": {"width": 1400, "height": 900},
+                    "args": [
+                        "--disable-blink-features=AutomationControlled",
+                        "--disable-features=IsolateOrigins,site-per-process",
+                        "--no-sandbox",
+                        "--disable-setuid-sandbox",
+                        "--disable-dev-shm-usage",
+                        "--disable-gpu",
+                        "--no-first-run",
+                    ],
+                }
+                browser_channel = os.getenv("APIX_BROWSER_CHANNEL")
+                if browser_channel:
+                    browser_options["channel"] = browser_channel
+                elif os.name == "nt" and not headless:
+                    browser_options["channel"] = "chrome"
+                context = p.chromium.launch_persistent_context(**browser_options)
             try:
                 page = context.pages[0] if context.pages else context.new_page()
                 page.goto(source_url, wait_until="domcontentloaded", timeout=timeout_ms)

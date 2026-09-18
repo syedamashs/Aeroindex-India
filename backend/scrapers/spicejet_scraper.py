@@ -245,23 +245,28 @@ def run(task):
 
     try:
         with sync_playwright() as playwright:
-            browser_options = {
-                "headless": headless,
-                "args": [
-                    "--disable-blink-features=AutomationControlled",
-                    "--no-sandbox",
-                    "--disable-setuid-sandbox",
-                    "--disable-dev-shm-usage",
-                    "--disable-gpu",
-                    "--no-first-run",
-                    "--disable-http2",
-                    "--ignore-certificate-errors",
-                ],
-            }
-            browser_channel = os.getenv("APIX_BROWSER_CHANNEL")
-            if browser_channel:
-                browser_options["channel"] = browser_channel
-            browser = playwright.chromium.launch(**browser_options)
+            browserless_token = os.getenv("BROWSERLESS_TOKEN")
+            if browserless_token:
+                print("[spicejet] Using Browserless cloud browser")
+                browser = playwright.chromium.connect_over_cdp(
+                    f"wss://chrome.browserless.io?token={browserless_token}"
+                )
+            else:
+                browser_options = {
+                    "headless": headless,
+                    "args": [
+                        "--disable-blink-features=AutomationControlled",
+                        "--no-sandbox",
+                        "--disable-setuid-sandbox",
+                        "--disable-dev-shm-usage",
+                        "--disable-gpu",
+                        "--no-first-run",
+                    ],
+                }
+                browser_channel = os.getenv("APIX_BROWSER_CHANNEL")
+                if browser_channel:
+                    browser_options["channel"] = browser_channel
+                browser = playwright.chromium.launch(**browser_options)
             page = browser.new_page(viewport={"width": 1400, "height": 900})
             try:
                 page.goto(source_url, wait_until="domcontentloaded", timeout=timeout_ms)

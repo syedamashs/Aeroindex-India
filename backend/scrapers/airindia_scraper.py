@@ -1892,31 +1892,40 @@ def run(task):
         print(f"target lead: T+{target_lead_days}")
 
         with sync_playwright() as p:
-            is_headless = (
-                str(os.getenv("APIX_HEADLESS", "true" if os.name != "nt" else "false")).lower()
-                == "true"
-            )
-            browser_options = {
-                "user_data_dir": str(profile_dir),
-                "headless": is_headless,
-                "args": [
-                    "--disable-blink-features=AutomationControlled",
-                    "--disable-web-security",
-                    "--no-sandbox",
-                    "--disable-setuid-sandbox",
-                    "--disable-dev-shm-usage",
-                    "--disable-gpu",
-                    "--no-first-run",
-                    "--disable-http2",
-                    "--ignore-certificate-errors",
-                    "--disable-features=NetworkService",
-                ],
-                "viewport": {"width": 1400, "height": 900},
-            }
-            browser_channel = os.getenv("APIX_BROWSER_CHANNEL")
-            if browser_channel:
-                browser_options["channel"] = browser_channel
-            context = p.chromium.launch_persistent_context(**browser_options)
+            browserless_token = os.getenv("BROWSERLESS_TOKEN")
+            if browserless_token:
+                print("[airindia] Using Browserless cloud browser")
+                _browser = p.chromium.connect_over_cdp(
+                    f"wss://chrome.browserless.io?token={browserless_token}"
+                )
+                context = _browser.new_context(
+                    viewport={"width": 1400, "height": 900},
+                    user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                )
+            else:
+                is_headless = (
+                    str(os.getenv("APIX_HEADLESS", "true" if os.name != "nt" else "false")).lower()
+                    == "true"
+                )
+                browser_options = {
+                    "user_data_dir": str(profile_dir),
+                    "headless": is_headless,
+                    "args": [
+                        "--disable-blink-features=AutomationControlled",
+                        "--disable-web-security",
+                        "--no-sandbox",
+                        "--disable-setuid-sandbox",
+                        "--disable-dev-shm-usage",
+                        "--disable-gpu",
+                        "--no-first-run",
+                        "--disable-http2",
+                    ],
+                    "viewport": {"width": 1400, "height": 900},
+                }
+                browser_channel = os.getenv("APIX_BROWSER_CHANNEL")
+                if browser_channel:
+                    browser_options["channel"] = browser_channel
+                context = p.chromium.launch_persistent_context(**browser_options)
 
             page = context.pages[0] if context.pages else context.new_page()
 
