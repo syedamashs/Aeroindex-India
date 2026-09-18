@@ -127,10 +127,6 @@ export function Layout({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  // Sync canScrape state to AppContext so pages can disable their triggers
-  useEffect(() => {
-    setIsScrapingActive(schedulerRunning || isRefreshing);
-  }, [schedulerRunning, isRefreshing, setIsScrapingActive]);
 
   const dropdownContainerRef = useRef<HTMLDivElement>(null);
 
