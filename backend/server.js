@@ -1083,6 +1083,7 @@ app.post('/api/scheduler/run', (req, res) => {
   }
 
   const isHeadless = process.env.APIX_HEADLESS || (process.platform === 'win32' ? 'false' : 'true');
+  console.log(`[scraper] BROWSERLESS_TOKEN present: ${!!process.env.BROWSERLESS_TOKEN}`);
   schedulerProcess = spawn(process.env.PYTHON_EXECUTABLE || 'python', [schedulerPath], {
     cwd: __dirname,
     windowsHide: true,
@@ -1092,6 +1093,7 @@ app.post('/api/scheduler/run', (req, res) => {
       APIX_SCHEDULER_AIRLINES: airlines.join(','),
       APIX_SCHEDULER_LEAD_TIMES: leadTimes.join(','),
       APIX_SCHEDULER_ROUTES: routes.join(','),
+      BROWSERLESS_TOKEN: process.env.BROWSERLESS_TOKEN || '',
     },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
