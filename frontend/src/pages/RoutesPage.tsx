@@ -6,6 +6,7 @@ import { formatINR, formatPercent } from '@/data/random';
 import { Search, Download, ArrowUpDown, ChevronsUpDown } from 'lucide-react';
 import type { RouteStats } from '@/data/types';
 import { apiRoutes, type ApiFilters } from '@/lib/api';
+import { InsightBot, ROUTES_PAGE_INSIGHTS } from '@/components/InsightBot';
 
 type SortKey = keyof Pick<RouteStats, 'averageFare' | 'index' | 'momChange' | 'volatility' | 'observations'>;
 
@@ -125,6 +126,11 @@ export function RoutesPage() {
         </div>
 
         <div className="flex items-center gap-2">
+          <InsightBot
+            title="Route Watch & Corridor Surveillance"
+            subtitle="Live fare telemetry"
+            insights={ROUTES_PAGE_INSIGHTS}
+          />
           <button onClick={exportCSV} className="btn btn-secondary text-xs">
             <Download className="w-3 h-3 text-slate-500" />
             <span>Export CSV</span>

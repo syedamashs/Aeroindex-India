@@ -7,6 +7,7 @@ import { formatINR, formatPercent } from '@/data/random';
 import { FilterBar } from '@/components/FilterBar';
 import { genericFareTooltipFormatter } from '@/components/chartFormatters';
 import { apiAirlines, type ApiFilters } from '@/lib/api';
+import { InsightBot, AIRLINE_COMPARISON_INSIGHTS } from '@/components/InsightBot';
 
 type ComparisonMode = 'airline' | 'source';
 
@@ -86,8 +87,15 @@ export function AirlinesPage() {
           </p>
         </div>
 
-        {/* Group by mode switcher */}
-        <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded border border-slate-200">
+        <div className="flex items-center gap-2">
+          <InsightBot
+            title="Airline Carrier Comparison"
+            subtitle="IndiGo · Air India · SpiceJet"
+            insights={AIRLINE_COMPARISON_INSIGHTS}
+          />
+
+          {/* Group by mode switcher */}
+          <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded border border-slate-200">
           <button
             onClick={() => setComparisonMode('airline')}
             className={`px-2.5 py-1 text-xs font-medium rounded ${
@@ -104,6 +112,7 @@ export function AirlinesPage() {
           >
             By OTA Carriers
           </button>
+          </div>
         </div>
       </div>
 

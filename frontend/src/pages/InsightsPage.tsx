@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useApp } from '@/context/AppContext';
 import { formatINR, formatPercent } from '@/data/random';
 import { apiAirlines, apiBookingWindow, apiIndex, apiInsights, apiRoutes, type ApiFilters, type ApiRouteStats } from '@/lib/api';
+import { InsightBot, MARKET_INSIGHTS_INSIGHTS } from '@/components/InsightBot';
 
 export function InsightsPage() {
   const { filters, lastUpdate } = useApp();
@@ -66,9 +67,17 @@ export function InsightsPage() {
           </p>
         </div>
 
-        <span className="text-xs font-mono text-slate-400">
-          Source: Ministry of Civil Aviation / DGCA Spec
-        </span>
+        <div className="flex items-center gap-2">
+          <InsightBot
+            title="Civil Aviation Market Intelligence"
+            subtitle="DGCA Policy Briefs"
+            insights={MARKET_INSIGHTS_INSIGHTS}
+            triggerLabel="Market Context"
+          />
+          <span className="text-xs font-mono text-slate-400">
+            Source: Ministry of Civil Aviation / DGCA Spec
+          </span>
+        </div>
       </div>
 
       {/* 2. STRUCTURED EDITORIAL OBSERVATIONS */}

@@ -28,14 +28,32 @@ export function InsightBot({ title, subtitle, insights, triggerLabel = 'AI Expla
 
   return (
     <>
+      {/* Premium Trigger Button */}
       <button
         id={`insightbot-trigger-${title.replace(/\s+/g, '-').toLowerCase()}`}
         onClick={handleOpen}
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 shadow-sm hover:shadow-md"
-        style={{ background: 'linear-gradient(135deg, #7c3aed, #4f46e5)', color: '#fff' }}
+        className="group relative inline-flex items-center gap-2 text-xs font-semibold transition-all duration-300"
+        style={{
+          padding: '6px 14px',
+          borderRadius: 10,
+          background: 'linear-gradient(135deg, #9333ea 0%, #7c3aed 45%, #4f46e5 100%)',
+          color: '#fff',
+          border: '1px solid rgba(196,181,253,0.35)',
+          boxShadow: '0 0 10px rgba(139,92,246,0.45), 0 2px 6px rgba(0,0,0,0.12)',
+          animation: 'ibGlow 2.5s ease-in-out infinite',
+          letterSpacing: '0.01em',
+        }}
       >
-        <Sparkles className="w-3 h-3" />
-        <span>{triggerLabel}</span>
+        {/* Shimmer overlay */}
+        <span
+          className="absolute inset-0 rounded-[9px] pointer-events-none"
+          style={{
+            background: 'linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.18) 50%, transparent 65%)',
+            animation: 'ibShimmer 3s ease-in-out infinite',
+          }}
+        />
+        <Sparkles className="w-3 h-3 flex-shrink-0" style={{ filter: 'drop-shadow(0 0 3px rgba(255,255,255,0.7))' }} />
+        <span className="relative">{triggerLabel}</span>
       </button>
 
       {open && (
@@ -146,6 +164,14 @@ export function InsightBot({ title, subtitle, insights, triggerLabel = 'AI Expla
               0%,100% { transform:translateY(0); opacity:0.5; }
               50%      { transform:translateY(-4px); opacity:1; }
             }
+            @keyframes ibGlow {
+              0%,100% { box-shadow: 0 0 10px rgba(139,92,246,0.4), 0 2px 6px rgba(0,0,0,0.1); }
+              50%      { box-shadow: 0 0 22px rgba(139,92,246,0.75), 0 4px 12px rgba(0,0,0,0.15); }
+            }
+            @keyframes ibShimmer {
+              0%   { background-position: -200% center; }
+              100% { background-position: 200% center; }
+            }
           `}</style>
         </div>
       )}
@@ -183,3 +209,35 @@ export const BOOKING_WINDOW_INSIGHTS: BotInsight[] = [
   { type: 'highlight', tag: '💡 Optimal Window', text: 'The T+7 to T+15 window consistently shows the best price-to-availability ratio on Indian trunk routes. Booking 1–2 weeks out captures most discount inventory while availability is still good.' },
   { type: 'ai', text: 'Advance purchase curves flatten after T+30 on competitive routes — multiple airlines compete for early bookings, suppressing fares. As departure nears, capacity locks in and pricing power shifts to airlines.' },
 ];
+
+export const AIRLINE_COMPARISON_INSIGHTS: BotInsight[] = [
+  { type: 'ai', text: 'This carrier comparison benchmarks IndiGo, Air India, and SpiceJet across yield metrics — average fare, fare dispersion (volatility), and observation market share captured in our scraping pipeline.' },
+  { type: 'ai', text: "IndiGo consistently prices below the market average — it operates India's largest LCC (Low Cost Carrier) network with the highest seat density, allowing it to undercut full-service carriers on most trunk routes while maintaining profitability through ancillary revenue." },
+  { type: 'highlight', tag: '✈️ Air India Premium', text: 'Air India commands a yield premium on long-haul trunk routes (DEL–BOM, DEL–MAA) due to its full-service positioning — in-flight meals, larger seat pitch, and Maharaja Club loyalty points justify 15–25% higher average fares vs. IndiGo on identical routes.' },
+  { type: 'ai', text: "SpiceJet's fare volatility is notably higher than peers — reflecting its capacity utilization challenges and frequent flash sale events to move unsold inventory rapidly. High volatility = higher risk and higher opportunity for price-sensitive travelers." },
+  { type: 'highlight', tag: '📊 Market Concentration', text: "India's domestic aviation is a concentrated oligopoly: IndiGo holds ~58% market share by passengers, Air India ~24%, SpiceJet ~8%. This concentration limits price competition on trunk routes and explains why fares trend upward across carriers simultaneously." },
+];
+
+export const ROUTES_PAGE_INSIGHTS: BotInsight[] = [
+  { type: 'ai', text: 'This route surveillance table tracks 10+ city-pair corridors in real-time, monitoring fare telemetry across booking windows and lead times to identify pricing anomalies and surge events.' },
+  { type: 'ai', text: "India's domestic aviation network is hub-and-spoke centered on Delhi (DEL), Mumbai (BOM), Bengaluru (BLR), Chennai (MAA), Kolkata (CCU), and Hyderabad (HYD). These 6 metros account for ~75% of all domestic passenger movements per DGCA annual statistics." },
+  { type: 'highlight', tag: '🔴 High MoM = Surge Alert', text: 'Routes with >5% month-on-month fare increase are flagged as surge corridors. This typically indicates an upcoming demand event (festival, exam season, IPL venue) or capacity reduction by airlines.' },
+  { type: 'ai', text: "Volatility score measures intra-month fare dispersion — high volatility routes are actively being yield-managed by airlines. A volatile route is one where the airline frequently adjusts its pricing buckets as booking pace changes." },
+];
+
+export const FARE_STATE_INSIGHTS: BotInsight[] = [
+  { type: 'ai', text: 'Fare-state transition analysis applies Markov chain methodology to track how reservation prices move between states over consecutive collection cycles — UNCHANGED, PRICE_INCREASE, PRICE_DECREASE, and BECAME_UNAVAILABLE.' },
+  { type: 'ai', text: "PRICE_INCREASE is the most common transition on India's trunk routes — reflecting airlines' dynamic yield management systems which continuously raise fares as seats are booked and booking pace accelerates toward departure." },
+  { type: 'highlight', tag: '⚠️ BECAME_UNAVAILABLE', text: "When a fare bucket becomes unavailable, it means the airline has sold all seats at that price point and moved to the next higher bucket. This is the purest signal of genuine demand pressure — not artificial scarcity." },
+  { type: 'ai', text: 'PRICE_DECREASE transitions are rare (<20% of observations) and typically occur during fare war periods, flash sales by capacity-excess carriers, or when booking pace lags significantly behind seat-fill targets 10–15 days before departure.' },
+  { type: 'highlight', tag: '📐 Markov Model', text: 'The steady-state distribution derived from these transition probabilities can predict the long-run probability that any observed fare will increase before departure — a key metric for travel timing optimization.' },
+];
+
+export const MARKET_INSIGHTS_INSIGHTS: BotInsight[] = [
+  { type: 'ai', text: 'AeroIndex Policy Briefs synthesize our real-time scraping data with DGCA regulatory frameworks to generate actionable intelligence for aviation economists and policy makers.' },
+  { type: 'ai', text: "India's domestic aviation market is the world's 3rd largest by passengers (2024) — growing at 8-12% CAGR. This explosive growth creates structural fare pressure as capacity additions lag demand growth, especially on Tier-2 to Tier-2 city connections." },
+  { type: 'highlight', tag: '🏛️ DGCA Mandate', text: "India's DGCA has a price cap mechanism on key routes (UDAN scheme routes) to ensure affordability. However, uncapped metro trunk routes (DEL-BOM, DEL-BLR) show free-market pricing dynamics with significantly higher fare volatility." },
+  { type: 'ai', text: 'The T+1 surge premium (last-minute fare spike) is an inefficiency in India\'s booking market — driven by business travelers who book late and are price-inelastic. Airlines deliberately hold back inventory at lower prices to capture both leisure and business segments.' },
+  { type: 'highlight', tag: '📈 Policy Implication', text: 'A transparent, real-time national airfare index (like AeroIndex) is the prerequisite for evidence-based price regulation — allowing DGCA to distinguish genuine demand-driven increases from artificial capacity restriction by airlines.' },
+];
+

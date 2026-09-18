@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { apiFareStateSummary } from '@/lib/api';
 import { formatINR } from '@/data/random';
+import { InsightBot, FARE_STATE_INSIGHTS } from '@/components/InsightBot';
 
 type FareStateData = Awaited<ReturnType<typeof apiFareStateSummary>>['data'];
 type TransitionState = 'UNCHANGED' | 'PRICE_INCREASE' | 'PRICE_DECREASE' | 'BECAME_UNAVAILABLE';
@@ -40,8 +41,15 @@ export function FareStatePage() {
           </p>
         </div>
 
-        <div className="text-xs font-mono text-slate-500">
-          Run Cycle: {String(data?.current_run?.run_id || 'Active Sequence')}
+        <div className="flex items-center gap-2">
+          <InsightBot
+            title="Fare-State Transition Analysis"
+            subtitle="Markov chain methodology"
+            insights={FARE_STATE_INSIGHTS}
+          />
+          <div className="text-xs font-mono text-slate-500">
+            Run Cycle: {String(data?.current_run?.run_id || 'Active Sequence')}
+          </div>
         </div>
       </div>
 
