@@ -1896,7 +1896,7 @@ def run(task):
             if browserless_token:
                 print("[airindia] Using Browserless cloud browser")
                 _browser = p.chromium.connect_over_cdp(
-                    f"wss://chrome.browserless.io?token={browserless_token}"
+                    f"wss://chrome.browserless.io?token={browserless_token}&timeout=120000"
                 )
                 context = _browser.new_context(
                     viewport={"width": 1400, "height": 900},
@@ -1953,8 +1953,8 @@ def run(task):
                     wait_until="domcontentloaded",
                     timeout=120000,
                 )
-                # Wait longer for JS-heavy booking widget to fully render
-                page.wait_for_timeout(8000)
+                # Give the JS-heavy booking widget time to render
+                page.wait_for_timeout(5000)
                 close_popups(page)
 
                 # Wait explicitly for airport input to appear (up to 30s)

@@ -249,7 +249,7 @@ def run(task):
             if browserless_token:
                 print("[spicejet] Using Browserless cloud browser")
                 browser = playwright.chromium.connect_over_cdp(
-                    f"wss://chrome.browserless.io?token={browserless_token}"
+                    f"wss://chrome.browserless.io?token={browserless_token}&timeout=120000"
                 )
             else:
                 browser_options = {

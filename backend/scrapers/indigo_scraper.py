@@ -814,7 +814,7 @@ def run(task):
             if browserless_token:
                 print("[indigo] Using Browserless cloud browser")
                 _browser = p.chromium.connect_over_cdp(
-                    f"wss://chrome.browserless.io?token={browserless_token}"
+                    f"wss://chrome.browserless.io?token={browserless_token}&timeout=120000"
                 )
                 context = _browser.new_context(
                     viewport={"width": 1400, "height": 900},
