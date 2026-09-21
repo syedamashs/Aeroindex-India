@@ -247,9 +247,11 @@ def save_preview(page):
     try:
         preview_dir = Path(__file__).resolve().parents[1] / "data"
         preview_dir.mkdir(parents=True, exist_ok=True)
-        page.screenshot(path=str(preview_dir / "live_preview.jpg"), quality=70, type="jpeg")
-    except Exception:
-        pass
+        preview_file = preview_dir / "live_preview.jpg"
+        page.screenshot(path=str(preview_file), quality=70, type="jpeg")
+        print(f"[preview] Viewport saved: {preview_file} ({preview_file.stat().st_size} bytes)")
+    except Exception as exc:
+        print(f"[preview] Screenshot note: {exc}")
 
 def run(task):
     run_id = str(task["run_id"])

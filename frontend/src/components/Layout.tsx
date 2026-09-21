@@ -13,7 +13,7 @@ import {
   Play,
 } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
-import { apiRunScheduler, apiSchedulerStatus, apiStatistics, apiIndex, type SchedulerTaskStatus } from '@/lib/api';
+import { apiRunScheduler, apiSchedulerStatus, apiStatistics, apiIndex, type SchedulerTaskStatus, API_BASE } from '@/lib/api';
 import { AviationTickerTape } from '@/components/animation/AviationTickerTape';
 import { PlatformGuideModal } from '@/components/PlatformGuideModal';
 import { AeroBotChat } from '@/components/AeroBotChat';
@@ -103,6 +103,7 @@ export function Layout({ children }: { children: ReactNode }) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
   const [previewTimestamp, setPreviewTimestamp] = useState<number>(Date.now());
+  const [previewLoaded, setPreviewLoaded] = useState(false);
 
   const canScrape = !isUiLoading && backendReady && !schedulerRunning && !isRefreshing;
   const [selectedSchedulerAirlines, setSelectedSchedulerAirlines] = useState<string[]>(SCHEDULER_AIRLINES.map((a) => a.value));
@@ -740,27 +741,19 @@ export function Layout({ children }: { children: ReactNode }) {
                     </div>
                     <div className="relative aspect-video max-h-56 bg-stone-950 flex items-center justify-center overflow-hidden">
                       <img
-                        src={`/api/scheduler/preview?t=${previewTimestamp}`}
+                        src={`${API_BASE}/api/scheduler/preview?t=${previewTimestamp}`}
                         alt="Live Browser Scraper Feed"
-                        className="w-full h-full object-contain"
-                        onError={(e) => {
-                          const target = e.currentTarget as HTMLElement;
-                          target.style.display = 'none';
-                          const fallback = target.nextElementSibling as HTMLElement;
-                          if (fallback) fallback.style.display = 'flex';
-                        }}
-                        onLoad={(e) => {
-                          const target = e.currentTarget as HTMLElement;
-                          target.style.display = 'block';
-                          const fallback = target.nextElementSibling as HTMLElement;
-                          if (fallback) fallback.style.display = 'none';
-                        }}
+                        className={`w-full h-full object-contain ${previewLoaded ? 'block' : 'hidden'}`}
+                        onLoad={() => setPreviewLoaded(true)}
+                        onError={() => setPreviewLoaded(false)}
                       />
-                      <div className="flex flex-col items-center justify-center p-6 text-center text-stone-400 space-y-2">
-                        <Loader2 className="w-6 h-6 animate-spin text-amber-500" />
-                        <p className="text-xs font-mono text-stone-300">Connecting to Playwright browser viewport...</p>
-                        <p className="text-[10px] text-stone-500">Live viewport stream renders as the airline portal loads.</p>
-                      </div>
+                      {!previewLoaded && (
+                        <div className="flex flex-col items-center justify-center p-6 text-center text-stone-400 space-y-2">
+                          <Loader2 className="w-6 h-6 animate-spin text-amber-500" />
+                          <p className="text-xs font-mono text-stone-300">Connecting to Playwright browser viewport...</p>
+                          <p className="text-[10px] text-stone-500">Live viewport stream renders as the airline portal loads.</p>
+                        </div>
+                      )}
                     </div>
                   </div>
 
