@@ -1108,6 +1108,17 @@ app.post('/api/scheduler/run', (req, res) => {
     return res.status(400).json({ message: 'Select at least one airline, route, and booking window.' });
   }
 
+  // Clear stale live preview from prior runs so old screenshots are never served
+  const previewPath = path.join(__dirname, 'data', 'live_preview.jpg');
+  if (fs.existsSync(previewPath)) {
+    try {
+      fs.unlinkSync(previewPath);
+      console.log('[scraper] Cleared stale live_preview.jpg for fresh scraping run');
+    } catch (err) {
+      console.warn('[scraper] Note on clearing preview:', err.message);
+    }
+  }
+
   const isHeadless = process.env.APIX_HEADLESS || (process.platform === 'win32' ? 'false' : 'true');
   console.log(`[scraper] BROWSERLESS_TOKEN present: ${!!process.env.BROWSERLESS_TOKEN}`);
   schedulerProcess = spawn(process.env.PYTHON_EXECUTABLE || 'python', [schedulerPath], {
@@ -1242,7 +1253,9 @@ app.get('/api/scheduler/preview', (req, res) => {
   const previewPath = path.join(__dirname, 'data', 'live_preview.jpg');
   if (fs.existsSync(previewPath)) {
     res.setHeader('Content-Type', 'image/jpeg');
-    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, proxy-revalidate, max-age=0');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
     return fs.createReadStream(previewPath).pipe(res);
   }
   return res.status(404).json({ message: 'No live preview available yet' });

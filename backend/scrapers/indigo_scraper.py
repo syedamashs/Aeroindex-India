@@ -930,7 +930,12 @@ def run(task):
 
                 select_airport(page, "From", origin_query)
                 select_airport(page, "To", destination_query)
+                page.wait_for_timeout(800)
+                save_preview(page)
+
                 select_departure_date(page, departure_date)
+                page.wait_for_timeout(800)
+                save_preview(page)
 
                 search_button = page.get_by_role("button", name="Search").first
                 if search_button.count() == 0:
@@ -944,6 +949,8 @@ def run(task):
 
                 response = response_info.value
                 response_data = response.json()
+                page.wait_for_timeout(1000)
+                save_preview(page)
                 raw_file = raw_dir / f"{datetime.now():%Y%m%d_%H%M%S_%f}_{route_id}_{departure_date}_{task_id}.json"
                 raw_file.write_text(json.dumps(response_data, indent=2, ensure_ascii=False), encoding="utf-8")
 

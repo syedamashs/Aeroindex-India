@@ -1751,6 +1751,20 @@ def save_csv(
 
 
 ######################################
+# PREVIEW STREAM
+######################################
+
+def save_preview(page):
+    try:
+        preview_dir = Path(__file__).resolve().parents[1] / "data"
+        preview_dir.mkdir(parents=True, exist_ok=True)
+        preview_file = preview_dir / "live_preview.jpg"
+        page.screenshot(path=str(preview_file), quality=70, type="jpeg")
+        print(f"[preview] Air India viewport saved: {preview_file} ({preview_file.stat().st_size} bytes)")
+    except Exception as exc:
+        pass
+
+######################################
 # SELECT AIRPORT
 ######################################
 
@@ -1797,6 +1811,7 @@ def select_airport(page, airport_input, city_name, airport_code):
 
     option.click()
     page.wait_for_timeout(1000)
+    save_preview(page)
 
     # Air India may replace the city name with its IATA code
     # e.g. Madurai -> IXM
@@ -1820,17 +1835,6 @@ def select_airport(page, airport_input, city_name, airport_code):
 ######################################
 # MAIN
 ######################################
-
-
-def save_preview(page):
-    try:
-        preview_dir = Path(__file__).resolve().parents[1] / "data"
-        preview_dir.mkdir(parents=True, exist_ok=True)
-        preview_file = preview_dir / "live_preview.jpg"
-        page.screenshot(path=str(preview_file), quality=70, type="jpeg")
-        print(f"[preview] Air India viewport saved: {preview_file} ({preview_file.stat().st_size} bytes)")
-    except Exception as exc:
-        pass
 
 def generate_airindia_records(task, raw_dir):
     run_id = str(task["run_id"])
@@ -2078,6 +2082,8 @@ def run(task):
 
                 if not select_airport(page, airports.nth(1), destination_query, destination_code):
                     raise RuntimeError(f"Failed to select destination: {destination_query}")
+                page.wait_for_timeout(800)
+                save_preview(page)
 
                 date_picker_button = page.get_by_role("button", name="Open date picker")
                 date_picker_button.click()
@@ -2135,6 +2141,7 @@ def run(task):
                     raise RuntimeError(f"Departure date not selected: {departure_date}")
 
                 page.wait_for_timeout(1000)
+                save_preview(page)
 
                 search_button = None
                 search_candidates = (
@@ -2177,6 +2184,8 @@ def run(task):
                     )
 
                 response_data = air_bounds_response.json()
+                page.wait_for_timeout(1000)
+                save_preview(page)
 
                 raw_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
                 raw_file = raw_dir / (

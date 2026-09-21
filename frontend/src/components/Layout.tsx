@@ -206,6 +206,8 @@ export function Layout({ children }: { children: ReactNode }) {
 
   const openSchedulerModal = () => {
     setSchedulerResult(null);
+    setPreviewLoaded(false);
+    setPreviewTimestamp(Date.now());
     setSelectedSchedulerAirlines(['spicejet']);
     setSelectedSchedulerLeadTimes([7]);
     setSelectedSchedulerRoutes(['DELHI_MUMBAI']);
@@ -237,6 +239,8 @@ export function Layout({ children }: { children: ReactNode }) {
     setSchedulerRunning(true);
     setSchedulerResult(null);
     setSchedulerTasks([]);
+    setPreviewLoaded(false);
+    setPreviewTimestamp(Date.now());
 
     let pollTimer: number | undefined;
 
@@ -616,19 +620,19 @@ export function Layout({ children }: { children: ReactNode }) {
           DATA INGESTION / SCRAPER WORKER MODAL
           ========================================================================= */}
       {schedulerModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/60 backdrop-blur-xs px-4 py-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/60 backdrop-blur-xs p-3 sm:p-4">
           <div
             role="dialog"
             aria-modal="true"
             aria-labelledby="scheduler-modal-title"
-            className="w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden rounded-xl border border-stone-200 bg-white shadow-2xl transition-all"
+            className="w-full max-w-3xl flex flex-col overflow-hidden rounded-xl border border-stone-200 bg-white shadow-2xl transition-all"
           >
-            <div className="flex items-start justify-between border-b border-stone-200 px-5 py-3.5 bg-stone-50">
+            <div className="flex items-start justify-between border-b border-stone-200 px-4 py-2.5 bg-stone-50 shrink-0">
               <div>
                 <h2 id="scheduler-modal-title" className="text-sm font-semibold text-stone-900 font-serif">
                   Live Tariff Scraping Pipeline
                 </h2>
-                <p className="text-xs text-stone-500 mt-0.5">Real-time domestic airline reservation tariff scraping</p>
+                <p className="text-[11px] text-stone-500 mt-0.5">Real-time domestic airline reservation tariff scraping</p>
               </div>
               <button
                 onClick={closeSchedulerModal}
@@ -640,20 +644,20 @@ export function Layout({ children }: { children: ReactNode }) {
               </button>
             </div>
 
-            <div className="p-5 space-y-4 text-xs overflow-y-auto max-h-[calc(92vh-110px)]">
+            <div className="p-3.5 space-y-3 text-xs overflow-hidden">
               {!schedulerResult && !schedulerRunning && (
                 <>
-                  <p className="text-stone-600 leading-relaxed">
+                  <p className="text-stone-600 leading-relaxed text-xs">
                     Select target flight corridors, domestic scheduled carriers, and advance-purchase booking horizons for on-demand tariff capture.
                   </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="border border-stone-200 rounded p-3 bg-stone-50/50">
-                      <p className="font-semibold text-stone-700 text-[11px] uppercase tracking-wider mb-2 font-mono">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div className="border border-stone-200 rounded p-2.5 bg-stone-50/50">
+                      <p className="font-semibold text-stone-700 text-[10px] uppercase tracking-wider mb-1.5 font-mono">
                         Corridors
                       </p>
-                      <div className="space-y-1.5">
+                      <div className="space-y-1">
                         {SCHEDULER_ROUTES.map((route) => (
-                          <label key={route.value} className="flex items-center gap-2 cursor-pointer text-stone-800">
+                          <label key={route.value} className="flex items-center gap-2 cursor-pointer text-stone-800 text-xs">
                             <input
                               type="checkbox"
                               checked={selectedSchedulerRoutes.includes(route.value)}
@@ -670,13 +674,13 @@ export function Layout({ children }: { children: ReactNode }) {
                       </div>
                     </div>
 
-                    <div className="border border-stone-200 rounded p-3 bg-stone-50/50">
-                      <p className="font-semibold text-stone-700 text-[11px] uppercase tracking-wider mb-2 font-mono">
+                    <div className="border border-stone-200 rounded p-2.5 bg-stone-50/50">
+                      <p className="font-semibold text-stone-700 text-[10px] uppercase tracking-wider mb-1.5 font-mono">
                         Carriers
                       </p>
-                      <div className="space-y-1.5">
+                      <div className="space-y-1">
                         {SCHEDULER_AIRLINES.map((airline) => (
-                          <label key={airline.value} className="flex items-center gap-2 cursor-pointer text-stone-800">
+                          <label key={airline.value} className="flex items-center gap-2 cursor-pointer text-stone-800 text-xs">
                             <input
                               type="checkbox"
                               checked={selectedSchedulerAirlines.includes(airline.value)}
@@ -693,13 +697,13 @@ export function Layout({ children }: { children: ReactNode }) {
                       </div>
                     </div>
 
-                    <div className="border border-stone-200 rounded p-3 bg-stone-50/50 sm:col-span-2">
-                      <p className="font-semibold text-stone-700 text-[11px] uppercase tracking-wider mb-2 font-mono">
+                    <div className="border border-stone-200 rounded p-2.5 bg-stone-50/50 sm:col-span-2">
+                      <p className="font-semibold text-stone-700 text-[10px] uppercase tracking-wider mb-1.5 font-mono">
                         Booking Windows
                       </p>
-                      <div className="flex flex-wrap gap-4">
+                      <div className="flex flex-wrap gap-3">
                         {SCHEDULER_LEAD_TIMES.map((days) => (
-                          <label key={days} className="flex items-center gap-2 cursor-pointer text-stone-800">
+                          <label key={days} className="flex items-center gap-1.5 cursor-pointer text-stone-800 text-xs">
                             <input
                               type="checkbox"
                               checked={selectedSchedulerLeadTimes.includes(days)}
@@ -720,41 +724,40 @@ export function Layout({ children }: { children: ReactNode }) {
               )}
 
               {schedulerRunning && (
-                <div className="space-y-3 py-2">
-                  {/* Live Browser Viewport Frame */}
+                <div className="space-y-2.5">
                   {/* Live Browser Viewport Frame */}
                   {(() => {
                     const activeTask = schedulerTasks.find((t) => t.status === 'RUNNING') || schedulerTasks.find((t) => t.status === 'SUCCESS') || schedulerTasks[0];
-                    const activeAirline = activeTask?.source?.toLowerCase() || selectedSchedulerAirlines[0] || 'spicejet';
-                    const activeUrl = activeAirline === 'airindia' 
+                    const activeAirline = (activeTask?.source || selectedSchedulerAirlines[0] || 'spicejet').toLowerCase();
+                    const activeUrl = activeAirline.includes('airindia') 
                       ? 'https://www.airindia.com/' 
-                      : activeAirline === 'indigo' 
+                      : activeAirline.includes('indigo') 
                       ? 'https://www.goindigo.in/' 
                       : 'https://www.spicejet.com/';
                     return (
-                      <div className="border border-stone-800 rounded-lg overflow-hidden bg-stone-900 shadow-lg">
-                        <div className="bg-[#1c1917] px-3.5 py-2 border-b border-stone-800 flex items-center justify-between text-[11px] font-mono">
+                      <div className="border border-stone-800 rounded-lg overflow-hidden bg-stone-900 shadow-md">
+                        <div className="bg-[#1c1917] px-3 py-1.5 border-b border-stone-800 flex items-center justify-between text-[11px] font-mono">
                           <div className="flex items-center gap-2 min-w-0">
-                            <div className="flex gap-1.5 shrink-0">
-                              <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80 inline-block"></span>
-                              <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80 inline-block"></span>
-                              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80 inline-block"></span>
+                            <div className="flex gap-1 shrink-0">
+                              <span className="w-2 h-2 rounded-full bg-rose-500/80 inline-block"></span>
+                              <span className="w-2 h-2 rounded-full bg-amber-500/80 inline-block"></span>
+                              <span className="w-2 h-2 rounded-full bg-emerald-500/80 inline-block"></span>
                             </div>
-                            <span className="text-stone-300 ml-2 bg-stone-800/90 px-2.5 py-0.5 rounded text-[11px] border border-stone-700/60 truncate font-mono">
+                            <span className="text-stone-300 ml-1.5 bg-stone-800/90 px-2 py-0.5 rounded text-[10px] border border-stone-700/60 truncate font-mono">
                               {activeUrl}
                             </span>
                             {activeTask && (
-                              <span className="hidden sm:inline text-stone-400 text-[10px] ml-1.5 font-mono">
+                              <span className="hidden sm:inline text-stone-400 text-[10px] ml-1 font-mono">
                                 {activeTask.origin} → {activeTask.destination} · T+{activeTask.target_lead_days}
                               </span>
                             )}
                           </div>
-                          <div className="flex items-center gap-1.5 text-amber-400 font-semibold shrink-0">
+                          <div className="flex items-center gap-1.5 text-amber-400 font-semibold shrink-0 text-[10px]">
                             <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
-                            <span className="tracking-wide uppercase text-[10px]">LIVE SCRAPER VIEWPORT</span>
+                            <span className="tracking-wide uppercase">LIVE VIEWPORT</span>
                           </div>
                         </div>
-                        <div className="relative aspect-video max-h-[500px] min-h-[300px] sm:min-h-[400px] w-full bg-stone-950 flex items-center justify-center overflow-hidden">
+                        <div className="relative h-[250px] sm:h-[280px] w-full bg-stone-950 flex items-center justify-center overflow-hidden">
                           <img
                             src={`${API_BASE}/api/scheduler/preview?t=${previewTimestamp}`}
                             alt="Live Browser Scraper Feed"
@@ -763,10 +766,10 @@ export function Layout({ children }: { children: ReactNode }) {
                             onError={() => setPreviewLoaded(false)}
                           />
                           {!previewLoaded && (
-                            <div className="flex flex-col items-center justify-center p-8 text-center text-stone-400 space-y-3">
-                              <Loader2 className="w-8 h-8 animate-spin text-amber-500" />
-                              <p className="text-sm font-mono text-stone-200">Connecting to Playwright browser viewport...</p>
-                              <p className="text-xs text-stone-400">Live viewport stream renders as the airline portal loads.</p>
+                            <div className="flex flex-col items-center justify-center p-6 text-center text-stone-400 space-y-2">
+                              <Loader2 className="w-7 h-7 animate-spin text-amber-500" />
+                              <p className="text-xs font-mono text-stone-200">Connecting to Playwright browser viewport...</p>
+                              <p className="text-[11px] text-stone-400">Live viewport stream renders as the airline portal loads.</p>
                             </div>
                           )}
                         </div>
@@ -774,16 +777,16 @@ export function Layout({ children }: { children: ReactNode }) {
                     );
                   })()}
 
-                  <div className="flex items-center gap-2.5 text-stone-800">
-                    <Loader2 className="w-4 h-4 animate-spin text-amber-700" />
-                    <span className="font-medium">Collecting observations from airline distribution engines...</span>
+                  <div className="flex items-center gap-2 text-stone-800 text-[11px]">
+                    <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-700 shrink-0" />
+                    <span className="font-medium truncate">Collecting observations from airline distribution engines...</span>
                   </div>
-                  <div className="border border-stone-200 rounded divide-y divide-stone-100 max-h-48 overflow-y-auto bg-stone-50/50">
+                  <div className="border border-stone-200 rounded divide-y divide-stone-100 max-h-24 overflow-y-auto bg-stone-50/50">
                     {schedulerTasks.length === 0 ? (
-                      <div className="p-3 text-stone-400 text-center font-mono">Initializing Playwright worker...</div>
+                      <div className="p-2 text-stone-400 text-center font-mono text-[10px]">Initializing Playwright worker...</div>
                     ) : (
                       schedulerTasks.map((task) => (
-                        <div key={task.task_id} className="p-2 text-[11px]">
+                        <div key={task.task_id} className="p-1.5 text-[11px]">
                           <div className="flex items-center justify-between">
                             <div>
                               <span className="font-semibold text-stone-800">{task.source.toUpperCase()}</span>
@@ -792,7 +795,7 @@ export function Layout({ children }: { children: ReactNode }) {
                               </span>
                             </div>
                             <span
-                              className={`px-1.5 py-0.5 rounded text-[10px] font-mono ${
+                              className={`px-1.5 py-0.2 rounded text-[9px] font-mono ${
                                 task.status === 'SUCCESS'
                                   ? 'bg-emerald-100 text-emerald-800'
                                   : task.status === 'FAILED'
@@ -806,7 +809,7 @@ export function Layout({ children }: { children: ReactNode }) {
                             </span>
                           </div>
                           {task.status === 'FAILED' && (task.error_message || task.error_type) && (
-                            <p className="mt-1 text-[10px] font-mono text-rose-700 break-words bg-rose-50 p-1 rounded">
+                            <p className="mt-0.5 text-[9px] font-mono text-rose-700 break-words bg-rose-50 p-1 rounded">
                               {task.error_type ? `${task.error_type}: ` : ''}{task.error_message}
                             </p>
                           )}
@@ -818,17 +821,17 @@ export function Layout({ children }: { children: ReactNode }) {
               )}
 
               {schedulerResult && (
-                <div className="space-y-3">
+                <div className="space-y-2.5">
                   {previewLoaded && (
-                    <div className="border border-stone-800 rounded-lg overflow-hidden bg-stone-900 shadow-lg">
-                      <div className="bg-[#1c1917] px-3.5 py-2 border-b border-stone-800 flex items-center justify-between text-[11px] font-mono">
-                        <span className="text-stone-300 text-[11px] font-mono">LIVE BROWSER FEED</span>
-                        <div className="flex items-center gap-1.5 text-emerald-400 font-semibold text-[10px]">
-                          <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <div className="border border-stone-800 rounded-lg overflow-hidden bg-stone-900 shadow-md">
+                      <div className="bg-[#1c1917] px-3 py-1.5 border-b border-stone-800 flex items-center justify-between text-[10px] font-mono">
+                        <span className="text-stone-300">LIVE BROWSER FEED</span>
+                        <div className="flex items-center gap-1.5 text-emerald-400 font-semibold">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                           <span>SCRAPING COMPLETE</span>
                         </div>
                       </div>
-                      <div className="relative aspect-video max-h-[440px] min-h-[260px] sm:min-h-[340px] w-full bg-stone-950 flex items-center justify-center overflow-hidden">
+                      <div className="relative h-[220px] sm:h-[250px] w-full bg-stone-950 flex items-center justify-center overflow-hidden">
                         <img
                           src={`${API_BASE}/api/scheduler/preview?t=${previewTimestamp}`}
                           alt="Scraped Browser Viewport"
@@ -839,7 +842,7 @@ export function Layout({ children }: { children: ReactNode }) {
                   )}
 
                   <div
-                    className={`p-3.5 rounded-lg border ${
+                    className={`p-2.5 rounded-lg border text-xs ${
                       schedulerResult.kind === 'success'
                         ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
                         : schedulerResult.kind === 'warning'
@@ -856,12 +859,12 @@ export function Layout({ children }: { children: ReactNode }) {
                     <div className="min-w-0 flex-1">
                       <p className="font-medium">{schedulerResult.message}</p>
                       {schedulerResult.errorDetail && (
-                        <p className="mt-1.5 p-2 rounded bg-rose-100/80 border border-rose-300 text-[11px] font-mono text-rose-900 break-words">
+                        <p className="mt-1 p-1.5 rounded bg-rose-100/80 border border-rose-300 text-[10px] font-mono text-rose-900 break-words">
                           {schedulerResult.errorDetail}
                         </p>
                       )}
                       {schedulerResult.observationsAfter !== undefined && (
-                        <p className="mt-1 text-[11px] text-stone-600 font-mono">
+                        <p className="mt-0.5 text-[10px] text-stone-600 font-mono">
                           Records: {schedulerResult.observationsBefore?.toLocaleString()} →{' '}
                           {schedulerResult.observationsAfter?.toLocaleString()} (+
                           {schedulerResult.observationsInserted?.toLocaleString()} new)
@@ -873,18 +876,18 @@ export function Layout({ children }: { children: ReactNode }) {
               </div>
             )}
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-stone-100">
+              <div className="flex justify-end gap-2 pt-1.5 border-t border-stone-100">
                 {!schedulerResult && !schedulerRunning ? (
                   <>
-                    <button onClick={closeSchedulerModal} className="btn btn-secondary">
+                    <button onClick={closeSchedulerModal} className="btn btn-secondary text-xs py-1.5 px-3">
                       Cancel
                     </button>
-                    <button onClick={handleSchedulerRun} className="btn btn-ochre">
+                    <button onClick={handleSchedulerRun} className="btn btn-ochre text-xs py-1.5 px-3">
                       Start Live Scraping
                     </button>
                   </>
                 ) : !schedulerRunning ? (
-                  <button onClick={closeSchedulerModal} className="btn btn-primary">
+                  <button onClick={closeSchedulerModal} className="btn btn-primary text-xs py-1.5 px-3">
                     Close
                   </button>
                 ) : null}
