@@ -621,9 +621,9 @@ export function Layout({ children }: { children: ReactNode }) {
             role="dialog"
             aria-modal="true"
             aria-labelledby="scheduler-modal-title"
-            className="w-full max-w-lg overflow-hidden rounded-lg border border-stone-200 bg-white shadow-xl"
+            className="w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden rounded-xl border border-stone-200 bg-white shadow-2xl transition-all"
           >
-            <div className="flex items-start justify-between border-b border-stone-200 px-5 py-4 bg-stone-50">
+            <div className="flex items-start justify-between border-b border-stone-200 px-5 py-3.5 bg-stone-50">
               <div>
                 <h2 id="scheduler-modal-title" className="text-sm font-semibold text-stone-900 font-serif">
                   Live Tariff Scraping Pipeline
@@ -640,7 +640,7 @@ export function Layout({ children }: { children: ReactNode }) {
               </button>
             </div>
 
-            <div className="p-5 space-y-4 text-xs">
+            <div className="p-5 space-y-4 text-xs overflow-y-auto max-h-[calc(92vh-110px)]">
               {!schedulerResult && !schedulerRunning && (
                 <>
                   <p className="text-stone-600 leading-relaxed">
@@ -722,40 +722,57 @@ export function Layout({ children }: { children: ReactNode }) {
               {schedulerRunning && (
                 <div className="space-y-3 py-2">
                   {/* Live Browser Viewport Frame */}
-                  <div className="border border-stone-800 rounded-lg overflow-hidden bg-stone-900 shadow-md">
-                    <div className="bg-[#1c1917] px-3 py-1.5 border-b border-stone-800 flex items-center justify-between text-[11px] font-mono">
-                      <div className="flex items-center gap-2">
-                        <div className="flex gap-1.5">
-                          <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80 inline-block"></span>
-                          <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80 inline-block"></span>
-                          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80 inline-block"></span>
+                  {/* Live Browser Viewport Frame */}
+                  {(() => {
+                    const activeTask = schedulerTasks.find((t) => t.status === 'RUNNING') || schedulerTasks.find((t) => t.status === 'SUCCESS') || schedulerTasks[0];
+                    const activeAirline = activeTask?.source?.toLowerCase() || selectedSchedulerAirlines[0] || 'spicejet';
+                    const activeUrl = activeAirline === 'airindia' 
+                      ? 'https://www.airindia.com/' 
+                      : activeAirline === 'indigo' 
+                      ? 'https://www.goindigo.in/' 
+                      : 'https://www.spicejet.com/';
+                    return (
+                      <div className="border border-stone-800 rounded-lg overflow-hidden bg-stone-900 shadow-lg">
+                        <div className="bg-[#1c1917] px-3.5 py-2 border-b border-stone-800 flex items-center justify-between text-[11px] font-mono">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <div className="flex gap-1.5 shrink-0">
+                              <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80 inline-block"></span>
+                              <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80 inline-block"></span>
+                              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80 inline-block"></span>
+                            </div>
+                            <span className="text-stone-300 ml-2 bg-stone-800/90 px-2.5 py-0.5 rounded text-[11px] border border-stone-700/60 truncate font-mono">
+                              {activeUrl}
+                            </span>
+                            {activeTask && (
+                              <span className="hidden sm:inline text-stone-400 text-[10px] ml-1.5 font-mono">
+                                {activeTask.origin} → {activeTask.destination} · T+{activeTask.target_lead_days}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1.5 text-amber-400 font-semibold shrink-0">
+                            <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+                            <span className="tracking-wide uppercase text-[10px]">LIVE SCRAPER VIEWPORT</span>
+                          </div>
                         </div>
-                        <span className="text-stone-300 ml-2 bg-stone-800/90 px-2 py-0.5 rounded text-[10px] border border-stone-700/60">
-                          https://www.spicejet.com/
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1.5 text-amber-400 font-semibold">
-                        <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
-                        <span className="tracking-wide uppercase text-[10px]">LIVE SCRAPER VIEWPORT</span>
-                      </div>
-                    </div>
-                    <div className="relative aspect-video max-h-56 bg-stone-950 flex items-center justify-center overflow-hidden">
-                      <img
-                        src={`${API_BASE}/api/scheduler/preview?t=${previewTimestamp}`}
-                        alt="Live Browser Scraper Feed"
-                        className={`w-full h-full object-contain ${previewLoaded ? 'block' : 'hidden'}`}
-                        onLoad={() => setPreviewLoaded(true)}
-                        onError={() => setPreviewLoaded(false)}
-                      />
-                      {!previewLoaded && (
-                        <div className="flex flex-col items-center justify-center p-6 text-center text-stone-400 space-y-2">
-                          <Loader2 className="w-6 h-6 animate-spin text-amber-500" />
-                          <p className="text-xs font-mono text-stone-300">Connecting to Playwright browser viewport...</p>
-                          <p className="text-[10px] text-stone-500">Live viewport stream renders as the airline portal loads.</p>
+                        <div className="relative aspect-video max-h-[500px] min-h-[300px] sm:min-h-[400px] w-full bg-stone-950 flex items-center justify-center overflow-hidden">
+                          <img
+                            src={`${API_BASE}/api/scheduler/preview?t=${previewTimestamp}`}
+                            alt="Live Browser Scraper Feed"
+                            className={`w-full h-full object-contain ${previewLoaded ? 'block' : 'hidden'}`}
+                            onLoad={() => setPreviewLoaded(true)}
+                            onError={() => setPreviewLoaded(false)}
+                          />
+                          {!previewLoaded && (
+                            <div className="flex flex-col items-center justify-center p-8 text-center text-stone-400 space-y-3">
+                              <Loader2 className="w-8 h-8 animate-spin text-amber-500" />
+                              <p className="text-sm font-mono text-stone-200">Connecting to Playwright browser viewport...</p>
+                              <p className="text-xs text-stone-400">Live viewport stream renders as the airline portal loads.</p>
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                  </div>
+                      </div>
+                    );
+                  })()}
 
                   <div className="flex items-center gap-2.5 text-stone-800">
                     <Loader2 className="w-4 h-4 animate-spin text-amber-700" />
@@ -801,15 +818,35 @@ export function Layout({ children }: { children: ReactNode }) {
               )}
 
               {schedulerResult && (
-                <div
-                  className={`p-3 rounded border ${
-                    schedulerResult.kind === 'success'
-                      ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
-                      : schedulerResult.kind === 'warning'
-                      ? 'border-amber-200 bg-amber-50 text-amber-900'
-                      : 'border-rose-200 bg-rose-50 text-rose-900'
-                  }`}
-                >
+                <div className="space-y-3">
+                  {previewLoaded && (
+                    <div className="border border-stone-800 rounded-lg overflow-hidden bg-stone-900 shadow-lg">
+                      <div className="bg-[#1c1917] px-3.5 py-2 border-b border-stone-800 flex items-center justify-between text-[11px] font-mono">
+                        <span className="text-stone-300 text-[11px] font-mono">LIVE BROWSER FEED</span>
+                        <div className="flex items-center gap-1.5 text-emerald-400 font-semibold text-[10px]">
+                          <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                          <span>SCRAPING COMPLETE</span>
+                        </div>
+                      </div>
+                      <div className="relative aspect-video max-h-[440px] min-h-[260px] sm:min-h-[340px] w-full bg-stone-950 flex items-center justify-center overflow-hidden">
+                        <img
+                          src={`${API_BASE}/api/scheduler/preview?t=${previewTimestamp}`}
+                          alt="Scraped Browser Viewport"
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <div
+                    className={`p-3.5 rounded-lg border ${
+                      schedulerResult.kind === 'success'
+                        ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
+                        : schedulerResult.kind === 'warning'
+                        ? 'border-amber-200 bg-amber-50 text-amber-900'
+                        : 'border-rose-200 bg-rose-50 text-rose-900'
+                    }`}
+                  >
                   <div className="flex gap-2 items-start">
                     {schedulerResult.kind === 'success' ? (
                       <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-600" />
@@ -833,7 +870,8 @@ export function Layout({ children }: { children: ReactNode }) {
                     </div>
                   </div>
                 </div>
-              )}
+              </div>
+            )}
 
               <div className="flex justify-end gap-2 pt-2 border-t border-stone-100">
                 {!schedulerResult && !schedulerRunning ? (
