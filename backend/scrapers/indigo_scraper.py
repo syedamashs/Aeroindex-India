@@ -811,7 +811,7 @@ def run(task):
     try:
         with sync_playwright() as p:
             browserless_token = os.getenv("BROWSERLESS_TOKEN")
-            if browserless_token:
+            if headless and browserless_token:
                 print("[indigo] Using Browserless cloud browser (stealth mode)")
                 _browser = p.chromium.connect_over_cdp(
                     f"wss://chrome.browserless.io?token={browserless_token}&stealth=true&--disable-blink-features=AutomationControlled&timeout=120000"
@@ -823,6 +823,7 @@ def run(task):
                     timezone_id="Asia/Kolkata",
                 )
             else:
+                print("[indigo] Launching local browser (live UI mode)")
                 browser_options = {
                     "user_data_dir": str(profile_dir),
                     "headless": headless,

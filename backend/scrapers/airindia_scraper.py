@@ -1892,8 +1892,12 @@ def run(task):
         print(f"target lead: T+{target_lead_days}")
 
         with sync_playwright() as p:
+            is_headless = (
+                str(os.getenv("APIX_HEADLESS", "true" if os.name != "nt" else "false")).lower()
+                == "true"
+            )
             browserless_token = os.getenv("BROWSERLESS_TOKEN")
-            if browserless_token:
+            if is_headless and browserless_token:
                 print("[airindia] Using Browserless cloud browser (stealth mode)")
                 _browser = p.chromium.connect_over_cdp(
                     f"wss://chrome.browserless.io?token={browserless_token}&stealth=true&--disable-blink-features=AutomationControlled&timeout=120000"
@@ -1905,10 +1909,7 @@ def run(task):
                     timezone_id="Asia/Kolkata",
                 )
             else:
-                is_headless = (
-                    str(os.getenv("APIX_HEADLESS", "true" if os.name != "nt" else "false")).lower()
-                    == "true"
-                )
+                print("[airindia] Launching local browser (live UI mode)")
                 browser_options = {
                     "user_data_dir": str(profile_dir),
                     "headless": is_headless,

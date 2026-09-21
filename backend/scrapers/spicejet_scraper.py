@@ -247,7 +247,7 @@ def run(task):
     try:
         with sync_playwright() as playwright:
             browserless_token = os.getenv("BROWSERLESS_TOKEN")
-            if browserless_token:
+            if headless and browserless_token:
                 print("[spicejet] Using Browserless cloud browser (stealth mode)")
                 browser = playwright.chromium.connect_over_cdp(
                     f"wss://chrome.browserless.io?token={browserless_token}&stealth=true&--disable-blink-features=AutomationControlled&timeout=120000"
@@ -260,6 +260,7 @@ def run(task):
                 )
                 page = context.new_page()
             else:
+                print("[spicejet] Launching local browser (live UI mode)")
                 browser_options = {
                     "headless": headless,
                     "args": [
@@ -274,6 +275,8 @@ def run(task):
                 browser_channel = os.getenv("APIX_BROWSER_CHANNEL")
                 if browser_channel:
                     browser_options["channel"] = browser_channel
+                elif os.name == "nt" and not headless:
+                    browser_options["channel"] = "chrome"
                 browser = playwright.chromium.launch(**browser_options)
                 page = browser.new_page(viewport={"width": 1400, "height": 900})
             try:
