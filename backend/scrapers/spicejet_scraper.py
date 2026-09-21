@@ -233,6 +233,7 @@ def run(task):
 
     default_headless = "true" if os.name != "nt" else "false"
     headless = str(task.get("headless", os.getenv("APIX_HEADLESS", default_headless))).lower() == "true"
+    source_url = str(task.get("source_url") or os.getenv("APIX_SPICEJET_URL", "https://www.spicejet.com/"))
     timeout_ms = int(task.get("timeout_ms") or os.getenv("APIX_BROWSER_TIMEOUT_MS", "120000"))
     collection_timestamp = datetime.now().isoformat(timespec="seconds")
     result = {
@@ -247,10 +248,17 @@ def run(task):
         with sync_playwright() as playwright:
             browserless_token = os.getenv("BROWSERLESS_TOKEN")
             if browserless_token:
-                print("[spicejet] Using Browserless cloud browser")
+                print("[spicejet] Using Browserless cloud browser (stealth mode)")
                 browser = playwright.chromium.connect_over_cdp(
-                    f"wss://chrome.browserless.io?token={browserless_token}&timeout=120000"
+                    f"wss://chrome.browserless.io?token={browserless_token}&stealth=true&--disable-blink-features=AutomationControlled&timeout=120000"
                 )
+                context = browser.new_context(
+                    viewport={"width": 1400, "height": 900},
+                    user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+                    locale="en-IN",
+                    timezone_id="Asia/Kolkata",
+                )
+                page = context.new_page()
             else:
                 browser_options = {
                     "headless": headless,
@@ -267,7 +275,7 @@ def run(task):
                 if browser_channel:
                     browser_options["channel"] = browser_channel
                 browser = playwright.chromium.launch(**browser_options)
-            page = browser.new_page(viewport={"width": 1400, "height": 900})
+                page = browser.new_page(viewport={"width": 1400, "height": 900})
             try:
                 page.goto(source_url, wait_until="domcontentloaded", timeout=timeout_ms)
                 page.wait_for_timeout(3000)

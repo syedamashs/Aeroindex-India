@@ -1,126 +1,123 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
-  Compass, X, ChevronRight, ChevronLeft, Play, Pause,
-  Sparkles, Activity, TrendingUp, Award, BookOpen, Layers,
-  MapPin, ShieldCheck, Bell
+  X, ChevronRight, ChevronLeft, Play, Pause,
+  Sparkles, Activity, TrendingUp, BookOpen, Layers,
+  ShieldCheck, Bell, CheckCircle2
 } from 'lucide-react';
 
-export interface TourStep {
+export interface StoryStep {
   id: string;
-  title: string;
   route: string;
+  spotSelector: string;
+  stepBadge: string;
   category: string;
-  icon: React.ComponentType<{ className?: string }>;
+  shortTitle: string;
   headline: string;
-  bullets: string[];
+  narrativeLead: string;
+  narrativeText: string;
+  icon: React.ComponentType<{ className?: string }>;
+  accentColor: string;
 }
 
-// Strictly matching the active tabs in the top navigation bar
-export const TOUR_STEPS: TourStep[] = [
+export const STORY_STEPS: StoryStep[] = [
   {
-    id: 'dashboard',
-    title: 'Executive Dashboard',
+    id: 'headline-index',
     route: '/dashboard',
-    category: 'Overview',
+    spotSelector: '#guide-headline-index',
+    stepBadge: 'Step 1 of 7 · National Airfare Index',
+    category: 'Macroeconomic Metric',
+    shortTitle: 'National Index',
+    headline: 'This is the headline number that feeds national inflation.',
+    narrativeLead: 'Composite Laspeyres Index (Jan 2026 = 100.0)',
+    narrativeText:
+      'Calibrated directly with DGCA domestic passenger volume weights. It measures true airfare movement across India and feeds the transport component of the Consumer Price Index (CPI) used for monetary policy.',
     icon: Activity,
-    headline: 'National Airfare Index (Base Jan 2026 = 100.0) & Market Pulse',
-    bullets: [
-      'Headline Laspeyres Index: Composite domestic ticket indicator weighted by DGCA passenger volume.',
-      'Autonomous Flight Curve: Simulates seasonal movements along the line (winter fog ➔ summer peak ➔ autumn calm).',
-      'Market Coverage: High-level pipeline metrics across monitored domestic trunk corridors & active carriers.'
-    ]
+    accentColor: 'text-amber-400'
   },
   {
-    id: 'routes',
-    title: 'Route Watch',
+    id: 'trajectory-simulation',
+    route: '/dashboard',
+    spotSelector: '#guide-trajectory-chart',
+    stepBadge: 'Step 2 of 7 · Continuous Automated Radar',
+    category: 'Surveillance Engine',
+    shortTitle: 'Trajectory Radar',
+    headline: 'Manual monthly sampling misses 99% of pricing reality.',
+    narrativeLead: 'Autonomous Time-Series Flight Radar',
+    narrativeText:
+      'Current DGCA monitoring inspects ~78 routes by hand once a month—arriving 60 days late. Aeroindex automates multi-daily tariff ingestion across 150+ corridors, capturing winter fog surges, festive spikes, and off-peak troughs in real time.',
+    icon: Sparkles,
+    accentColor: 'text-sky-400'
+  },
+  {
+    id: 'corridor-surveillance',
     route: '/routes',
-    category: 'Surveillance',
+    spotSelector: '#guide-routes-table',
+    stepBadge: 'Step 3 of 7 · Route Watch & Volatility',
+    category: 'Market Intelligence',
+    shortTitle: 'Route Watch',
+    headline: 'A flight has no single price across the network.',
+    narrativeLead: '150+ Monitored Domestic Trunk & Regional Corridors',
+    narrativeText:
+      'Monitors IndiGo, Air India, SpiceJet, and Akasa with standard deviation volatility tracking. Automated surge alarms flag anti-competitive tariff escalation and sudden pricing anomalies before travelers are exploited.',
     icon: TrendingUp,
-    headline: '150+ Monitored Domestic Trunk & Regional Corridors',
-    bullets: [
-      'Corridor Volatility: Standard deviation indexing to isolate unstable domestic pricing bands.',
-      'Surge Detection: Flags routes exceeding statistical pricing ceilings to protect consumer affordability.',
-      'One-Click CSV Export: Instant downloadable dataset for Civil Aviation Ministry reporting & audits.'
-    ]
+    accentColor: 'text-emerald-400'
   },
   {
-    id: 'map',
-    title: 'India Airway Map',
-    route: '/map',
-    category: 'Surveillance',
-    icon: MapPin,
-    headline: 'Geospatial Network Topology & Corridor Load Arcs',
-    bullets: [
-      'Geospatial Airway Arcs: Interactive Leaflet map connecting Indian airport nodes with flight arcs.',
-      'Corridor Pricing Tiers: Color-coded routes indicating normal vs elevated surge pricing across regions.',
-      'Hub-and-Spoke Density: Visualizes capacity concentration around Delhi and Mumbai mega-hubs.'
-    ]
-  },
-  {
-    id: 'airlines',
-    title: 'Carrier Yields',
-    route: '/airlines',
-    category: 'Market Economics',
-    icon: Award,
-    headline: 'Airline Pricing Dispersion & Market Share',
-    bullets: [
-      'Carrier Spreads: Real-time price benchmarks between IndiGo, Air India, SpiceJet, and Akasa Air.',
-      'Pricing Power Audit: Evaluates whether carrier consolidation causes anti-competitive fare surges.',
-      'Yield Dispersion: Compares low-cost vs full-service airline pricing behaviors on identical corridors.'
-    ]
-  },
-  {
-    id: 'booking-window',
-    title: 'Advance Curve',
+    id: 'booking-window-curve',
     route: '/booking-window',
+    spotSelector: '#guide-booking-curve',
+    stepBadge: 'Step 4 of 7 · Close-in Surge Multiplier',
     category: 'Market Economics',
+    shortTitle: 'Advance Curve',
+    headline: 'Quantifying the last-minute T+1 booking penalty.',
+    narrativeLead: 'Exponential Yield Curve (T+45 down to T+1)',
+    narrativeText:
+      'Empirically measures the steep 2.4x surge multiplier between 45-day advance purchase and last-minute emergency departures. Delivers rigorous mathematical proof for Civil Aviation committees evaluating dynamic fare caps.',
     icon: BookOpen,
-    headline: 'Quantifying the Last-Minute T+1 Booking Surge Penalty',
-    bullets: [
-      'Exponential Curve: Empirically measures the 2.4x surge penalty from T+45 down to T+1 departure.',
-      'Affordability Horizons: Pinpoints optimal lead-time booking windows for Indian travelers.',
-      'Regulatory Evidence: Hard empirical data for DGCA committees evaluating dynamic fare caps.'
-    ]
+    accentColor: 'text-amber-400'
   },
   {
-    id: 'fare-state',
-    title: 'Markov Fare States',
+    id: 'markov-transition',
     route: '/fare-state',
-    category: 'Market Economics',
+    spotSelector: '#guide-markov-matrix',
+    stepBadge: 'Step 5 of 7 · Markov Fare State Analytics',
+    category: 'Predictive Modeling',
+    shortTitle: 'Fare Escalation',
+    headline: 'Predicting price escalation before complaints occur.',
+    narrativeLead: 'Markov Chain Fare Escalation Probability (FEP)',
+    narrativeText:
+      'Discrete state transitions (Stable, Surge, Discount, Capacity Cleared) compute empirical mathematical probabilities that a corridor enters an aggressive escalation cycle during subsequent inventory sweeps.',
     icon: Layers,
-    headline: 'Markov Chain Fare Escalation Probability (FEP)',
-    bullets: [
-      'Discrete Fare States: Classifies fares into Low, Moderate, High, and Surge states.',
-      'Transition Matrix: Calculates mathematical probabilities of a route transitioning into surge pricing.',
-      'Predictive Surveillance: Forecasts upcoming price escalations before public consumer complaints occur.'
-    ]
+    accentColor: 'text-indigo-400'
   },
   {
-    id: 'dqe',
-    title: 'Data Quality Audit',
+    id: 'dqe-governance',
     route: '/dqe',
-    category: 'Observations',
+    spotSelector: '#guide-dqe-audit',
+    stepBadge: 'Step 6 of 7 · Statutory Collection & DQE Audit',
+    category: 'Regulatory Compliance',
+    shortTitle: 'Quality Engine',
+    headline: 'Statutory basis under Rule 135(2) and zero-noise audit.',
+    narrativeLead: '5-Stage Data Quality Engine (DQE)',
+    narrativeText:
+      'Tariffs are collected under statutory airline disclosures (Aircraft Rules 1937, Rule 135(2)). The 5-stage DQE validates schemas, prunes duplicates via SHA fingerprints, and discards outliers so raw web noise never corrupts official indices.',
     icon: ShieldCheck,
-    headline: 'Production Data Integrity & Ingestion Validation',
-    bullets: [
-      '5-Stage Pipeline: Schema validation, deduplication, price outlier filtering, and DB integrity checks.',
-      'Zero-Corruption Guarantee: Ensures raw web scraping noise never corrupts official economic indices.',
-      'Audit Logging: Real-time pass/fail observation tracking on production SQLite APX database.'
-    ]
+    accentColor: 'text-teal-400'
   },
   {
-    id: 'alerts',
-    title: 'Surveillance Alerts',
+    id: 'surveillance-alerts',
     route: '/alerts',
-    category: 'Governance & API',
+    spotSelector: '#guide-alerts-stream',
+    stepBadge: 'Step 7 of 7 · Automated Governance Alerts',
+    category: 'Aviation Governance',
+    shortTitle: 'Surveillance Alerts',
+    headline: 'Automated intelligence for Civil Aviation authorities.',
+    narrativeLead: 'Algorithmic Surge Incident Stream',
+    narrativeText:
+      'Automated incident stream alerts officials the moment corridor volatility or fare ceilings breach statistical thresholds—providing verifiable timestamps, carrier identities, and severity tiers for prompt regulatory action.',
     icon: Bell,
-    headline: 'Automated Surge Notifications for Civil Aviation',
-    bullets: [
-      'Automated Thresholds: Algorithmic rules trigger incident notices when fares breach statistical norms.',
-      'Severity Tiers: High, Moderate, and Advisory notices with collection timestamps and route IDs.',
-      'Actionable Governance: Direct intelligence feed for ministry intervention and consumer advisories.'
-    ]
+    accentColor: 'text-rose-400'
   }
 ];
 
@@ -135,174 +132,293 @@ export function PlatformGuideModal({
   const location = useLocation();
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [autoPlay, setAutoPlay] = useState(false);
+  const [autoProgress, setAutoProgress] = useState(0);
+  const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Sync step with current route if user navigates manually
-  useEffect(() => {
-    const foundIndex = TOUR_STEPS.findIndex((s) => s.route === location.pathname);
-    if (foundIndex !== -1) {
-      setCurrentStepIndex(foundIndex);
-    }
-  }, [location.pathname]);
+  // Clear existing spotlights
+  const clearSpot = useCallback(() => {
+    document.querySelectorAll('.spot').forEach((node) => {
+      node.classList.remove('spot');
+    });
+  }, []);
 
-  // Navigate to page when step changes
-  const goToStep = (index: number) => {
-    const targetIndex = Math.max(0, Math.min(TOUR_STEPS.length - 1, index));
-    setCurrentStepIndex(targetIndex);
-    const step = TOUR_STEPS[targetIndex];
+  // Spotlight target element with smooth centering and pulse ring
+  const highlightTarget = useCallback((selector: string) => {
+    clearSpot();
+    if (!selector) return;
+
+    let attempts = 0;
+    const maxAttempts = 8;
+
+    const findAndSpot = () => {
+      const target = document.querySelector(selector);
+      if (target) {
+        target.classList.add('spot');
+        target.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
+        });
+      } else if (attempts < maxAttempts) {
+        attempts++;
+        retryTimeoutRef.current = setTimeout(findAndSpot, 140);
+      }
+    };
+
+    findAndSpot();
+  }, [clearSpot]);
+
+  // Navigate to step
+  const goToStep = useCallback((index: number) => {
+    const targetIdx = Math.max(0, Math.min(STORY_STEPS.length - 1, index));
+    setCurrentStepIndex(targetIdx);
+    setAutoProgress(0);
+
+    const step = STORY_STEPS[targetIdx];
     if (location.pathname !== step.route) {
       navigate(step.route);
     }
-  };
 
-  const handleNext = () => {
-    if (currentStepIndex < TOUR_STEPS.length - 1) {
+    // Trigger spotlight with slight delay for route transition
+    setTimeout(() => {
+      highlightTarget(step.spotSelector);
+    }, 150);
+  }, [location.pathname, navigate, highlightTarget]);
+
+  const handleNext = useCallback(() => {
+    if (currentStepIndex < STORY_STEPS.length - 1) {
       goToStep(currentStepIndex + 1);
     } else {
-      goToStep(0); // loop back
+      // Finished
+      clearSpot();
+      setCurrentStepIndex(0);
+      onClose();
     }
-  };
+  }, [currentStepIndex, goToStep, clearSpot, onClose]);
 
-  const handlePrev = () => {
+  const handlePrev = useCallback(() => {
     if (currentStepIndex > 0) {
       goToStep(currentStepIndex - 1);
     }
-  };
+  }, [currentStepIndex, goToStep]);
 
-  // Auto-play timer (advances step every 8.5 seconds)
+  // When guide opens, ALWAYS restart from Step 0 and navigate to dashboard
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add('storyOn');
+      setCurrentStepIndex(0);
+      goToStep(0);
+    } else {
+      document.body.classList.remove('storyOn');
+      clearSpot();
+      setCurrentStepIndex(0);
+      setAutoPlay(false);
+      setAutoProgress(0);
+      if (retryTimeoutRef.current) clearTimeout(retryTimeoutRef.current);
+    }
+    return () => {
+      document.body.classList.remove('storyOn');
+      clearSpot();
+      if (retryTimeoutRef.current) clearTimeout(retryTimeoutRef.current);
+    };
+  }, [isOpen]);
+
+  // Keyboard navigation: ArrowRight / ArrowLeft / Esc / Space
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        handleNext();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        handlePrev();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        clearSpot();
+        setCurrentStepIndex(0);
+        onClose();
+      } else if (e.key === ' ' && e.target === document.body) {
+        e.preventDefault();
+        setAutoPlay((prev) => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, handleNext, handlePrev, clearSpot, onClose]);
+
+  // Auto-play timer with smooth progress bar
   useEffect(() => {
     if (!isOpen || !autoPlay) return;
-    const interval = setInterval(() => {
-      goToStep((currentStepIndex + 1) % TOUR_STEPS.length);
-    }, 8500);
-    return () => clearInterval(interval);
-  }, [isOpen, autoPlay, currentStepIndex]);
+
+    const DURATION = 8500; // 8.5 seconds per step
+    const STEP_INTERVAL = 100;
+    const progressIncrement = (STEP_INTERVAL / DURATION) * 100;
+
+    const timer = setInterval(() => {
+      setAutoProgress((prev) => {
+        if (prev >= 100) {
+          handleNext();
+          return 0;
+        }
+        return prev + progressIncrement;
+      });
+    }, STEP_INTERVAL);
+
+    return () => clearInterval(timer);
+  }, [isOpen, autoPlay, handleNext]);
 
   if (!isOpen) return null;
 
-  const currentStep = TOUR_STEPS[currentStepIndex];
+  const currentStep = STORY_STEPS[currentStepIndex];
   const StepIcon = currentStep.icon;
+  const isLastStep = currentStepIndex === STORY_STEPS.length - 1;
 
   return (
-    <aside
-      aria-label="SIH Interactive Platform Guide Docked Bar"
-      className="fixed bottom-3 left-3 right-3 sm:bottom-4 sm:left-6 sm:right-6 max-w-6xl mx-auto z-50 animate-in fade-in slide-in-from-bottom-5 duration-300 pointer-events-auto"
-    >
-      <div className="bg-slate-950/95 backdrop-blur-md border border-amber-500/50 rounded-2xl shadow-2xl overflow-hidden ring-1 ring-amber-500/20 text-slate-100">
-        {/* Top Accent Gradient Line */}
-        <div className="h-1 bg-gradient-to-r from-amber-500 via-orange-400 to-amber-500" />
+    <>
+      {/* Subtle Focus Mask Vignette (allows clicks through to page) */}
+      <div
+        className="fixed inset-0 bg-slate-950/20 pointer-events-none z-30 transition-opacity duration-300"
+        aria-hidden="true"
+      />
 
-        {/* Step Quick-Jump Pills (Strictly matching top bar tabs) */}
-        <div className="bg-slate-900/90 px-3 py-1.5 border-b border-slate-800/80 flex items-center gap-1 overflow-x-auto select-none">
-          <span className="text-[10px] font-mono uppercase text-amber-400 font-bold px-1.5 shrink-0 flex items-center gap-1">
-            <Compass className="w-3 h-3 animate-spin-slow" />
-            <span>Top Bar Tabs:</span>
-          </span>
-          {TOUR_STEPS.map((step, idx) => {
-            const isActive = idx === currentStepIndex;
-            return (
-              <button
-                key={step.id}
-                onClick={() => goToStep(idx)}
-                className={`px-2 py-0.5 rounded text-[10px] font-mono transition-all flex items-center gap-1 whitespace-nowrap shrink-0 cursor-pointer ${isActive
-                    ? 'bg-amber-400 text-slate-950 font-bold shadow-xs scale-105 ring-1 ring-amber-300'
-                    : 'bg-slate-800/70 text-slate-400 hover:bg-slate-800 hover:text-slate-200'
-                  }`}
-              >
-                <span>{idx + 1}.</span>
-                <span>{step.title}</span>
-              </button>
-            );
-          })}
+      {/* =========================================================================
+          VIMAAN-STYLE DOCKED STORY BAR (Solid Obsidian Dark with High Contrast)
+          ========================================================================= */}
+      <div
+        id="storyBar"
+        role="region"
+        aria-label="Platform Guided Walkthrough"
+        className="fixed bottom-0 left-0 right-0 z-50 animate-story-slide-up bg-[#090d16] border-t-2 border-amber-500 shadow-[0_-16px_50px_rgba(0,0,0,0.85)] text-slate-100"
+      >
+        {/* Top Accent Gradient Line + Auto-Play Progress Indicator */}
+        <div className="relative h-1 w-full bg-slate-800/80 overflow-hidden">
+          <div
+            className="absolute top-0 bottom-0 left-0 bg-gradient-to-r from-amber-500 via-amber-300 to-amber-500 transition-all duration-100 ease-linear shadow-[0_0_8px_rgba(245,158,11,0.8)]"
+            style={{
+              width: autoPlay
+                ? `${autoProgress}%`
+                : `${((currentStepIndex + 1) / STORY_STEPS.length) * 100}%`
+            }}
+          />
         </div>
 
-        {/* Main Docked Bar Body */}
-        <div className="p-3 sm:p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
-          {/* Left: Step Identity */}
-          <div className="flex items-center gap-3 shrink-0 md:max-w-xs">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0 shadow-inner">
-              <StepIcon className="w-5 h-5" />
+        <div className="max-w-7xl mx-auto px-3.5 sm:px-6 py-3 sm:py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3">
+          {/* Left: Step Identity & Category Card */}
+          <div className="flex items-center gap-3 shrink-0 bg-slate-900/90 border border-slate-800 rounded-xl px-3.5 py-2 shadow-xs">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/50 flex items-center justify-center text-amber-400 shrink-0 shadow-inner">
+              <StepIcon className="w-5 h-5 text-amber-400" />
             </div>
+
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-mono text-amber-400 font-bold uppercase tracking-wider">
-                  TAB {currentStepIndex + 1} OF {TOUR_STEPS.length}
+                <span className="text-[11px] font-mono font-black uppercase tracking-widest text-amber-400">
+                  STEP {currentStepIndex + 1} OF {STORY_STEPS.length}
                 </span>
-                <span className="px-1.5 py-0.2 text-[9px] font-mono rounded bg-slate-800 border border-slate-700 text-slate-300">
+                <span className="hidden sm:inline-block px-1.5 py-0.2 text-[9px] font-mono font-bold rounded bg-slate-800 border border-slate-700 text-amber-300">
                   {currentStep.category}
                 </span>
               </div>
-              <h3 className="text-sm font-bold text-white tracking-tight truncate">
-                {currentStep.title}
+              <h3 className="text-xs sm:text-sm font-bold text-white tracking-tight truncate flex items-center gap-1.5 mt-0.5">
+                <span>{currentStep.shortTitle}</span>
+                <span className="text-slate-500 font-normal">·</span>
+                <span className="text-[11px] font-mono font-semibold text-amber-300">
+                  {currentStep.route}
+                </span>
               </h3>
-              <p className="text-[10px] font-mono text-slate-400">
-                URL: <code className="text-amber-300">{currentStep.route}</code>
-              </p>
             </div>
           </div>
 
-          {/* Middle: Point-wise content about what is shown on this active tab */}
-          <div className="flex-1 bg-slate-900/70 rounded-xl p-2.5 border border-slate-800/80 min-w-0">
-            <div className="flex items-center gap-1.5 text-xs font-bold text-amber-300 mb-1">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              <span className="truncate">{currentStep.headline}</span>
-            </div>
-            <ul className="space-y-0.5 text-[11px] text-slate-300">
-              {currentStep.bullets.map((bullet, i) => (
-                <li key={i} className="flex items-start gap-1.5 leading-snug">
-                  <span className="text-amber-400 font-bold shrink-0 mt-0.5">•</span>
-                  <span>{bullet}</span>
-                </li>
-              ))}
-            </ul>
+          {/* Middle: Rich Story Text Card with Bold Punchlines */}
+          <div className="flex-1 min-w-0 bg-slate-900/90 rounded-xl px-4 py-2.5 border border-slate-800 shadow-inner">
+            <p className="text-xs sm:text-[13px] leading-relaxed text-slate-200">
+              <b className="font-bold text-amber-300 mr-1.5">
+                {currentStep.headline}
+              </b>
+              <span className="text-slate-200 font-normal">{currentStep.narrativeText}</span>
+            </p>
           </div>
 
-          {/* Right: Navigation Controls */}
-          <div className="flex items-center gap-1.5 shrink-0 self-end md:self-center">
-            {/* Auto Play Toggle */}
+          {/* Right: Controls & Interactive Navigation */}
+          <div className="flex items-center gap-2 shrink-0 self-end md:self-center bg-slate-900/90 border border-slate-800 rounded-xl px-3 py-2 shadow-xs">
+            {/* Step Pip Indicators */}
+            <div className="flex items-center gap-1.5 mr-1" aria-hidden="true">
+              {STORY_STEPS.map((step, k) => {
+                const isActive = k === currentStepIndex;
+                const isPassed = k < currentStepIndex;
+                return (
+                  <button
+                    key={step.id}
+                    onClick={() => goToStep(k)}
+                    title={`Jump to Step ${k + 1}: ${step.shortTitle}`}
+                    className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                      isActive
+                        ? 'w-6 bg-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.9)]'
+                        : isPassed
+                        ? 'w-2 bg-amber-400/50 hover:bg-amber-400'
+                        : 'w-2 bg-slate-700 hover:bg-slate-500'
+                    }`}
+                  />
+                );
+              })}
+            </div>
+
+            {/* Auto-Play Toggle Button */}
             <button
               onClick={() => setAutoPlay(!autoPlay)}
-              className={`p-1.5 sm:px-2 sm:py-1.5 rounded-lg text-xs font-mono transition flex items-center gap-1 cursor-pointer border ${autoPlay
-                  ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300 animate-pulse'
+              className={`px-2 py-1.5 rounded-lg text-xs font-mono transition flex items-center gap-1 cursor-pointer border ${
+                autoPlay
+                  ? 'bg-emerald-500/20 border-emerald-500/60 text-emerald-300 font-bold'
                   : 'bg-slate-800 border-slate-700 text-slate-300 hover:text-white hover:bg-slate-700'
-                }`}
-              title={autoPlay ? 'Pause auto-play tour' : 'Auto-advance page every 8.5s'}
+              }`}
+              title={autoPlay ? 'Pause Auto-Play (Space)' : 'Auto-Play Walkthrough (Space)'}
             >
-              {autoPlay ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-              <span className="hidden sm:inline text-[11px]">{autoPlay ? 'Auto' : 'Auto'}</span>
+              {autoPlay ? <Pause className="w-3.5 h-3.5 text-emerald-300" /> : <Play className="w-3.5 h-3.5" />}
+              <span className="hidden lg:inline text-[10px]">{autoPlay ? 'Auto ON' : 'Auto'}</span>
             </button>
 
-            {/* Previous Step */}
+            {/* Previous Step Button */}
             <button
               onClick={handlePrev}
               disabled={currentStepIndex === 0}
-              className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed text-slate-200 text-xs font-semibold transition border border-slate-700 flex items-center gap-1 cursor-pointer"
-              title="Previous Tab"
+              className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed text-slate-200 text-xs font-semibold transition border border-slate-700 flex items-center gap-1 cursor-pointer"
+              title="Previous Step (Left Arrow)"
             >
               <ChevronLeft className="w-4 h-4" />
-              <span className="hidden sm:inline">Prev</span>
+              <span className="hidden sm:inline">Back</span>
             </button>
 
-            {/* Next Step */}
+            {/* Next / Finish Button */}
             <button
               onClick={handleNext}
-              className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 text-xs font-bold transition flex items-center gap-1 shadow-md shadow-amber-500/20 cursor-pointer"
-              title="Next Tab"
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-md ${
+                isLastStep
+                  ? 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 shadow-emerald-500/25 font-black'
+                  : 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 shadow-amber-500/25 font-black'
+              }`}
+              title={isLastStep ? 'Finish and Explore' : 'Next Step (Right Arrow)'}
             >
-              <span>{currentStepIndex === TOUR_STEPS.length - 1 ? 'Restart ↺' : 'Next Tab'}</span>
-              <ChevronRight className="w-3.5 h-3.5" />
+              <span>{isLastStep ? 'Finish & Explore' : 'Next'}</span>
+              {isLastStep ? <CheckCircle2 className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
             </button>
 
-            {/* Close Button */}
+            {/* Exit Button */}
             <button
-              onClick={onClose}
-              className="p-1.5 rounded-lg bg-slate-800 hover:bg-rose-900/60 text-slate-400 hover:text-white border border-slate-700 transition cursor-pointer ml-1"
-              title="Close Tour Bar"
+              onClick={() => {
+                clearSpot();
+                setCurrentStepIndex(0);
+                onClose();
+              }}
+              className="p-1.5 rounded-lg bg-slate-800 hover:bg-rose-950/80 hover:border-rose-700 text-slate-400 hover:text-white border border-slate-700 transition cursor-pointer"
+              title="Exit Walkthrough (Esc)"
+              aria-label="Exit walkthrough"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
         </div>
       </div>
-    </aside>
+    </>
   );
 }

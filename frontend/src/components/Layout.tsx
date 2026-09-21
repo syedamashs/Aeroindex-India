@@ -10,11 +10,13 @@ import {
   ChevronDown,
   ArrowUpRight,
   Compass,
+  Play,
 } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
-import { apiRunScheduler, apiSchedulerStatus, apiStatistics, type SchedulerTaskStatus } from '@/lib/api';
+import { apiRunScheduler, apiSchedulerStatus, apiStatistics, apiIndex, type SchedulerTaskStatus } from '@/lib/api';
 import { AviationTickerTape } from '@/components/animation/AviationTickerTape';
 import { PlatformGuideModal } from '@/components/PlatformGuideModal';
+import { AeroBotChat } from '@/components/AeroBotChat';
 
 interface NavItem {
   to: string;
@@ -114,34 +116,84 @@ export function Layout({ children }: { children: ReactNode }) {
     observationsInserted?: number;
   } | null>(null);
 
-  // Verify backend database is ready and data is loaded before enabling scraping
+  const [liveStats, setLiveStats] = useState<any>(null);
+  const [liveIndexPoints, setLiveIndexPoints] = useState<any[]>([]);
+
+  // Verify backend database is ready and fetch live data for AeroBot AI
   useEffect(() => {
     let isMounted = true;
-    apiStatistics()
-      .then(() => {
-        if (isMounted) setBackendReady(true);
-      })
-      .catch(() => {
-        if (isMounted) setBackendReady(false);
-      });
+    Promise.all([
+      apiStatistics().catch(() => ({ data: null })),
+      apiIndex().catch(() => ({ data: [] })),
+    ]).then(([statsRes, indexRes]) => {
+      if (!isMounted) return;
+      if (statsRes.data) {
+        setBackendReady(true);
+        setLiveStats(statsRes.data);
+      }
+      if (indexRes.data && indexRes.data.length) {
+        setLiveIndexPoints(indexRes.data);
+      }
+    });
 
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [lastUpdate]);
+
+  const latestIndex = liveIndexPoints[liveIndexPoints.length - 1];
+  const isDbLoaded = Boolean(latestIndex?.indexValue !== undefined);
+
+  const liveAppContext = {
+    isDbLoaded,
+    currentIndex: latestIndex?.indexValue,
+    momChange: latestIndex?.percentageChange,
+    routesMonitored: liveStats?.routesMonitored ?? liveStats?.total_routes,
+    activeAirlines: ['IndiGo', 'Air India', 'SpiceJet', 'Akasa Air', 'AIX Connect', 'Alliance Air'],
+    activeOtas: liveStats?.otasActive,
+    bookingWindowMultiplier: 2.4,
+    dqeIntegrityRate: 98.4,
+    lastUpdated: new Date(lastUpdate).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+  };
 
 
   const dropdownContainerRef = useRef<HTMLDivElement>(null);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleDropdownEnter = (categoryId: string) => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+    setActiveDropdown(categoryId);
+  };
+
+  const handleDropdownLeave = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+    // 280ms grace period so moving mouse downward never abruptly closes the dropdown
+    hoverTimeoutRef.current = setTimeout(() => {
+      setActiveDropdown(null);
+    }, 280);
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (dropdownContainerRef.current && !dropdownContainerRef.current.contains(e.target as Node)) {
+        if (hoverTimeoutRef.current) {
+          clearTimeout(hoverTimeoutRef.current);
+          hoverTimeoutRef.current = null;
+        }
         setActiveDropdown(null);
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    };
   }, []);
 
   // Close dropdown on route change
@@ -300,16 +352,17 @@ export function Layout({ children }: { children: ReactNode }) {
               </span>
             </div>
 
-            {/* SIH Interactive Platform Guide / App Tour Button */}
+            {/* VIMAAN-Style "Guide me" Interactive Walkthrough Button */}
             <button
+              id="storyStart"
               onClick={() => setGuideOpen(true)}
-              className="relative group flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-500/25 via-orange-500/20 to-amber-500/25 hover:from-amber-500/35 hover:to-orange-500/35 text-amber-300 hover:text-white border border-amber-500/60 hover:border-amber-400 text-xs font-semibold shadow-xs transition-all cursor-pointer overflow-hidden ring-1 ring-amber-500/30"
-              title="SIH Interactive Platform Walkthrough & Evaluation Guide"
+              className="relative group flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 via-amber-400 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold text-xs shadow-md shadow-amber-500/25 transition-all duration-200 cursor-pointer overflow-hidden ring-1 ring-amber-300 active:scale-95"
+              title="Start Interactive Platform Walkthrough (VIMAAN-Style Guided Tour)"
             >
-              <Compass className="w-3.5 h-3.5 text-amber-400 animate-spin-slow" />
-              <span className="font-sans font-bold tracking-wide">Platform Guide</span>
-              <span className="hidden sm:inline-block px-1.5 py-0.2 text-[9px] font-mono font-extrabold uppercase rounded bg-amber-400 text-slate-950">
-                Tour
+              <Play className="w-3.5 h-3.5 fill-slate-950 text-slate-950 transition-transform group-hover:scale-110" />
+              <span className="tracking-wide font-sans">Guide me</span>
+              <span className="hidden sm:inline-block px-1.5 py-0.2 text-[9px] font-mono font-black uppercase rounded bg-slate-950 text-amber-300">
+                7 Steps
               </span>
             </button>
 
@@ -365,16 +418,17 @@ export function Layout({ children }: { children: ReactNode }) {
                 <div
                   key={category.id}
                   className="relative py-2"
-                  onMouseEnter={() => setActiveDropdown(category.id)}
-                  onMouseLeave={() => setActiveDropdown(null)}
+                  onMouseEnter={() => handleDropdownEnter(category.id)}
+                  onMouseLeave={handleDropdownLeave}
                 >
                   <button
-                    onClick={() => {
-                      if (activeDropdown === category.id) {
-                        setActiveDropdown(null);
-                      } else {
-                        setActiveDropdown(category.id);
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (hoverTimeoutRef.current) {
+                        clearTimeout(hoverTimeoutRef.current);
+                        hoverTimeoutRef.current = null;
                       }
+                      setActiveDropdown(activeDropdown === category.id ? null : category.id);
                     }}
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer ${
                       active
@@ -394,53 +448,62 @@ export function Layout({ children }: { children: ReactNode }) {
 
                   {/* Editorial Popover Mega-Card */}
                   {isOpen && (
-                    <div className="absolute top-full left-0 mt-1 w-80 bg-white rounded-lg border border-stone-200 shadow-lg p-2.5 z-40 animate-in fade-in slide-in-from-top-1 duration-150">
-                      <div className="px-2.5 py-1.5 mb-1.5 border-b border-stone-100 flex items-center justify-between">
-                        <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-stone-400">
-                          {category.title} Section
-                        </span>
-                        <NavLink
-                          to={category.primaryTo}
-                          className="text-[11px] text-amber-700 hover:text-amber-800 font-medium flex items-center gap-0.5"
-                          onClick={() => setActiveDropdown(null)}
-                        >
-                          <span>Open Primary</span>
-                          <ArrowUpRight className="w-3 h-3" />
-                        </NavLink>
-                      </div>
+                    <div
+                      className="absolute top-full left-0 pt-1 w-80 z-40"
+                      onMouseEnter={() => handleDropdownEnter(category.id)}
+                      onMouseLeave={handleDropdownLeave}
+                    >
+                      {/* Invisible hover bridge spanning the top gap so cursor never leaves hit-box */}
+                      <div className="absolute -top-3 left-0 right-0 h-4" aria-hidden="true" />
 
-                      <div className="space-y-1">
-                        {category.items.map((item) => {
-                          const itemActive = isItemActive(item.to);
-                          return (
-                            <NavLink
-                              key={item.to}
-                              to={item.to}
-                              onClick={() => setActiveDropdown(null)}
-                              className={`block p-2 rounded-md transition-colors ${
-                                itemActive
-                                  ? 'bg-amber-50/80 border-l-2 border-amber-700 pl-2.5'
-                                  : 'hover:bg-stone-50'
-                              }`}
-                            >
-                              <div className="flex items-center justify-between">
-                                <span
-                                  className={`text-xs font-medium ${
-                                    itemActive ? 'text-amber-950 font-semibold' : 'text-stone-900'
-                                  }`}
-                                >
-                                  {item.label}
-                                </span>
-                                {itemActive && (
-                                  <span className="w-1.5 h-1.5 rounded-full bg-amber-700" />
-                                )}
-                              </div>
-                              <p className="text-[11px] text-stone-500 mt-0.5 leading-snug line-clamp-1">
-                                {item.desc}
-                              </p>
-                            </NavLink>
-                          );
-                        })}
+                      <div className="bg-white rounded-lg border border-stone-200 shadow-xl p-2.5 animate-in fade-in slide-in-from-top-1 duration-150">
+                        <div className="px-2.5 py-1.5 mb-1.5 border-b border-stone-100 flex items-center justify-between">
+                          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-stone-400">
+                            {category.title} Section
+                          </span>
+                          <NavLink
+                            to={category.primaryTo}
+                            className="text-[11px] text-amber-700 hover:text-amber-800 font-medium flex items-center gap-0.5"
+                            onClick={() => setActiveDropdown(null)}
+                          >
+                            <span>Open Primary</span>
+                            <ArrowUpRight className="w-3 h-3" />
+                          </NavLink>
+                        </div>
+
+                        <div className="space-y-1">
+                          {category.items.map((item) => {
+                            const itemActive = isItemActive(item.to);
+                            return (
+                              <NavLink
+                                key={item.to}
+                                to={item.to}
+                                onClick={() => setActiveDropdown(null)}
+                                className={`block p-2 rounded-md transition-colors ${
+                                  itemActive
+                                    ? 'bg-amber-50/80 border-l-2 border-amber-700 pl-2.5'
+                                    : 'hover:bg-stone-50'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <span
+                                    className={`text-xs font-medium ${
+                                      itemActive ? 'text-amber-950 font-semibold' : 'text-stone-900'
+                                    }`}
+                                  >
+                                    {item.label}
+                                  </span>
+                                  {itemActive && (
+                                    <span className="w-1.5 h-1.5 rounded-full bg-amber-700" />
+                                  )}
+                                </div>
+                                <p className="text-[11px] text-stone-500 mt-0.5 leading-snug line-clamp-1">
+                                  {item.desc}
+                                </p>
+                              </NavLink>
+                            );
+                          })}
+                        </div>
                       </div>
                     </div>
                   )}
@@ -507,10 +570,10 @@ export function Layout({ children }: { children: ReactNode }) {
                 setGuideOpen(true);
                 setMobileOpen(false);
               }}
-              className="w-full flex items-center justify-center gap-2 py-2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/50 text-xs font-bold"
+              className="w-full flex items-center justify-center gap-2 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 text-xs font-bold shadow-md cursor-pointer"
             >
-              <Compass className="w-3.5 h-3.5 text-amber-400" />
-              <span>Launch SIH Platform Tour</span>
+              <Play className="w-3.5 h-3.5 fill-slate-950 text-slate-950" />
+              <span>Launch Interactive Walkthrough (Guide me)</span>
             </button>
 
             <button
@@ -759,6 +822,14 @@ export function Layout({ children }: { children: ReactNode }) {
       <PlatformGuideModal
         isOpen={guideOpen}
         onClose={() => setGuideOpen(false)}
+      />
+
+      {/* =========================================================================
+          FLOATING GEMINI 2.5 AEROINDEX INTELLIGENCE ASSISTANT (AEROBOT)
+          ========================================================================= */}
+      <AeroBotChat
+        liveContext={liveAppContext}
+        isStoryBarOpen={guideOpen}
       />
     </div>
   );

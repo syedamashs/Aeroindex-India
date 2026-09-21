@@ -86,7 +86,7 @@ export function BookingWindowPage() {
       <FilterBar />
 
       {/* 2. ADVANCE-PURCHASE CURVE VISUALIZATION */}
-      <section className="bg-white border border-slate-200 rounded-lg p-5">
+      <section id="guide-booking-curve" className="bg-white border border-slate-200 rounded-lg p-5">
         <div className="pb-3 mb-4 border-b border-slate-100 flex items-center justify-between">
           <div>
             <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-700">

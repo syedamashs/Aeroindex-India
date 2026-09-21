@@ -71,7 +71,9 @@ from storage.observation_storage import (
     insert_observations,
 )
 from database.connection import sync_scheduler_run_to_backup
-from upload_db import upload_database
+from upload_db import upload_database, load_local_env
+
+load_local_env()
 
 
 # ============================================================
@@ -591,17 +593,22 @@ def run_stage_a():
 
     safe_print("=" * 60)
 
-    if failed == 0 and total_inserted == 0:
-        safe_print("NO OBSERVATIONS FOUND FOR THE SELECTED FILTERS")
-    elif failed == 0:
-        safe_print(
-            "STAGE A SCHEDULER COMPLETED SUCCESSFULLY"
-        )
+    if total_inserted > 0:
+        if failed == 0:
+            safe_print(
+                "STAGE A SCHEDULER COMPLETED SUCCESSFULLY"
+            )
+        else:
+            safe_print(
+                f"STAGE A COMPLETED WITH PARTIAL SUCCESS ({successful} succeeded, {failed} failed)"
+            )
         try:
             upload_url = upload_database()
             safe_print(f"Updated database uploaded to Hugging Face: {upload_url}")
         except Exception as exc:
             safe_print(f"Hugging Face database upload failed: {type(exc).__name__}: {exc}")
+    elif failed == 0 and total_inserted == 0:
+        safe_print("NO OBSERVATIONS FOUND FOR THE SELECTED FILTERS")
     else:
         safe_print(
             "STAGE A COMPLETED WITH FAILURES"

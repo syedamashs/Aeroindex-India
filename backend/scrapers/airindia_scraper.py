@@ -1894,13 +1894,15 @@ def run(task):
         with sync_playwright() as p:
             browserless_token = os.getenv("BROWSERLESS_TOKEN")
             if browserless_token:
-                print("[airindia] Using Browserless cloud browser")
+                print("[airindia] Using Browserless cloud browser (stealth mode)")
                 _browser = p.chromium.connect_over_cdp(
-                    f"wss://chrome.browserless.io?token={browserless_token}&timeout=120000"
+                    f"wss://chrome.browserless.io?token={browserless_token}&stealth=true&--disable-blink-features=AutomationControlled&timeout=120000"
                 )
                 context = _browser.new_context(
                     viewport={"width": 1400, "height": 900},
-                    user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                    user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+                    locale="en-IN",
+                    timezone_id="Asia/Kolkata",
                 )
             else:
                 is_headless = (
@@ -1957,15 +1959,21 @@ def run(task):
                 page.wait_for_timeout(5000)
                 close_popups(page)
 
-                # Wait explicitly for airport input to appear (up to 30s)
                 try:
                     page.wait_for_selector(
                         'input[aria-label="Select origin airport"]',
                         timeout=30000,
                     )
                 except Exception:
+                    page_title = page.title()
+                    page_url = page.url
+                    print(f"[airindia] Booking widget failed to load. Title: '{page_title}', URL: '{page_url}'")
+                    try:
+                        page.screenshot(path=str(raw_dir / "airindia_fail.png"))
+                    except Exception:
+                        pass
                     raise RuntimeError(
-                        "Air India booking widget did not load (airport input not found after 30s)"
+                        f"Air India booking widget did not load (airport input not found after 30s). Title: '{page_title}'"
                     )
 
                 airports = page.locator('input[aria-label="Select origin airport"]')

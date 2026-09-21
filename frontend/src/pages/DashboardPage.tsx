@@ -92,7 +92,7 @@ export function DashboardPage() {
       )}
 
       {/* 1. NATIONAL AIRFARE INDEX HEADLINE (ON TOP) */}
-      <section className="pb-1">
+      <section className="pb-1" id="guide-headline-index">
         <div className="flex flex-wrap items-center gap-x-3.5 gap-y-2">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-stone-900">
             National Airfare Index
@@ -125,7 +125,7 @@ export function DashboardPage() {
       <FilterBar />
 
       {/* 3. MARKET COVERAGE & SUMMARY METRICS (BELOW FILTER BAR) */}
-      <section className="bg-slate-100/70 border border-slate-200 rounded-lg p-4">
+      <section id="guide-market-coverage" className="bg-slate-100/70 border border-slate-200 rounded-lg p-4">
         <div className="mb-3 border-b border-slate-200 pb-2">
           <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-600">
             Market Coverage &amp; Pipeline Health
@@ -190,16 +190,17 @@ export function DashboardPage() {
       </section>
 
       {/* 3. PRIMARY TIME-SERIES CHART WITH FLIGHT SIMULATION */}
-      <FlightTrajectoryChart
-        data={indexPoints}
-        loading={loading}
-        title="National Airfare Index Trajectory"
-        subtitle="Monthly weighted cohort aggregation across monitored domestic city-pairs"
-        showModeSwitcher={true}
-        showInsightBot={true}
-        botInsights={INDEX_TRAJECTORY_INSIGHTS}
-      />
-
+      <div id="guide-trajectory-chart">
+        <FlightTrajectoryChart
+          data={indexPoints}
+          loading={loading}
+          title="National Airfare Index Trajectory"
+          subtitle="Monthly weighted cohort aggregation across monitored domestic city-pairs"
+          showModeSwitcher={true}
+          showInsightBot={true}
+          botInsights={INDEX_TRAJECTORY_INSIGHTS}
+        />
+      </div>
 
       {/* 4. ROUTE ACTIVITY TABLE (PAGINATED 10 PER PAGE) */}
       {(() => {
@@ -208,7 +209,7 @@ export function DashboardPage() {
         const paginatedRoutes = routeStats.slice((routePage - 1) * ROUTE_PAGE_SIZE, routePage * ROUTE_PAGE_SIZE);
 
         return (
-          <section className="space-y-3">
+          <section id="guide-route-activity" className="space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
                 <div className="flex items-center gap-2">

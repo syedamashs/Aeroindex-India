@@ -16,6 +16,11 @@ export default defineConfig({
         target: 'http://localhost:4002',
         changeOrigin: true,
       },
+      '/gemini-proxy': {
+        target: 'https://generativelanguage.googleapis.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/gemini-proxy/, ''),
+      },
     },
   },
   optimizeDeps: {

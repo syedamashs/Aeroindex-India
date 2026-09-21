@@ -179,3 +179,44 @@
   .no-print { display: none !important; }
   .print-full { width: 100% !important; max-width: none !important; }
 }
+
+/* =========================================================================
+   VIMAAN-STYLE INTERACTIVE STORY & SPOTLIGHT ENGINE
+   ========================================================================= */
+body.storyOn {
+  padding-bottom: 124px !important;
+  transition: padding-bottom 0.28s ease;
+}
+
+.spot {
+  position: relative !important;
+  z-index: 35 !important;
+  border-radius: 10px !important;
+  box-shadow: 0 0 0 2px #f59e0b, 0 0 0 8px rgba(245, 158, 11, 0.3) !important;
+  animation: spotPulse 2.4s infinite ease-in-out !important;
+  transition: box-shadow 0.26s cubic-bezier(0.16, 1, 0.3, 1), transform 0.26s ease !important;
+}
+
+@keyframes spotPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 2px #f59e0b, 0 0 0 8px rgba(245, 158, 11, 0.28);
+  }
+  50% {
+    box-shadow: 0 0 0 3px #fbbf24, 0 0 0 14px rgba(245, 158, 11, 0.48);
+  }
+}
+
+@keyframes storySlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-story-slide-up {
+  animation: storySlideUp 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+}

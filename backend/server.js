@@ -1,16 +1,42 @@
 import express from 'express';
 import cors from 'cors';
 import { readFile } from 'node:fs/promises';
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DatabaseSync } from 'node:sqlite';
 import { spawn } from 'node:child_process';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Automatically load backend .env file into process.env if present
+try {
+  const envPath = path.resolve(__dirname, '.env');
+  if (fs.existsSync(envPath)) {
+    const envContent = fs.readFileSync(envPath, 'utf8');
+    for (const line of envContent.split(/\r?\n/)) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#') || !trimmed.includes('=')) continue;
+      const eqIdx = trimmed.indexOf('=');
+      const key = trimmed.slice(0, eqIdx).trim();
+      const val = trimmed.slice(eqIdx + 1).trim().replace(/^['"]|['"]$/g, '');
+      if (!process.env[key]) {
+        process.env[key] = val;
+      }
+    }
+    console.log('[server] Loaded environment from .env');
+  }
+} catch (e) {
+  console.warn('[server] Notice: .env loader skipped:', e.message);
+}
+
 const app = express();
 const PORT = process.env.PORT || 4002;
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+app.use(cors());
+app.use(express.json({ limit: '10mb' }));
+
 const datasetsPath = path.resolve(__dirname, 'database');
 const sqlitePath = process.env.APIX_DB_PATH
   ? path.resolve(process.env.APIX_DB_PATH)
@@ -1229,6 +1255,49 @@ app.get('/api/fare-state/summary', (req, res) => {
 
 app.get('/api/dqe/summary', (req, res) => {
   res.json({ data: readDqeSummary() });
+});
+
+// Gemini 2.5 Flash Proxy for AeroBot AI
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
+const GEMINI_MODEL = 'gemini-2.5-flash';
+
+app.post('/api/chat', async (req, res) => {
+  try {
+    const { contents, systemInstruction } = req.body || {};
+    if (!contents || !Array.isArray(contents) || contents.length === 0) {
+      return res.status(400).json({ message: 'Missing or invalid contents array.' });
+    }
+
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+    const payload = {
+      contents,
+      systemInstruction: systemInstruction ? { parts: [{ text: systemInstruction }] } : undefined,
+      generationConfig: {
+        temperature: 0.3,
+        topP: 0.9,
+        maxOutputTokens: 800,
+      },
+    };
+
+    const apiResponse = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    if (!apiResponse.ok) {
+      const errText = await apiResponse.text();
+      console.error(`[Gemini API Error] (${apiResponse.status}):`, errText);
+      return res.status(apiResponse.status).json({ message: `Gemini API returned error (${apiResponse.status}): ${errText}` });
+    }
+
+    const data = await apiResponse.json();
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    return res.json({ text });
+  } catch (error) {
+    console.error('[AeroBot Chat API Error]:', error);
+    return res.status(500).json({ message: error.message || 'Internal Server Error' });
+  }
 });
 
 app.post('/api/login', async (req, res) => {

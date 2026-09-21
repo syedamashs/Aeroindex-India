@@ -84,7 +84,7 @@ export function AlertsPage() {
       </div>
 
       {/* 2. INBOX-STYLE SURVEILLANCE TABLE */}
-      <div className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-xs">
+      <div id="guide-alerts-stream" className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>

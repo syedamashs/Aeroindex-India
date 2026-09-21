@@ -176,7 +176,7 @@ export function RoutesPage() {
       </div>
 
       {/* 3. PRIMARY DATA TABLE */}
-      <div className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-xs">
+      <div id="guide-routes-table" className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>

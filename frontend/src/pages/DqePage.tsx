@@ -52,7 +52,7 @@ export function DqePage() {
       )}
 
       {/* 2. STATISTICAL SUMMARY AUDIT ROW */}
-      <section className="bg-white border border-slate-200 rounded-lg p-4">
+      <section id="guide-dqe-audit" className="bg-white border border-slate-200 rounded-lg p-4">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-700 mb-3 border-b border-slate-100 pb-2">
           Validation Metrics Summary
         </h2>

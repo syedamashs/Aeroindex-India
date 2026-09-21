@@ -812,13 +812,15 @@ def run(task):
         with sync_playwright() as p:
             browserless_token = os.getenv("BROWSERLESS_TOKEN")
             if browserless_token:
-                print("[indigo] Using Browserless cloud browser")
+                print("[indigo] Using Browserless cloud browser (stealth mode)")
                 _browser = p.chromium.connect_over_cdp(
-                    f"wss://chrome.browserless.io?token={browserless_token}&timeout=120000"
+                    f"wss://chrome.browserless.io?token={browserless_token}&stealth=true&--disable-blink-features=AutomationControlled&timeout=120000"
                 )
                 context = _browser.new_context(
                     viewport={"width": 1400, "height": 900},
-                    user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                    user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+                    locale="en-IN",
+                    timezone_id="Asia/Kolkata",
                 )
             else:
                 browser_options = {
