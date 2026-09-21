@@ -814,7 +814,7 @@ def run(task):
             if headless and browserless_token:
                 print("[indigo] Using Browserless cloud browser (stealth mode)")
                 _browser = p.chromium.connect_over_cdp(
-                    f"wss://chrome.browserless.io?token={browserless_token}&stealth=true&--disable-blink-features=AutomationControlled&timeout=120000"
+                    f"wss://chrome.browserless.io/stealth?token={browserless_token}&timeout=120000"
                 )
                 context = _browser.new_context(
                     viewport={"width": 1400, "height": 900},
@@ -847,7 +847,13 @@ def run(task):
             try:
                 page = context.pages[0] if context.pages else context.new_page()
                 page.goto(source_url, wait_until="domcontentloaded", timeout=timeout_ms)
-                page.wait_for_timeout(10000)
+                page.wait_for_timeout(5000)
+
+                if "Access Denied" in page.title() or "errors.edgesuite.net" in page.content():
+                    raise RuntimeError(
+                        "IndiGo Akamai Bot Manager blocked cloud datacenter connection (Access Denied). "
+                        "Please select SpiceJet for cloud scraping on Render, or run IndiGo from a local residential connection."
+                    )
 
                 select_airport(page, "From", origin_query)
                 select_airport(page, "To", destination_query)

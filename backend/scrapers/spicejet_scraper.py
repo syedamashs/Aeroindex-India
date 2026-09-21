@@ -218,6 +218,32 @@ def run(task):
     if missing:
         raise ValueError(f"Missing task fields: {missing}")
 
+def close_spicejet_popups(page):
+    try:
+        # Common SpiceJet modal close selectors
+        close_buttons = [
+            'div[data-testid="undefined-modal-display"] svg',
+            'div[aria-label="close"]',
+            'div[aria-label="Close"]',
+            'button:has-text("OK")',
+            'button:has-text("Skip")',
+            '.close-btn',
+            '#close-button',
+        ]
+        for sel in close_buttons:
+            try:
+                loc = page.locator(sel)
+                if loc.count() > 0 and loc.first.is_visible():
+                    loc.first.click(timeout=1500)
+                    page.wait_for_timeout(500)
+            except Exception:
+                pass
+        page.keyboard.press("Escape")
+        page.wait_for_timeout(500)
+    except Exception:
+        pass
+
+def run(task):
     run_id = str(task["run_id"])
     task_id = str(task["task_id"])
     route_id = str(task["route_id"])
@@ -250,7 +276,7 @@ def run(task):
             if headless and browserless_token:
                 print("[spicejet] Using Browserless cloud browser (stealth mode)")
                 browser = playwright.chromium.connect_over_cdp(
-                    f"wss://chrome.browserless.io?token={browserless_token}&stealth=true&--disable-blink-features=AutomationControlled&timeout=120000"
+                    f"wss://chrome.browserless.io/stealth?token={browserless_token}&timeout=120000"
                 )
                 context = browser.new_context(
                     viewport={"width": 1400, "height": 900},
@@ -281,19 +307,26 @@ def run(task):
                 page = browser.new_page(viewport={"width": 1400, "height": 900})
             try:
                 page.goto(source_url, wait_until="domcontentloaded", timeout=timeout_ms)
-                page.wait_for_timeout(3000)
+                page.wait_for_timeout(4000)
+                close_spicejet_popups(page)
 
                 origin_field = page.locator('[data-testid="to-testID-origin"] input')
-                origin_field.focus()
+                if origin_field.count() == 0:
+                    origin_field = page.locator('text="From"').locator('..').locator('input')
+                origin_field.wait_for(state="visible", timeout=15000)
+                origin_field.click(force=True)
                 origin_field.fill(origin)
                 page.wait_for_timeout(2000)
                 print(f"\nSelecting From: {origin}")
                 print(f"From selected: {origin}")
 
                 destination_field = page.locator('[data-testid="to-testID-destination"] input')
-                destination_field.focus()
+                if destination_field.count() == 0:
+                    destination_field = page.locator('text="To"').locator('..').locator('input')
+                destination_field.wait_for(state="visible", timeout=15000)
+                destination_field.click(force=True)
                 destination_field.fill(destination)
-                page.wait_for_timeout(5000)
+                page.wait_for_timeout(3000)
                 print(f"\nSelecting To: {destination}")
                 print(f"To selected: {destination}")
 
@@ -325,18 +358,19 @@ def run(task):
                 if not selected_day:
                     raise RuntimeError(f"Visible departure date was not found: {departure_date}")
                 print(f"Selected departure date: {departure_date}")
+                page.wait_for_timeout(1000)
 
-                search_control = page.locator("text=Search Flight").first
-                search_control.wait_for(state="visible", timeout=10000)
-                box = search_control.bounding_box()
-                if not box:
-                    raise RuntimeError("SpiceJet Search Flight control is not visible")
+                search_button = page.locator('[data-testid="home-page-flight-cta"]')
+                if search_button.count() == 0:
+                    search_button = page.locator("text=Search Flight").first
+
+                search_button.wait_for(state="visible", timeout=15000)
 
                 with page.expect_response(
                     lambda response: "availability" in response.url.lower() and response.status == 200,
                     timeout=timeout_ms,
                 ) as response_info:
-                    page.mouse.click(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
+                    search_button.click(force=True)
 
                 response = response_info.value
                 response_data = response.json()

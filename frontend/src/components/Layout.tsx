@@ -204,7 +204,7 @@ export function Layout({ children }: { children: ReactNode }) {
 
   const openSchedulerModal = () => {
     setSchedulerResult(null);
-    setSelectedSchedulerAirlines(['indigo']);
+    setSelectedSchedulerAirlines(['spicejet']);
     setSelectedSchedulerLeadTimes([7]);
     setSelectedSchedulerRoutes(['DELHI_MUMBAI']);
     setSchedulerModalOpen(true);

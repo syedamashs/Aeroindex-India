@@ -1900,7 +1900,7 @@ def run(task):
             if is_headless and browserless_token:
                 print("[airindia] Using Browserless cloud browser (stealth mode)")
                 _browser = p.chromium.connect_over_cdp(
-                    f"wss://chrome.browserless.io?token={browserless_token}&stealth=true&--disable-blink-features=AutomationControlled&timeout=120000"
+                    f"wss://chrome.browserless.io/stealth?token={browserless_token}&timeout=120000"
                 )
                 context = _browser.new_context(
                     viewport={"width": 1400, "height": 900},
