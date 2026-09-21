@@ -243,6 +243,14 @@ def close_spicejet_popups(page):
     except Exception:
         pass
 
+def save_preview(page):
+    try:
+        preview_dir = Path(__file__).resolve().parents[1] / "data"
+        preview_dir.mkdir(parents=True, exist_ok=True)
+        page.screenshot(path=str(preview_dir / "live_preview.jpg"), quality=70, type="jpeg")
+    except Exception:
+        pass
+
 def run(task):
     run_id = str(task["run_id"])
     task_id = str(task["task_id"])
@@ -309,6 +317,7 @@ def run(task):
                 page.goto(source_url, wait_until="domcontentloaded", timeout=timeout_ms)
                 page.wait_for_timeout(4000)
                 close_spicejet_popups(page)
+                save_preview(page)
 
                 origin_field = page.locator('[data-testid="to-testID-origin"] input')
                 if origin_field.count() == 0:
@@ -359,6 +368,7 @@ def run(task):
                     raise RuntimeError(f"Visible departure date was not found: {departure_date}")
                 print(f"Selected departure date: {departure_date}")
                 page.wait_for_timeout(1000)
+                save_preview(page)
 
                 search_button = page.locator('[data-testid="home-page-flight-cta"]')
                 if search_button.count() == 0:
@@ -374,6 +384,8 @@ def run(task):
 
                 response = response_info.value
                 response_data = response.json()
+                page.wait_for_timeout(1000)
+                save_preview(page)
                 print("\n========== EXTRACTING FARES ==========")
                 trips = response_data.get("data", {}).get("trips", [])
                 journeys = [

@@ -1112,7 +1112,7 @@ app.post('/api/scheduler/run', (req, res) => {
   console.log(`[scraper] BROWSERLESS_TOKEN present: ${!!process.env.BROWSERLESS_TOKEN}`);
   schedulerProcess = spawn(process.env.PYTHON_EXECUTABLE || 'python', [schedulerPath], {
     cwd: __dirname,
-    windowsHide: true,
+    windowsHide: false,
     env: {
       ...process.env,
       APIX_HEADLESS: isHeadless,
@@ -1236,6 +1236,16 @@ app.get('/api/scheduler/progress', (req, res) => {
   } catch (error) {
     res.status(500).json({ message: `Unable to read scheduler progress: ${error.message}` });
   }
+});
+
+app.get('/api/scheduler/preview', (req, res) => {
+  const previewPath = path.join(__dirname, 'data', 'live_preview.jpg');
+  if (fs.existsSync(previewPath)) {
+    res.setHeader('Content-Type', 'image/jpeg');
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    return fs.createReadStream(previewPath).pipe(res);
+  }
+  return res.status(404).json({ message: 'No live preview available yet' });
 });
 
 app.get('/api/data-source', (req, res) => {

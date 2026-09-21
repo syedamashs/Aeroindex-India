@@ -102,6 +102,7 @@ export function Layout({ children }: { children: ReactNode }) {
   const [backendReady, setBackendReady] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
+  const [previewTimestamp, setPreviewTimestamp] = useState<number>(Date.now());
 
   const canScrape = !isUiLoading && backendReady && !schedulerRunning && !isRefreshing;
   const [selectedSchedulerAirlines, setSelectedSchedulerAirlines] = useState<string[]>(SCHEDULER_AIRLINES.map((a) => a.value));
@@ -242,6 +243,7 @@ export function Layout({ children }: { children: ReactNode }) {
       try {
         const status = await apiSchedulerStatus();
         setSchedulerTasks(status.tasks ?? []);
+        setPreviewTimestamp(Date.now());
       } catch {
         // Ignore transient polling failures
       }
@@ -718,6 +720,50 @@ export function Layout({ children }: { children: ReactNode }) {
 
               {schedulerRunning && (
                 <div className="space-y-3 py-2">
+                  {/* Live Browser Viewport Frame */}
+                  <div className="border border-stone-800 rounded-lg overflow-hidden bg-stone-900 shadow-md">
+                    <div className="bg-[#1c1917] px-3 py-1.5 border-b border-stone-800 flex items-center justify-between text-[11px] font-mono">
+                      <div className="flex items-center gap-2">
+                        <div className="flex gap-1.5">
+                          <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80 inline-block"></span>
+                          <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80 inline-block"></span>
+                          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80 inline-block"></span>
+                        </div>
+                        <span className="text-stone-300 ml-2 bg-stone-800/90 px-2 py-0.5 rounded text-[10px] border border-stone-700/60">
+                          https://www.spicejet.com/
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-amber-400 font-semibold">
+                        <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+                        <span className="tracking-wide uppercase text-[10px]">LIVE SCRAPER VIEWPORT</span>
+                      </div>
+                    </div>
+                    <div className="relative aspect-video max-h-56 bg-stone-950 flex items-center justify-center overflow-hidden">
+                      <img
+                        src={`/api/scheduler/preview?t=${previewTimestamp}`}
+                        alt="Live Browser Scraper Feed"
+                        className="w-full h-full object-contain"
+                        onError={(e) => {
+                          const target = e.currentTarget as HTMLElement;
+                          target.style.display = 'none';
+                          const fallback = target.nextElementSibling as HTMLElement;
+                          if (fallback) fallback.style.display = 'flex';
+                        }}
+                        onLoad={(e) => {
+                          const target = e.currentTarget as HTMLElement;
+                          target.style.display = 'block';
+                          const fallback = target.nextElementSibling as HTMLElement;
+                          if (fallback) fallback.style.display = 'none';
+                        }}
+                      />
+                      <div className="flex flex-col items-center justify-center p-6 text-center text-stone-400 space-y-2">
+                        <Loader2 className="w-6 h-6 animate-spin text-amber-500" />
+                        <p className="text-xs font-mono text-stone-300">Connecting to Playwright browser viewport...</p>
+                        <p className="text-[10px] text-stone-500">Live viewport stream renders as the airline portal loads.</p>
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="flex items-center gap-2.5 text-stone-800">
                     <Loader2 className="w-4 h-4 animate-spin text-amber-700" />
                     <span className="font-medium">Collecting observations from airline distribution engines...</span>
