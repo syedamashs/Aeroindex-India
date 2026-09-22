@@ -384,15 +384,21 @@ function observationFromRow(row) {
   };
 }
 
+function getPeriodSql(alias = 'o') {
+  return `(CASE WHEN substr(${alias}.search_timestamp, 1, 7) >= '2026-09' THEN substr(${alias}.search_timestamp, 1, 7) ELSE substr(${alias}.departure_datetime, 1, 7) END)`;
+}
+
 function queryDateRange(database) {
   const row = database.prepare(`
     SELECT MIN(substr(departure_datetime, 1, 10)) AS min_date,
-           MAX(substr(departure_datetime, 1, 10)) AS max_date
+           MAX(substr(departure_datetime, 1, 10)) AS max_date,
+           MAX(substr(search_timestamp, 1, 10)) AS max_search_date
     FROM apix_observations
   `).get();
   return {
     minDate: row?.min_date || '2026-01-01',
     maxDate: row?.max_date || '2026-08-30',
+    maxSearchDate: row?.max_search_date || '2026-09-22',
   };
 }
 
@@ -406,9 +412,11 @@ function queryDateFilter(query, database) {
     end = query.customEnd || end;
   } else if (preset && preset !== 'all') {
     const days = preset === 'today' || preset === '7d' ? 7 : preset === '30d' ? 30 : preset === '90d' ? 90 : 180;
-    const date = new Date(`${end}T00:00:00Z`);
+    const anchor = bounds.maxSearchDate || '2026-09-22';
+    const date = new Date(`${anchor}T00:00:00Z`);
     date.setUTCDate(date.getUTCDate() - days);
     start = date.toISOString().slice(0, 10);
+    end = anchor;
   }
   return { start, end };
 }
@@ -448,8 +456,14 @@ function buildObservationWhere(query, database, alias = 'o') {
     const pattern = `%${search}%`;
     add(`lower(${alias}.observation_id || ' ' || COALESCE(${alias}.origin, '') || ' ' || COALESCE(${alias}.destination, '') || ' ' || COALESCE(${alias}.carrier_code, ${alias}.marketing_airline, ${alias}.source, '')) LIKE ?`, pattern);
   }
-  const dates = queryDateFilter(query, database);
-  add(`substr(${alias}.departure_datetime, 1, 10) BETWEEN ? AND ?`, dates.start, dates.end);
+  const preset = String(query.preset || '').trim();
+  if (preset === 'custom') {
+    const dates = queryDateFilter(query, database);
+    add(`(substr(${alias}.departure_datetime, 1, 10) BETWEEN ? AND ? OR substr(${alias}.search_timestamp, 1, 10) BETWEEN ? AND ?)`, dates.start, dates.end, dates.start, dates.end);
+  } else if (preset && preset !== 'all') {
+    const dates = queryDateFilter(query, database);
+    add(`(substr(${alias}.departure_datetime, 1, 10) >= ? OR substr(${alias}.search_timestamp, 1, 10) >= ?)`, dates.start, dates.start);
+  }
   return { sql: conditions.length ? `WHERE ${conditions.join(' AND ')}` : '', params };
 }
 
@@ -471,7 +485,8 @@ function queryObservations(query, page, pageSize) {
 function queryIndex(query) {
   return withDatabase((database) => {
     const where = buildObservationWhere(query, database);
-    const rows = database.prepare(`SELECT substr(o.departure_datetime, 1, 7) AS period, AVG(o.total_fare) AS average_fare FROM apix_observations o ${where.sql} GROUP BY period ORDER BY period`).all(...where.params);
+    const periodCol = getPeriodSql('o');
+    const rows = database.prepare(`SELECT ${periodCol} AS period, AVG(o.total_fare) AS average_fare FROM apix_observations o ${where.sql} GROUP BY period ORDER BY period`).all(...where.params);
     if (!rows.length) return [{ period: '2026-01', indexValue: 100, percentageChange: 0, averageFare: 0, monthLabel: 'Jan 2026' }];
     const baseline = Number(rows[0].average_fare || 0);
     return rows.map((row, index) => {
@@ -498,7 +513,8 @@ function queryRouteStats(query) {
     delete nationalQuery.destination;
     const nationalWhere = buildObservationWhere(nationalQuery, database);
     const national = database.prepare(`SELECT AVG(o.total_fare) AS average_fare FROM apix_observations o ${nationalWhere.sql}`).get(...nationalWhere.params)?.average_fare || 11777;
-    const rows = database.prepare(`SELECT o.route_id AS route_id, o.origin, o.destination, COUNT(*) AS observations, AVG(o.total_fare) AS average_fare, MIN(o.total_fare) AS min_fare, MAX(o.total_fare) AS max_fare, AVG(o.total_fare * o.total_fare) AS square_average, substr(o.departure_datetime, 1, 7) AS period, AVG(o.total_fare) AS period_average FROM apix_observations o ${where.sql} GROUP BY o.route_id, o.origin, o.destination, period ORDER BY average_fare DESC`).all(...where.params);
+    const periodCol = getPeriodSql('o');
+    const rows = database.prepare(`SELECT o.route_id AS route_id, o.origin, o.destination, COUNT(*) AS observations, AVG(o.total_fare) AS average_fare, MIN(o.total_fare) AS min_fare, MAX(o.total_fare) AS max_fare, AVG(o.total_fare * o.total_fare) AS square_average, ${periodCol} AS period, AVG(o.total_fare) AS period_average FROM apix_observations o ${where.sql} GROUP BY o.route_id, o.origin, o.destination, period ORDER BY average_fare DESC`).all(...where.params);
     const grouped = new Map();
     for (const row of rows) {
       const id = row.route_id || `${row.origin}-${row.destination}`;
@@ -695,8 +711,9 @@ function queryRouteCorridorAnalytics(routeId, query) {
     const params = [routeId, orig, dest, routeId];
 
     // 1. Full monthly trend across ALL historical observations for this corridor
+    const periodCol = getPeriodSql('o');
     const monthlyRows = database.prepare(`
-      SELECT substr(o.departure_datetime, 1, 7) AS month,
+      SELECT ${periodCol} AS month,
              AVG(o.total_fare) AS average_fare,
              MIN(o.total_fare) AS min_fare,
              MAX(o.total_fare) AS max_fare,
