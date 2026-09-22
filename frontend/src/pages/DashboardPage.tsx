@@ -304,7 +304,7 @@ export function DashboardPage() {
                 <span className="font-mono text-[11px]">
                   Showing <strong>{routeStats.length ? (routePage - 1) * ROUTE_PAGE_SIZE + 1 : 0}</strong>–<strong>{Math.min(routePage * ROUTE_PAGE_SIZE, routeStats.length)}</strong> of <strong>{routeStats.length}</strong> routes
                 </span>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 sm:mr-36">
                   <button
                     type="button"
                     onClick={() => setRoutePage((p) => Math.max(1, p - 1))}

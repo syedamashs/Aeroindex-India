@@ -64,7 +64,7 @@ const NAV_CATEGORIES: NavCategory[] = [
     title: 'Observations',
     primaryTo: '/dqe',
     items: [
-      { to: '/dqe', label: 'Data Quality Audit', desc: 'Ingestion validation rules, anomaly rates & integrity' },
+      { to: '/dqe', label: 'Data Quality & Reliability', desc: 'Ingestion validation rules, outlier isolation & reliability index' },
     ],
   },
   {
@@ -612,7 +612,7 @@ export function Layout({ children }: { children: ReactNode }) {
       {/* =========================================================================
           MAIN WORKSPACE VIEWPORT (100% FULL WIDTH REAL ESTATE)
           ========================================================================= */}
-      <main className="app-main-shell min-w-0 p-4 lg:p-8 max-w-[1600px] w-full mx-auto flex-1">
+      <main className="app-main-shell min-w-0 p-4 lg:p-8 pb-28 lg:pb-32 max-w-[1600px] w-full mx-auto flex-1">
         {children}
       </main>
 

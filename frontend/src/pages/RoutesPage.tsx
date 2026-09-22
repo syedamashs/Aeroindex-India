@@ -293,7 +293,7 @@ export function RoutesPage() {
           <span className="font-mono text-[11px]">
             Showing <strong>{filtered.length ? (page - 1) * PAGE_SIZE + 1 : 0}</strong>–<strong>{Math.min(page * PAGE_SIZE, filtered.length)}</strong> of <strong>{filtered.length}</strong> routes
           </span>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 sm:mr-36">
             <button
               type="button"
               onClick={() => setPage((p) => Math.max(1, p - 1))}

@@ -22,10 +22,9 @@ Start command:
 npm run start
 ```
 
-Both `npm run start` and `npm run dev` verify that `data/apix.db` exists before
-starting the API. Set `APIX_DB_REFRESH=true` for an explicit Hugging Face
-refresh before startup; this keeps normal local restarts fast while retaining
-the same database source as Render.
+Both `npm run start` and `npm run dev` automatically fetch and update `data/apix.db`
+from Hugging Face before starting the API. This ensures both local and deployed environments
+always run with the latest dataset. If offline, the app falls back to the existing local database.
 
 The backend listens on Render's `PORT` and binds to `0.0.0.0`. Locally it falls back to port `4002`.
 

@@ -256,7 +256,7 @@ export function DataExplorerPage() {
             Page {page} of {totalPages} ({data.total.toLocaleString('en-IN')} observations)
           </span>
 
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 sm:mr-36">
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page <= 1 || loading}
