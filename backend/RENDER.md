@@ -37,6 +37,7 @@ APIX_HEADLESS=true
 APIX_BROWSER_TIMEOUT_MS=120000
 APIX_DB_PATH=./data/apix.db
 HF_TOKEN=
+GEMINI_API_KEY=
 ```
 
 `APIX_BROWSER_CHANNEL` should normally be unset. When it is unset, the scrapers use the Chromium browser installed by the build command. `APIX_DB_PATH` may remain unset for local development, where it defaults to `backend/data/apix.db`.
@@ -44,6 +45,8 @@ HF_TOKEN=
 `HF_TOKEN` must be a Hugging Face token with permission to write to the
 `amashtce/aeroindex-db` dataset. Configure it in Render's secret environment
 variables; never commit it to GitHub.
+
+`GEMINI_API_KEY` is required for AeroBot AI assistant features. Add your Gemini API key (e.g. from Google AI Studio) to Render Environment Variables so `/api/chat` can process AI requests.
 
 Set `APIX_DB_REFRESH=true` only when a build must explicitly replace an
 existing local database download.

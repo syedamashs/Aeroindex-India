@@ -1,9 +1,11 @@
+import { API_BASE } from './api';
+
 // Gemini 2.5 Flash Client for Aeroindex AI Assistant (AeroBot)
 const GEMINI_API_KEY =
   (import.meta.env.VITE_GEMINI_API_KEY as string | undefined) || '';
 
 const GEMINI_MODEL = 'gemini-2.5-flash';
-// Local proxy completely eliminates browser CORS errors and adblocker issues
+// Local proxy for Vite dev server
 const GEMINI_PROXY_ENDPOINT = `/gemini-proxy/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
 const GEMINI_DIRECT_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
 
@@ -147,26 +149,59 @@ export async function askGemini(
     },
   };
 
-  let response: Response;
+  // 1. First priority: Backend proxy /api/chat (Production-ready, CORS-safe, uses Render GEMINI_API_KEY)
   try {
-    // Try Vite proxy endpoint first (CORS-free, immune to browser privacy extensions)
-    response = await fetch(GEMINI_PROXY_ENDPOINT, {
+    const backendRes = await fetch(`${API_BASE}/api/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        contents: turns,
+        systemInstruction,
+      }),
     });
-  } catch (proxyError) {
-    console.warn('Vite proxy fetch failed, falling back to direct endpoint:', proxyError);
-    // Direct endpoint fallback
-    response = await fetch(GEMINI_DIRECT_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    });
+
+    if (backendRes.ok) {
+      const data = await backendRes.json();
+      if (data?.text) {
+        return data.text.trim();
+      }
+    } else {
+      console.warn(`[AeroBot] Backend /api/chat returned status ${backendRes.status}, falling back...`);
+    }
+  } catch (backendErr) {
+    console.warn('[AeroBot] Backend /api/chat request failed, falling back:', backendErr);
+  }
+
+  // 2. Second priority: Local Vite dev server proxy (only active in local npm run dev)
+  let response: Response | null = null;
+  if (import.meta.env.DEV) {
+    try {
+      const proxyRes = await fetch(GEMINI_PROXY_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (proxyRes.ok) {
+        response = proxyRes;
+      }
+    } catch {
+      // ignore and continue to direct fallback
+    }
+  }
+
+  // 3. Third priority: Direct Google Gemini API endpoint (uses VITE_GEMINI_API_KEY)
+  if (!response) {
+    try {
+      response = await fetch(GEMINI_DIRECT_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+    } catch {
+      throw new Error('Unable to reach Gemini AI service. Please verify your connection or GEMINI_API_KEY in deployment.');
+    }
   }
 
   if (!response.ok) {
