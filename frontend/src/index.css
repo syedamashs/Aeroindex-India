@@ -220,3 +220,27 @@ body.storyOn {
 .animate-story-slide-up {
   animation: storySlideUp 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
+
+@keyframes radarPing {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+.radar-ping-ring {
+  animation: radarPing 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes airwayPulse {
+  0%, 100% { stroke-opacity: 0.65; }
+  50% { stroke-opacity: 0.95; }
+}
+
+.airway-surge-pulse {
+  animation: airwayPulse 2s ease-in-out infinite;
+}

@@ -55,6 +55,7 @@ export function AviationTickerTape() {
 
   return (
     <div
+      id="guide-ticker-tape"
       className="w-full bg-[#18181b] text-stone-300 border-b border-[#27272a] text-[11px] font-mono py-1.5 px-4 select-none flex items-center overflow-hidden z-10"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}

@@ -15,7 +15,7 @@ import {
 import { useApp } from '@/context/AppContext';
 import { apiRunScheduler, apiSchedulerStatus, apiStatistics, apiIndex, type SchedulerTaskStatus, API_BASE } from '@/lib/api';
 import { AviationTickerTape } from '@/components/animation/AviationTickerTape';
-import { PlatformGuideModal } from '@/components/PlatformGuideModal';
+import { PlatformGuideModal, STORY_STEPS } from '@/components/PlatformGuideModal';
 import { AeroBotChat } from '@/components/AeroBotChat';
 
 interface NavItem {
@@ -369,12 +369,13 @@ export function Layout({ children }: { children: ReactNode }) {
               <Play className="w-3.5 h-3.5 fill-slate-950 text-slate-950 transition-transform group-hover:scale-110" />
               <span className="tracking-wide font-sans">Guide me</span>
               <span className="hidden sm:inline-block px-1.5 py-0.2 text-[9px] font-mono font-black uppercase rounded bg-slate-950 text-amber-300">
-                7 Steps
+                {STORY_STEPS.length} Steps
               </span>
             </button>
 
             {/* Live Scraping Trigger Button - Only enabled after backend DB fetched and UI ready */}
             <button
+              id="guide-live-scraping"
               onClick={openSchedulerModal}
               disabled={!canScrape}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#292524] hover:bg-[#38332f] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#292524] text-stone-200 border border-[#44403c] text-xs font-medium transition-colors cursor-pointer"
@@ -412,7 +413,7 @@ export function Layout({ children }: { children: ReactNode }) {
           ========================================================================= */}
       <nav
         ref={dropdownContainerRef}
-        className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-stone-200/90 shadow-xs px-4 lg:px-8 select-none"
+        className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-stone-200/90 shadow-xs px-4 lg:px-8 select-none"
       >
         <div className="max-w-[1600px] mx-auto flex items-center justify-between">
           {/* Desktop Categories Ribbon */}
@@ -612,7 +613,7 @@ export function Layout({ children }: { children: ReactNode }) {
       {/* =========================================================================
           MAIN WORKSPACE VIEWPORT (100% FULL WIDTH REAL ESTATE)
           ========================================================================= */}
-      <main className="app-main-shell min-w-0 p-4 lg:p-8 pb-28 lg:pb-32 max-w-[1600px] w-full mx-auto flex-1">
+      <main className="app-main-shell min-w-0 p-3 lg:p-6 pb-6 lg:pb-8 max-w-[1600px] w-full mx-auto flex-1">
         {children}
       </main>
 

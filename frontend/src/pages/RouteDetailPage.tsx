@@ -765,7 +765,7 @@ export function RouteDetailPage() {
                   {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-slate-950 animate-ping" />}
                   <span>{b.displayLabel || b.label}</span>
                   <span className={`text-[10px] ${isSelected ? 'text-slate-950' : 'text-slate-400'}`}>
-                    {horizonMetric === 'fare' ? formatINR(b.averageFare) : `+${b.premiumPct || 0}%`}
+                    {horizonMetric === 'fare' ? formatINR(b.averageFare) : `+${(b as Record<string, unknown>).premiumPct || 0}%`}
                   </span>
                 </button>
               );
@@ -783,7 +783,7 @@ export function RouteDetailPage() {
                   </span>
                   {activeWindow.window === 1 ? (
                     <span className="block text-[11px] text-amber-800 mt-0.5">
-                      🚨 Peak surge zone on this corridor. Fares trade at a <strong>+{activeWindow.premiumPct}% premium</strong> compared to early booking.
+                      🚨 Peak surge zone on this corridor. Fares trade at a <strong>+{String((activeWindow as Record<string, unknown>).premiumPct || 0)}% premium</strong> compared to early booking.
                     </span>
                   ) : activeWindow.window <= 7 ? (
                     <span className="block text-[11px] text-amber-800 mt-0.5">

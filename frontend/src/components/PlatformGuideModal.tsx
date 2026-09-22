@@ -3,7 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import {
   X, ChevronRight, ChevronLeft, Play, Pause,
   Sparkles, Activity, TrendingUp, BookOpen, Layers,
-  ShieldCheck, Bell, CheckCircle2
+  ShieldCheck, Bell, CheckCircle2, Radio, RefreshCw,
+  Compass, MapPin, Plane
 } from 'lucide-react';
 
 export interface StoryStep {
@@ -25,7 +26,7 @@ export const STORY_STEPS: StoryStep[] = [
     id: 'headline-index',
     route: '/dashboard',
     spotSelector: '#guide-headline-index',
-    stepBadge: 'Step 1 of 7 · National Airfare Index',
+    stepBadge: 'Step 1 of 10 · National Airfare Index',
     category: 'Macroeconomic Metric',
     shortTitle: 'National Index',
     headline: 'This is the headline number that feeds national inflation.',
@@ -36,10 +37,38 @@ export const STORY_STEPS: StoryStep[] = [
     accentColor: 'text-amber-400'
   },
   {
+    id: 'ticker-stream',
+    route: '/dashboard',
+    spotSelector: '#guide-ticker-tape',
+    stepBadge: 'Step 2 of 10 · Live Running Corridors Stream',
+    category: 'Market Surveillance',
+    shortTitle: 'Corridors Stream',
+    headline: 'Live running corridor ticker tape — explore any domestic route instantly.',
+    narrativeLead: 'Real-Time Subcontinent Corridor Ticker',
+    narrativeText:
+      'Streaming 24/7 at the top of the interface. Displays live domestic sector fares, carrier symbols, and price shifts across Indian hubs. Click any corridor in the running ticker to immediately jump into that sector\'s pricing trajectory and deep historical dossier.',
+    icon: Radio,
+    accentColor: 'text-amber-400'
+  },
+  {
+    id: 'live-scraping',
+    route: '/dashboard',
+    spotSelector: '#guide-live-scraping',
+    stepBadge: 'Step 3 of 10 · Live Scraping Trigger',
+    category: 'Ingestion Pipeline',
+    shortTitle: 'Live Scraping',
+    headline: 'On-demand statutory multi-airline reservation scraper.',
+    narrativeLead: 'Automated Headless Playwright Tariff Ingestion Pipeline',
+    narrativeText:
+      'Click "Live Scraping" at any time to run automated multi-carrier headless scrapers across IndiGo, Air India, SpiceJet, and Akasa in real time. Ingests fresh live reservation airfares, validates through the 5-stage DQE audit, and synchronizes back to the cloud SQLite database.',
+    icon: RefreshCw,
+    accentColor: 'text-emerald-400'
+  },
+  {
     id: 'trajectory-simulation',
     route: '/dashboard',
     spotSelector: '#guide-trajectory-chart',
-    stepBadge: 'Step 2 of 7 · Continuous Automated Radar',
+    stepBadge: 'Step 4 of 10 · Continuous Automated Radar',
     category: 'Surveillance Engine',
     shortTitle: 'Trajectory Radar',
     headline: 'Manual monthly sampling misses 99% of pricing reality.',
@@ -53,7 +82,7 @@ export const STORY_STEPS: StoryStep[] = [
     id: 'corridor-surveillance',
     route: '/routes',
     spotSelector: '#guide-routes-table',
-    stepBadge: 'Step 3 of 7 · Route Watch & Volatility',
+    stepBadge: 'Step 5 of 10 · Route Watch & Volatility',
     category: 'Market Intelligence',
     shortTitle: 'Route Watch',
     headline: 'A flight has no single price across the network.',
@@ -64,10 +93,24 @@ export const STORY_STEPS: StoryStep[] = [
     accentColor: 'text-emerald-400'
   },
   {
+    id: 'airway-map',
+    route: '/map',
+    spotSelector: '#guide-airway-map',
+    stepBadge: 'Step 6 of 10 · Airway Radar Map',
+    category: 'Geospatial Radar',
+    shortTitle: 'Airway Radar Map',
+    headline: 'Interactive ATC Radar Ops Map with Geodesic Flight Arcs.',
+    narrativeLead: 'Geospatial Domestic Airway Network & Hub Focus Intelligence',
+    narrativeText:
+      'Switch between ATC Dark Ops, Aero Light, and Satellite terrain. Explore great-circle curved flight arcs, watch live animated aircraft traverse domestic corridors, and click any airport hub to isolate connected routes and inspect departure tariffs.',
+    icon: Compass,
+    accentColor: 'text-cyan-400'
+  },
+  {
     id: 'booking-window-curve',
     route: '/booking-window',
     spotSelector: '#guide-booking-curve',
-    stepBadge: 'Step 4 of 7 · Close-in Surge Multiplier',
+    stepBadge: 'Step 7 of 10 · Close-in Surge Multiplier',
     category: 'Market Economics',
     shortTitle: 'Advance Curve',
     headline: 'Quantifying the last-minute T+1 booking penalty.',
@@ -81,7 +124,7 @@ export const STORY_STEPS: StoryStep[] = [
     id: 'markov-transition',
     route: '/fare-state',
     spotSelector: '#guide-markov-matrix',
-    stepBadge: 'Step 5 of 7 · Markov Fare State Analytics',
+    stepBadge: 'Step 8 of 10 · Markov Fare State Analytics',
     category: 'Predictive Modeling',
     shortTitle: 'Fare Escalation',
     headline: 'Predicting price escalation before complaints occur.',
@@ -94,14 +137,14 @@ export const STORY_STEPS: StoryStep[] = [
   {
     id: 'dqe-governance',
     route: '/dqe',
-    spotSelector: '#guide-dqe-audit',
-    stepBadge: 'Step 6 of 7 · Statutory Collection & DQE Audit',
-    category: 'Regulatory Compliance',
-    shortTitle: 'Quality Engine',
-    headline: 'Statutory basis under Rule 135(2) and zero-noise audit.',
-    narrativeLead: '5-Stage Data Quality Engine (DQE)',
+    spotSelector: '#guide-reliability-hero',
+    stepBadge: 'Step 9 of 10 · 5-Dimension Reliability Governance',
+    category: 'Regulatory Governance',
+    shortTitle: 'Quality & Reliability',
+    headline: 'Dual Engine: APIx measures what changed; Reliability measures statistical confidence.',
+    narrativeLead: '5-Dimension Quantitative Reliability Framework (DGCA Standard)',
     narrativeText:
-      'Tariffs are collected under statutory airline disclosures (Aircraft Rules 1937, Rule 135(2)). The 5-stage DQE validates schemas, prunes duplicates via SHA fingerprints, and discards outliers so raw web noise never corrupts official indices.',
+      'Audits airfare ingestion across 5 empirical dimensions: 152-route Coverage, Scrape Freshness, Cross-Source Consistency, Outlier Cleanliness, and Calculation Stability. Ensures official airline index numbers are mathematically defensible under Aircraft Rules 1937, Rule 135(2).',
     icon: ShieldCheck,
     accentColor: 'text-teal-400'
   },
@@ -109,7 +152,7 @@ export const STORY_STEPS: StoryStep[] = [
     id: 'surveillance-alerts',
     route: '/alerts',
     spotSelector: '#guide-alerts-stream',
-    stepBadge: 'Step 7 of 7 · Automated Governance Alerts',
+    stepBadge: 'Step 10 of 10 · Automated Governance Alerts',
     category: 'Aviation Governance',
     shortTitle: 'Surveillance Alerts',
     headline: 'Automated intelligence for Civil Aviation authorities.',
