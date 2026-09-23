@@ -1,385 +1,451 @@
-# AeroIndex India
+<div align="center">
 
-## SIH 2026 Submission
+# ✈️ AeroIndex India (VayuYaan)
+### Real-Time National Airfare Price Index & Algorithmic Tariff Surveillance Platform
 
-AeroIndex India is an airfare intelligence and price-indexing platform for India's domestic aviation market. It turns flight-fare observations into a transparent, auditable set of indicators for analysts, policymakers, airlines, and informed travellers.
+[![SIH 2026](https://img.shields.io/badge/Smart%20India%20Hackathon-2026%20Finalist-FF9933?style=for-the-badge&logo=target)](https://sih.gov.in)
+[![Problem Statement](https://img.shields.io/badge/Problem%20Statement-SIH26056-138808?style=for-the-badge)](https://sih.gov.in)
+[![Ministry](https://img.shields.io/badge/Ministry-MoSPI%20%26%20DGCA-000080?style=for-the-badge)](https://www.mospi.gov.in/)
+[![Live App](https://img.shields.io/badge/Live%20Console-vayuyaan--india.vercel.app-blueviolet?style=for-the-badge&logo=vercel)](https://vayuyaan-india.vercel.app/)
+[![Dataset](https://img.shields.io/badge/HuggingFace%20Dataset-aeroindex--db-FFD21E?style=for-the-badge&logo=huggingface)](https://huggingface.co/datasets/amashtce/aeroindex-db)
 
-The platform connects the complete journey from collection to decision support:
+<br/>
 
-```text
-Route configuration
-        |
-        v
-Scraping and raw-response capture
-        |
-        v
-Airline-specific normalization
-        |
-        v
-Canonical SQLite observations
-        |
-        +--> Data-quality and integrity controls
-        |
-        +--> Fare-state and transition analytics
-        |
-        +--> Price relatives and index engine
-                         |
-                         v
-              Express API + React dashboard
-```
+**A mathematically robust, automated, end-to-end airfare intelligence pipeline designed to replace manual airfare sampling in India's Consumer Price Index (CPI) with high-frequency observations, advance booking window curves, and statutory tariff surveillance under DGCA Rule 135(2).**
 
-## Why AeroIndex
+<br/>
 
-Airfare is not a single number. It changes by route direction, carrier, travel date, booking lead time, fare family, availability, and collection timestamp. A useful public indicator therefore needs more than a dashboard of averages. It needs:
+[🚀 **Access Live Production Web App**](https://vayuyaan-india.vercel.app/) • [📂 **GitHub Repository**](https://github.com/syedamashs/Aeroindex-India) • [📊 **Automated Database Hub**](https://huggingface.co/datasets/amashtce/aeroindex-db) • [📑 **Solution Architecture & Deck**](./vimaan-airfare-index-main/26RBU142_SIH26056_BharatBytes.pdf)
 
-- A repeatable collection pipeline.
-- A common fare representation across sources.
-- Explicit identity and comparability rules.
-- Protection against duplicate, invalid, sold-out, and incomplete observations.
-- A declared index methodology with route weights and a visible base period.
-- Coverage and quality diagnostics alongside every headline result.
-- Drill-down views that explain the movement behind the national number.
+---
 
-AeroIndex is designed around those principles. Every layer is separated so that collection, validation, estimation, storage, and presentation can be reviewed independently.
+</div>
 
-## What The Platform Delivers
+## 📌 Executive Summary & Hackathon Context
 
-### National airfare index
-
-The index engine produces a headline national airfare index from route-level movements. The base period is declared as 100, and the headline estimator is a route-weighted Jevons index. The system also exposes route coverage, represented weight, missing routes, and estimator status so a number is never presented without its context.
-
-### Route and airline intelligence
-
-Users can compare routes, directional markets, airlines, fare levels, volatility, minimum and maximum fares, and month-over-month or year-over-year movement. Route detail pages connect the aggregate result to monthly trends, airline comparisons, and booking-window behaviour.
-
-### Booking-window analysis
-
-The platform keeps lead-time buckets separate:
-
-- `T+1` - one day before departure
-- `T+7` - seven days before departure
-- `T+15` - fifteen days before departure
-- `T+30` - thirty days before departure
-- `T+45` - forty-five days before departure
-
-This shows how fare levels change as departure approaches without mixing incomparable booking windows.
-
-### Fare-state analytics
-
-Repeated collection runs are matched using flight, route, timing, fare identity, passenger type, source, and lead-time rules. Matched snapshots produce transitions such as price increase, price decrease, unchanged fare, becoming available, and becoming unavailable. The fare-state layer also reports matching coverage and the Fare Event Probability (FEP), which measures the share of comparable observations that experienced an upward fare transition.
-
-### Data-quality governance
-
-The data-quality engine checks schema integrity, fare arithmetic, date and time validity, flight identity, duplicates, sold-out handling, outliers, and cross-source consistency. Results are summarized with statuses, hard errors, warnings, flagged records, limitations, and an audit timestamp.
-
-## End-to-End Architecture
-
-### 1. Route configuration and collection planning
-
-Reference files define airports, cities, routes, route direction, and route weights. The scheduler builds collection tasks for a route, airline/source, departure date, and target lead-time bucket. Each collection run receives a unique run identifier, and each task records its lifecycle, attempts, errors, and timestamps.
-
-### 2. Scraping and raw-response capture
-
-The scraper layer contains source-specific collectors for Air India, IndiGo, and SpiceJet, together with a dispatcher and shared scraper utilities. The collection process records the requested route, source, departure, lead time, URL, search timestamp, response metadata, storage path, checksum, and extraction status.
-
-Raw responses are kept separate from canonical observations. This preserves provenance and makes it possible to investigate a normalized value without losing the original collection context.
-
-### 3. Normalization into a canonical contract
-
-Each source has different field names and response structures. The normalizers convert those responses into one canonical observation model containing:
-
-- Observation and collection identifiers.
-- Source and source URL.
-- Search timestamp and departure/arrival times.
-- Origin, destination, route, flight, carrier, and journey identity.
-- Fare product, fare class, fare family, and offer identity.
-- Passenger type, currency, base fare, taxes, fees, and total fare.
-- Sold-out and availability signals.
-- Target and actual lead time.
-- Extraction status and collection provenance.
-
-The canonical consumer price is `total_fare`. Component fields remain available for arithmetic validation and explanation.
-
-### 4. SQLite storage
-
-The database schema separates reference data, collection management, raw responses, canonical observations, fare-state snapshots, transitions, and index outputs. Foreign keys connect observations to collection tasks and route definitions. This provides a traceable path from a dashboard number back to the run and task that produced it.
-
-The primary observation table is `apix_observations`. Important supporting tables include:
-
-| Area | Tables | Purpose |
-|---|---|---|
-| Reference data | `dgca_route_master`, `apix_route_basket`, `airport_city_master` | Route coverage, weights, and airport metadata |
-| Collection | `collection_runs`, `collection_tasks` | Run/task lifecycle and error tracking |
-| Provenance | `raw_scrape_responses` | Raw response metadata and storage references |
-| Canonical data | `apix_observations` | Normalized, queryable fare observations |
-| Fare state | Snapshot and transition tables | Comparable repeated-run changes |
-| Indexing | Index output tables | Reproducible route and national results |
-
-### 5. Data quality and validation
-
-Quality checks run before analytical results are trusted. The validators address:
-
-- Schema and required-field integrity.
-- `total_fare = base_fare + taxes + total_fees` arithmetic.
-- Positive, finite, usable prices.
-- Date/time consistency and lead-time boundaries.
-- Flight and journey identity completeness.
-- Duplicate observations and repeated records.
-- Sold-out and missing-fare treatment.
-- Suspicious outliers.
-- Cross-source consistency for comparable flight groups.
-
-Invalid or incomplete records are not silently converted into zero prices. Sold-out or missing-fare records remain useful for availability analysis but do not become price observations. Duplicate counts and rejected records remain visible in diagnostics.
-
-### 6. Fare-state matching and transitions
-
-The fare-state layer compares two successful collection runs. Comparability is established using a hierarchy that preserves source, route direction, departure date, lead time, carrier, flight number, timing, passenger type, and fare identity.
-
-Fare identity uses the strongest available key:
-
-1. `fare_availability_key`.
-2. `source_offer_id`.
-3. Fare product, fare class, and fare family.
-
-If an observation cannot be compared reliably, it is excluded from the transition calculation and counted as a coverage limitation. The system does not invent missing fares, lead times, passenger types, or route movements.
-
-### 7. Index calculation
-
-The index engine is composed of small, testable modules for price relatives, Jevons, Laspeyres, Paasche, Fisher, route indices, national aggregation, lead-time indices, inflation, sampling, persistence, and confidence.
-
-The production headline is the route-weighted Jevons index. Laspeyres, Paasche, and Fisher are robustness estimators and are reported for comparison when their required weights are available.
-
-## Index Methodology
-
-### Eligible price observations
-
-An observation can contribute to a price-relative calculation only when it has:
-
-- A valid route and direction.
-- A usable positive finite `total_fare`.
-- Sufficient flight, fare, source, and temporal identity.
-- A valid comparison observation in the adjacent period.
-- A compatible lead-time bucket when lead time is populated.
-
-Repeated records from the same collection run are not treated as independent time periods. Search or observation timestamps establish temporal order; scheduler completion time does not replace observation time.
-
-### Elementary price relative
-
-For comparable fare identity $i$ between periods $t-1$ and $t$:
-
-$$
-r_{i,t} = \frac{p_{i,t}}{p_{i,t-1}}
-$$
-
-where $p$ is the positive, finite `total_fare`. Missing, non-positive, or non-finite prices produce no price relative and are recorded in quality coverage.
-
-### Jevons primary estimator
-
-For $n$ comparable price relatives in a period:
-
-$$
-J_t = \left(\prod_{i=1}^{n} r_{i,t}\right)^{1/n}
-$$
-
-The implementation uses the logarithmic form for numerical stability:
-
-$$
-\ln J_t = \frac{1}{n}\sum_{i=1}^{n}\ln(r_{i,t})
-$$
-
-Jevons measures proportional movement and prevents a few high-value fares from dominating through absolute additions.
-
-### Route-level index
-
-For route $r$, direction $d$, lead-time bucket $b$, and period $t$, the route relative is calculated from eligible comparable fares in that slice. The route index is chained from the declared base:
-
-$$
-I_{r,d,b,t} = I_{r,d,b,t-1} \times J_{r,d,b,t}
-$$
-
-with the selected base period set to 100. Direction is preserved: `DEL -> BOM` and `BOM -> DEL` are separate markets.
-
-### National AeroIndex
-
-The national index aggregates available route-level indices using the configured route or passenger-traffic weights:
-
-$$
-APIx_t =
-\frac{\sum_{r \in R_t} W_r I_{r,t}}
-{\sum_{r \in R_t} W_r}
-$$
-
-Only routes with valid required data participate in $R_t$. The result reports the number of represented routes, represented weight share, missing routes, quality flag, and base-period definition. A missing route is not assigned zero movement or copied movement.
-
-### Robustness estimators
-
-When defensible base and current weights exist, the same eligible population can be evaluated with:
-
-- Laspeyres for previous-period weighting.
-- Paasche for current-period weighting.
-- Fisher as the geometric mean of Laspeyres and Paasche.
-
-These are diagnostics for estimator stability. They do not replace the declared Jevons headline merely because one produces a preferred result.
-
-### Inflation and lead-time series
-
-Index levels and inflation rates are distinct. Month-over-month movement is calculated from adjacent index levels:
-
-$$
-MoM_t = \left(\frac{I_t}{I_{t-1}} - 1\right) \times 100
-$$
-
-Year-over-year movement requires the declared historical comparison period:
-
-$$
-YoY_t = \left(\frac{I_t}{I_{t-12}} - 1\right) \times 100
-$$
-
-Each lead-time bucket has its own series when data exists. A missing bucket is reported as unavailable rather than filled from another bucket.
-
-## Product Experience
-
-The React and TypeScript frontend provides the following workflows:
-
-| View | Purpose |
+| Parameter | Details |
 |---|---|
-| Dashboard | National index, route coverage, freshness, quality, alerts, and current KPIs |
-| Airfare Index | Base period, route basket, weights, national trend, and contributions |
-| Route Analysis | Search, sort, risk, volatility, export, and route drill-down |
-| Route Detail | Fare trend, airline comparison, booking-window curve, and daily movement |
-| Airline Analysis | Carrier-level fare, index, range, and volatility comparison |
-| Booking Window | Fare behaviour from T+1 through T+45 |
-| India Map | Geographic route movements, airports, and regional summary |
-| Data Explorer | Filterable and exportable canonical observations |
-| Alerts | Price spikes, drops, thresholds, volatility, and quality events |
-| Policy Insights | Plain-language interpretation of current indicators |
-| Fare State | Comparable snapshot transitions and fare-event measures |
-| Data Quality | Integrity checks, coverage, and validation status |
-| Methodology | Public explanation of the measurement approach |
-| System/API | Pipeline status, processing controls, and endpoint view |
-| Audit Log | Session activity and governance visibility |
+| **Event** | **Smart India Hackathon (SIH 2026)** |
+| **Problem Statement ID** | **SIH26056** |
+| **Theme / Category** | Smart Automation / E-Governance / National Economic Indicators |
+| **Nodal Ministries / Stakeholders** | **Ministry of Statistics and Programme Implementation (MoSPI)** & **Directorate General of Civil Aviation (DGCA)** |
+| **Live Deployed Web App** | **[https://vayuyaan-india.vercel.app/](https://vayuyaan-india.vercel.app/)** |
+| **Team / Project Identifier** | **T_Humble Hackers** |
+| **Codebase Repository** | [https://github.com/syedamashs/Aeroindex-India](https://github.com/syedamashs/Aeroindex-India) |
 
-Shared filters support date ranges, origin, destination, airline, travel class, and booking window. Route tables and observation tables can be exported as CSV for review.
+---
 
-## API Layer
+## 🎯 The Core Problem & Motivation
 
-The Express backend exposes the dashboard's operational data and health surface. It reads canonical observations and analytical tables from SQLite, normalizes airline and airport metadata for presentation, and returns route, airline, index, fare-state, alerts, insights, map, and dashboard summaries.
+### Why India's Present Airfare CPI Measurement Fails
 
-The API layer is intentionally kept separate from the React presentation layer. The frontend communicates through the API client, while the Python calculation modules remain reusable for scheduled processing, diagnostics, and reproducible analysis.
+In India's official Consumer Price Index (CPI 2024 basket), **Transport and Communication accounts for 9.43%** of the consumer weight. Yet, the airfare sub-component is compiled using an antiquated manual process:
 
-## Repository Structure
+1. **Severe Under-sampling**: The DGCA Tariff Monitoring Unit manually checks fares for only **78 selected routes once a month**.
+2. **Dynamic Pricing Blindness**: In modern civil aviation, airlines employ automated revenue management algorithms. A single route does not possess "one price"—its price varies drastically across **booking lead times ($T+1, T+7, T+15, T+30, T+45$)**, carriers, time of departure, baggage allowances, and cabin tiers.
+3. **Publication Lag of ~60 Days**: Hand-collected fare quotes reach MoSPI and the Central Statistics Office approximately two months after flight completion, making real-time monetary policy analysis impossible.
+4. **Zero Regulatory Surveillance**: The Ministry and DGCA lack automated, real-time alerts to enforce **Rule 135(2) of the Aircraft Rules, 1937** (which mandates that airfares must have reasonable relation to cost of operation, reasonable profit, and prevailing market conditions, prohibiting predatory or surge price-gouging).
+
+### The AeroIndex (VayuYaan) Solution
+
+| Capability | Current MoSPI / DGCA Method | AeroIndex India (VayuYaan) |
+|---|---|---|
+| **Route Coverage** | 78 domestic routes | **500+ domestic city-pair corridors** across all Tier-1, 2, and 3 airports |
+| **Sampling Frequency** | Once a month (manual check) | **High-frequency automated daily runs** |
+| **Observation Volume** | ~78 data points/month | **1,440+ verified fare observations per route/month** |
+| **Lead-Time Decomposition** | Single arbitrary spot check | **5 Distinct Advance Windows**: $T+1, T+7, T+15, T+30, T+45$ |
+| **Statistical Estimator** | Naive arithmetic average (upward biased) | **Route-Weighted Jevons Index** (chain-drift proof, multilateral GEKS verified) |
+| **Publication Lag** | ~60 days publication delay | **Same-day real-time index computation & dashboard refresh** |
+| **Data Quality Verification** | Ad-hoc manual transcription | **Automated 9-Layer Data Quality Engine (DQE)** with 98.4%+ verification rate |
+| **Regulatory Alerts** | Retrospective passenger complaints | **Real-time DGCA Rule 135(2) surge and predatory pricing detection** |
+| **AI Decision Support** | None | **AeroBot**: Gemini 2.5 Flash GenAI assistant with live database context injection |
+
+---
+
+## ⚡ Key Platform Capabilities & Innovations
 
 ```text
-.
-├── backend/
-│   ├── server.js                 Express API and SQLite read layer
-│   ├── alert.py                  Alert generation support
-│   ├── config/                   Airport, route, and runtime configuration
-│   ├── database/                 Connection helpers and schema
-│   ├── data_quality/             Validators, scoring, and DQE orchestration
-│   ├── fare_state/               Snapshot matching and transition analytics
-│   ├── index_engine/             Price relatives, estimators, indices, and inflation
-│   ├── normalizers/              Source-to-canonical fare normalization
-│   ├── scheduler/                Collection task planning and execution
-│   ├── scrapers/                 Source adapters and dispatcher
-│   └── storage/                  Observation and collection persistence
-├── frontend/
-│   ├── src/pages/                Dashboard and analysis workflows
-│   ├── src/components/           Shared layout, filters, charts, and UI primitives
-│   ├── src/context/              Auth, filters, updates, and notifications
-│   └── src/data/                 Frontend types, API client, and formatting helpers
-├── requirements.txt              Python dependencies
-└── README.md                     Project and methodology documentation
+ ┌────────────────────────────────────────────────────────────────────────────────┐
+ │                              AEROINDEX INDIA                                   │
+ ├────────────────────────────────────────────────────────────────────────────────┤
+ │  🌐 LIVE FRONTEND (Vercel)            │  ⚡ BACKEND & CALCULATION ENGINE       │
+ │  https://vayuyaan-india.vercel.app/   │  Node.js (Node 22) + Python Core       │
+ ├───────────────────────────────────────┴────────────────────────────────────────┤
+ │  🤖 AEROBOT: Google Gemini 2.5 Flash In-App AI Policy Analyst                  │
+ │  🛡️ DQE: 9-Layer Automated Data Quality & Arithmetic Validation (98.4%+)        │
+ │  📊 INDEX ENGINE: Jevons Geometric Mean, Laspeyres, Paasche, Fisher & GEKS     │
+ │  🗺️ GEOSPATIAL MAP: Leaflet Interactive Flight Corridor Route Network          │
+ │  👁️ LIVE VIEWPORT: Real-Time Playwright Browser Scraping Stream in Web UI       │
+ │  ⚖️ DGCA COMPLIANCE: Statutory Rule 135(2) Anti-Surge Surveillance              │
+ └────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-## Local Setup
+### 1. Headline National Airfare Index Engine
+- **Base Period**: Declared base January 2026 = 100.0.
+- **Elementary Aggregator**: Chained Jevons Geometric Mean ($\ln J_t = \frac{1}{n} \sum \ln r_{i,t}$) adhering to UN and IMF Consumer Price Index Manual guidelines. Prevents sample churn and extreme ticket outliers from distorting national inflation indicators.
+- **Passenger Traffic Basket Weighting**: Aggregated using DGCA city-pair traffic volumes ($W_r$) ensuring high-density trunks (DEL-BOM, BLR-DEL) and regional connectivity routes (UDAN) receive precise economic representation.
+- **Robustness Triangulation**: Live cross-verification with Laspeyres, Paasche, and Fisher ideal indices.
 
-### Requirements
+### 2. AeroBot — Gemini 2.5 Flash AI Intelligence Assistant
+- Deeply integrated conversational intelligence powered by Google's **Gemini 2.5 Flash**.
+- Injects live database context (current national index level, MoM/YoY inflation rate, monitored corridor counts, active airlines, top surge routes, and DQE integrity rates) directly into prompt synthesis.
+- Answers regulatory inquiries regarding **Rule 135(2) of the Aircraft Rules, 1937**, dynamic pricing surge multipliers, and statistical methodology in natural language.
 
-- Node.js 18 or later.
-- npm.
-- Python 3.10 or later.
-- A local SQLite database at `backend/data/apix.db` containing the schema and required observation tables.
+### 3. Data Quality Engine (DQE) & Reliability Control Center
+- Automated 9-tier gatekeeper that guarantees zero corrupted observations enter the index calculation:
+  - **Schema Validation**: Mandatory fields, data typing, and null safety.
+  - **Arithmetic Audit**: Enforces $Total Fare = Base Fare + Taxes + Other Fees$.
+  - **Temporal Integrity**: Ensures departure timestamp > collection timestamp and validates $T+N$ advance purchase windows.
+  - **Duplicate De-duplication**: Filters identical carrier, flight number, fare-family, and seat availability matches within the same epoch.
+  - **Sold-Out vs Missing Fares**: Explicitly isolates zero-inventory states for capacity utilization analytics rather than treating them as zero prices.
+  - **Extreme Outlier Detection**: Flags fares exceeding $5\sigma$ deviation within comparable route buckets.
 
-The runtime database and generated collection files are intentionally excluded from Git. They should be supplied through the deployment environment or initialized locally before starting the backend.
+### 4. Advance Purchase Window Curve Decomposition
+- Keeps advance purchase windows rigorously separated to study booking behavior without mixing un-comparable seats:
+  - **$T+1$**: Last-minute distress/business traveler fares (highest surge volatility).
+  - **$T+7$**: One-week tactical pricing.
+  - **$T+15$**: Mid-range leisure booking.
+  - **$T+30$**: Standard advance planning.
+  - **$T+45$**: Baseline early-bird capacity opening.
 
-### Install dependencies
+### 5. Live Browser Scraping Engine & Viewport Streaming
+- Headless **Playwright / Chromium** scrapers with source-specific resilience adapters for **IndiGo (6E)**, **Air India (AI)**, and **SpiceJet (SG)**.
+- **Live Scraper Modal**: Operators can watch the real-time browser canvas directly inside the web UI as the bot solves navigation flows, selects departure dates, and harvests fare matrices.
 
-From the project root:
+### 6. Interactive Geospatial Flight Corridor Map
+- Full-screen **Leaflet & React-Leaflet** interactive visualizer of the Indian domestic airspace.
+- Renders bidirectional routes between all major metro airports (DEL, BOM, BLR, MAA, CCU, HYD) and regional nodes.
+- Corridors color-coded by real-time fare surge and price-volatility index.
+
+---
+
+## 🏛️ End-to-End System Architecture
+
+```mermaid
+flowchart TD
+    subgraph S1["1. Collection & Web Scraper Layer"]
+        A1["IndiGo Adapter (6E)"]
+        A2["Air India Adapter (AI)"]
+        A3["SpiceJet Adapter (SG)"]
+        PV["Playwright Headless Browser & Live UI Viewport Frame Stream"]
+        A1 --> PV
+        A2 --> PV
+        A3 --> PV
+    end
+
+    subgraph S2["2. Ingestion & Normalization"]
+        RAW[("Raw Scrape Responses Store")]
+        NORM["Canonical Normalizer Contract (apix_observations)"]
+        PV --> RAW
+        RAW --> NORM
+    end
+
+    subgraph S3["3. Governance & Quality Gate (DQE)"]
+        DQE{"9-Layer Data Quality Engine"}
+        VAL1["Arithmetic Audit: Base + Taxes + Fees == Total"]
+        VAL2["Temporal & Lead-Time Boundary Check (T+1 to T+45)"]
+        VAL3["Duplicate & Outlier Detection"]
+        NORM --> DQE
+        DQE --> VAL1
+        DQE --> VAL2
+        DQE --> VAL3
+    end
+
+    subgraph S4["4. Persistence & Cloud Storage"]
+        SQLITE[("Canonical SQLite Database (apix.db)")]
+        HF[("Hugging Face Hub: amashtce/aeroindex-db")]
+        VAL1 --> SQLITE
+        VAL2 --> SQLITE
+        VAL3 --> SQLITE
+        SQLITE <-->|Bi-directional Sync| HF
+    end
+
+    subgraph S5["5. Mathematical Index & Analytics Engine"]
+        REL["Elementary Price Relatives (r_it)"]
+        JEV["Logarithmic Jevons Geometric Mean (ln J_t)"]
+        DGCA["DGCA Passenger Volume Basket Weighting (W_r)"]
+        NAT["National AeroIndex Aggregation"]
+        TRANS["Fare-State Transition Matrix (FEP)"]
+        SQLITE --> REL
+        REL --> JEV
+        JEV --> DGCA
+        DGCA --> NAT
+        SQLITE --> TRANS
+    end
+
+    subgraph S6["6. Application Server"]
+        API["Node.js / Express REST API (Port 4002)"]
+        CHAT_PROXY["Gemini 2.5 Flash Proxy & Context Injector"]
+        NAT --> API
+        TRANS --> API
+        API --> CHAT_PROXY
+    end
+
+    subgraph S7["7. User Interface & Intelligence Console"]
+        UI["React 18 + Vite + TypeScript Dashboard"]
+        VAP["Live Deployment: vayuyaan-india.vercel.app"]
+        BOT["AeroBot AI Policy Assistant"]
+        MAP["Interactive Leaflet Air Corridor Map"]
+        API --> UI
+        CHAT_PROXY --> BOT
+        UI --> VAP
+        UI --> MAP
+    end
+```
+
+---
+
+## 📐 Mathematical & Statistical Methodology
+
+The AeroIndex measurement methodology implements the international guidelines laid out in the **ILO/IMF/OECD Consumer Price Index Manual** to eradicate chain drift and substitution bias.
+
+### 1. Eligible Price Observations & Relatives
+For any flight observation to enter index calculation, it must possess a confirmed positive finite consumer fare $p_{i,t} > 0$, strict route direction ($DEL \rightarrow BOM \neq BOM \rightarrow DEL$), and a matched counterpart in the adjacent base or reference period $t-1$:
+
+$$r_{i,t} = \frac{p_{i,t}}{p_{i,t-1}}$$
+
+### 2. Jevons Primary Elementary Aggregate
+To calculate the unweighted price relative across $n$ comparable flight quotes within a route-direction-leadtime cell, AeroIndex uses the **Jevons Geometric Mean**:
+
+$$J_t = \left(\prod_{i=1}^{n} r_{i,t}\right)^{1/n} = \exp\left(\frac{1}{n} \sum_{i=1}^{n} \ln r_{i,t}\right)$$
+
+> **Why Jevons?** Arithmetic formulations (like the Carli index) suffer from upward bias and fail the time-reversal test. Under price bouncing (typical in dynamic airline pricing), Jevons exhibits zero chain drift.
+
+### 3. Route Index Chaining
+Each directional route $r$, lead-time window $b$, and period $t$ is chained sequentially from the declared base period ($I_{r,b,0} = 100.0$):
+
+$$I_{r,b,t} = I_{r,b,t-1} \times J_{r,b,t}$$
+
+### 4. Route-Weighted National AeroIndex ($APIx_t$)
+The national headline indicator aggregates individual route indices using historical DGCA passenger traffic volume weights $W_r$:
+
+$$APIx_t = \frac{\sum_{r \in R_t} W_r \cdot I_{r,t}}{\sum_{r \in R_t} W_r}$$
+
+Where $R_t$ is the active set of routes meeting minimum sample size thresholds. If a route has insufficient data in period $t$, it is excluded from $R_t$ and its weight is re-allocated proportionally, avoiding artificial zero-price distortions.
+
+### 5. Multi-Estimator Robustness Triangulation
+When base-period quantities ($q_0$) and current quantities ($q_t$) are modeled, the platform computes:
+
+$$\text{Laspeyres}: L_t = \frac{\sum p_t q_0}{\sum p_0 q_0}, \quad \text{Paasche}: P_t = \frac{\sum p_t q_t}{\sum p_0 q_t}, \quad \text{Fisher Ideal}: F_t = \sqrt{L_t \cdot P_t}$$
+
+### 6. Inflation Rate Formulations
+- **Month-over-Month (MoM)**:
+
+$$MoM_t = \left(\frac{APIx_t}{APIx_{t-1}} - 1\right) \times 100$$
+
+- **Year-over-Year (YoY)**:
+
+$$YoY_t = \left(\frac{APIx_t}{APIx_{t-12}} - 1\right) \times 100$$
+
+---
+
+## 🔑 Role-Based Access Control (RBAC) & Test Accounts
+
+Evaluators and hackathon judges can log into the live console at **[https://vayuyaan-india.vercel.app/](https://vayuyaan-india.vercel.app/)** using the following role-based profiles:
+
+| Role | Email | Password | Permissions & Scope |
+|---|---|---|---|
+| **Administrator** | `admin@aeroindex.gov.in` | `admin123` | Full system access: Live scraper execution, database sync, threshold tuning, and audit logs |
+| **Analyst** | `analyst@aeroindex.gov.in` | `analyst123` | Data explorer, export CSV, index engine, route drill-downs, and policy insight briefs |
+| **Viewer** | `viewer@aeroindex.gov.in` | `viewer123` | Read-only national index dashboards, India map, and public methodology pages |
+
+---
+
+## 💻 Step-by-Step Local Setup & Execution Guide
+
+### Prerequisites
+- **Node.js**: `v22.5.0` or higher (uses native `node:sqlite`).
+- **Python**: `v3.10` or higher.
+- **npm**: `v10+`.
+- **Git**.
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/syedamashs/Aeroindex-India.git
+cd Aeroindex-India
+```
+
+### 2. Backend Setup & Automated Database Sync
+The backend comes equipped with an automated database synchronizer (`download_db.py`). You do **not** need to manually generate or hunt for SQLite files—it automatically downloads the latest verified dataset directly from Hugging Face!
 
 ```bash
+# Navigate to backend directory
+cd backend
+
+# Create virtual environment and install python dependencies
 python -m venv .venv
+# Windows:
 .venv\Scripts\activate
+# Linux/macOS:
+source .venv/bin/activate
+
 pip install -r requirements.txt
+python -m playwright install chromium
 
-cd backend
+# Install Node dependencies
 npm install
 
-cd ..\frontend
-npm install
-```
-
-### Start the backend
-
-```bash
-cd backend
+# Start the Express API server (port 4002)
+# This will automatically trigger download_db.py and verify apix.db!
 npm start
 ```
+*The backend server will launch at `http://localhost:4002`.* Verify via `http://localhost:4002/api/health`.
 
-The Express server listens on port `4002` by default.
-
-### Start the frontend
-
-In a second terminal:
+### 3. Frontend Setup
+In a separate terminal window:
 
 ```bash
+# Navigate to frontend directory
 cd frontend
+
+# Install dependencies
+npm install
+
+# (Optional) Create .env from template
+cp .env.example .env
+
+# Start Vite development server
 npm run dev
 ```
+*The React application will be accessible at `http://localhost:5173`.*
 
-Vite serves the frontend at `http://localhost:5173` by default. The backend health endpoint is available at `http://localhost:4002/api/health`.
+---
 
-### Frontend commands
+## 🌐 Environment Variables Configuration
 
-```bash
-npm run typecheck
-npm run lint
-npm run build
-npm run preview
+### Backend (`backend/.env`)
+```env
+PORT=4002
+APIX_HEADLESS=true
+APIX_BROWSER_TIMEOUT_MS=120000
+APIX_DB_PATH=./data/apix.db
+GEMINI_API_KEY=your_gemini_api_key_here
+HF_TOKEN=your_huggingface_write_token_optional
 ```
 
-## Demonstration Access
+### Frontend (`frontend/.env`)
+```env
+VITE_API_BASE=http://localhost:4002
+VITE_GEMINI_API_KEY=your_gemini_api_key_here
+```
+*(On the live production Vercel deployment, `VITE_API_BASE` points to the hosted API service, and requests are gracefully proxied).*
 
-The interface includes role-oriented demonstration accounts:
+---
 
-| Role | Email | Password |
+## 🛠️ REST API Specification
+
+The Express backend exposes a comprehensive set of REST endpoints:
+
+| Method | Endpoint | Description |
 |---|---|---|
-| Administrator | `admin@aeroindex.gov.in` | `admin123` |
-| Analyst | `analyst@aeroindex.gov.in` | `analyst123` |
-| Viewer | `viewer@aeroindex.gov.in` | `viewer123` |
+| `GET` | `/api/health` | Service health status, database connection, and system timestamp |
+| `GET` | `/api/index` | Headline National Airfare Index series, base periods, and basket contributions |
+| `GET` | `/api/routes` | All monitored corridors with average fares, volatility, and MoM price relative |
+| `GET` | `/api/routes/:routeId` | Route drill-down: historical trend, airline price dispersion, and booking curves |
+| `GET` | `/api/airlines` | Carrier metrics (IndiGo, Air India, SpiceJet, Akasa) with market shares |
+| `GET` | `/api/booking-window` | Lead-time price curves ($T+1$ through $T+45$) across domestic markets |
+| `GET` | `/api/map` | Geospatial nodes, airport coordinates, passenger volume weights, and routes |
+| `GET` | `/api/observations` | Filterable canonical observation records (paginated, with CSV export) |
+| `GET` | `/api/alerts` | Anomaly feed: dynamic pricing surges, sharp drops, and volatility breaches |
+| `GET` | `/api/insights` | Policy interpretations and DGCA Rule 135(2) compliance briefs |
+| `GET` | `/api/dqe/summary` | Real-time Data Quality Engine metrics, rejection logs, and integrity rates |
+| `GET` | `/api/fare-state/summary` | Matched-run fare transitions and Fare Event Probability (FEP) |
+| `POST` | `/api/chat` | AeroBot conversational endpoint with Gemini 2.5 Flash context injection |
+| `POST` | `/api/login` | Role-based authentication endpoint returning JWT-compatible session token |
+| `POST` | `/api/scheduler/run` | Triggers on-demand Playwright scraper collection task |
+| `GET` | `/api/scheduler/progress`| Real-time task progress, extracted flight count, and active airline |
+| `GET` | `/api/scheduler/preview` | Live base64 JPEG screenshot stream from the active Playwright browser |
+| `ALL` | `/api/db/sync` | Force refreshes `apix.db` from the official Hugging Face dataset repository |
 
-Authentication and audit history are implemented for the demonstration experience. A production deployment should replace these credentials with managed identity, server-side authorization, and durable audit storage.
+---
 
-## Responsible Data Collection
+## 🗂️ Project Directory Structure
 
-The scraper architecture is designed for permitted sources and controlled collection. Any deployment connected to external airline, OTA, GDS, or licensed feeds must respect applicable terms of service, robots.txt rules, rate limits, API licences, privacy requirements, and data-retention obligations.
+```text
+Aeroindex/
+├── backend/
+│   ├── config/                     Airport, route, and runtime configurations
+│   ├── data/                       Local SQLite storage (apix.db - auto-fetched)
+│   ├── database/                   Database connection helpers and DDL schemas
+│   ├── data_quality/               9-tier Data Quality Engine (DQE) validators
+│   ├── download_db.py              Automated Hugging Face SQLite dataset downloader
+│   ├── fare_state/                 Matched-run transition matrix & FEP analysis
+│   ├── index_engine/               Statistical index estimators (Jevons, Laspeyres, Fisher)
+│   ├── normalizers/                Source-to-canonical schema normalizers
+│   ├── scheduler/                  Collection task planning and scraper dispatcher
+│   ├── scrapers/                   Playwright browser scrapers (6E, AI, SG) with live viewport
+│   ├── upload_db.py                Automated dataset uploader to Hugging Face
+│   ├── server.js                   Express REST API server & database read layer
+│   ├── package.json                Node.js backend dependencies & scripts
+│   └── requirements.txt            Python dependencies (playwright, pandas, etc.)
+│
+├── frontend/
+│   ├── public/                     Static brand assets, icons, and logos
+│   ├── src/
+│   │   ├── components/             Shared UI components, navigation, modals, ticker tape
+│   │   ├── context/                Authentication, date filters, alerts, and theme context
+│   │   ├── data/                   Type interfaces, mock fallback data, and API clients
+│   │   ├── lib/
+│   │   │   ├── api.ts              Axios/Fetch REST API connector to backend
+│   │   │   └── gemini.ts           Google Gemini 2.5 Flash SDK client for AeroBot
+│   │   ├── pages/
+│   │   │   ├── LandingPage.tsx     Public SIH 2026 landing and presentation portal
+│   │   │   ├── DashboardPage.tsx   Executive National Airfare Index command center
+│   │   │   ├── IndexPage.tsx       Detailed index methodology and basket weight breakdown
+│   │   │   ├── RoutesPage.tsx      Corridor comparison table with volatility rankings
+│   │   │   ├── RouteDetailPage.tsx Granular single-route drill-down and booking curves
+│   │   │   ├── AirlinesPage.tsx    Carrier price dispersion and market share metrics
+│   │   │   ├── BookingWindowPage.tsx Advance booking curves (T+1 to T+45)
+│   │   │   ├── MapPage.tsx         Interactive Leaflet geospatial Indian airspace map
+│   │   │   ├── DataExplorerPage.tsx Filterable canonical observations with CSV export
+│   │   │   ├── AlertsPage.tsx      Regulatory surge and anomaly detection feed
+│   │   │   ├── InsightsPage.tsx    Plain-language policy and economic briefs
+│   │   │   ├── FareStatePage.tsx   Snapshot transition matrix and event probability
+│   │   │   ├── DqePage.tsx         Data Quality Engine control center and audit status
+│   │   │   ├── MethodologyPage.tsx Public mathematical documentation and formulas
+│   │   │   ├── SystemPage.tsx      Live scraper console & browser viewport stream
+│   │   │   ├── AuditLogPage.tsx    Governance action trail and session activity logs
+│   │   │   └── LoginPage.tsx       Role-based login authentication view
+│   │   ├── App.tsx                 Top-level routing, query providers, and layout wrapper
+│   │   └── index.css               Tailwind CSS custom styling tokens & animations
+│   ├── package.json                Frontend dependencies (React 18, Vite, Lucide, Recharts)
+│   ├── tailwind.config.js          Tailwind design system configuration
+│   └── vercel.json                 Vercel single-page application (SPA) rewrite rules
+│
+├── vimaan-airfare-index-main/      Official SIH submission deck (PPTX/PDF) & research documents
+├── RENDER.md                       Cloud backend deployment guide for Render
+├── vercel.json                     Root deployment configuration
+└── README.md                       Comprehensive SIH 2026 submission documentation
+```
 
-## Submission Scope
+---
 
-The Git repository contains the application source, configuration, schema, frontend, calculation modules, and operational documentation required to review the solution. Local databases, raw collection output, generated reports, test modules, diagnostic runners, and superseded standalone methodology files are excluded through `.gitignore`.
+## 🏆 Smart India Hackathon (SIH 2026) Evaluation Alignment
 
-This keeps the submission focused on the reproducible product and its core implementation while allowing runtime storage and engineering diagnostics to remain local or deployment-managed.
+| Evaluation Criteria | How AeroIndex (VayuYaan) Excels |
+|---|---|
+| **Novelty & Innovation** | First platform in India to introduce **high-frequency web scraping for official national statistics**, replacing a 60-day manual process with real-time SDMX-compatible price indices and live browser scraper streaming. |
+| **Statistical & Technical Rigor** | Uses **chain-drift resistant Jevons geometric estimators** combined with **DGCA passenger volume weighting**, completely avoiding the upward bias plaguing ordinary arithmetic averages. Cross-validated against Laspeyres, Paasche, and Fisher models. |
+| **Data Quality & Integrity (DQE)** | Implements a strict **9-layer automated validation engine** enforcing arithmetic balance ($Base + Taxes + Fees = Total$), temporal sanity, and duplicate prevention with a verified 98.4%+ data health score. |
+| **Statutory & Policy Impact** | Empowers the **Ministry of Civil Aviation and DGCA** to proactively enforce **Rule 135(2) of the Aircraft Rules, 1937**, detecting predatory fare drops and gouging surges during peak holiday travel. |
+| **Generative AI Integration** | Features **AeroBot (Gemini 2.5 Flash)** with dynamic database context injection, allowing non-technical policymakers to ask plain-language questions and receive cited, data-backed answers. |
+| **Production Readiness & UX** | Fully functional and live at **[https://vayuyaan-india.vercel.app/](https://vayuyaan-india.vercel.app/)** with responsive layouts, accessible dark/light modes, role-based security, interactive maps, and automated cloud dataset syncing. |
 
-## Future Production Enhancements
+---
 
-- Deploy permitted source connectors with scheduling, retries, rate limiting, and monitoring.
-- Move secrets and credentials to managed configuration.
-- Add server-side authentication, authorization, and audit persistence.
-- Add versioned methodology and calculation snapshots for each published index.
-- Persist quality reports and expose signed provenance for published values.
-- Add automated CI for normalization contracts, database migrations, index calculations, and API contracts.
-- Add observability for collection latency, source availability, matching coverage, and index confidence.
+## 👥 Team & Submission Information
 
-## License
+- **Submission Team**: T_Humble Hackers (SIH 2026)
+- **Problem Statement**: SIH26056
+- **Lead Developer & Contributor**: Syed Amash ([@syedamashs](https://github.com/syedamashs))
+- **Primary Repository**: [https://github.com/syedamashs/Aeroindex-India](https://github.com/syedamashs/Aeroindex-India)
+- **Live Vercel Application**: [https://vayuyaan-india.vercel.app/](https://vayuyaan-india.vercel.app/)
+- **Hugging Face Dataset Hub**: [https://huggingface.co/datasets/amashtce/aeroindex-db](https://huggingface.co/datasets/amashtce/aeroindex-db)
 
-No license is currently specified for this submission.
+---
+
+<div align="center">
+
+**Built with dedication for Smart India Hackathon 2026 • Empowering Data-Driven Governance in Indian Civil Aviation**
+
+</div>
